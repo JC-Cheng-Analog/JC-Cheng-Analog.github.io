@@ -1,14 +1,15 @@
 Markdown
 
-# Ninja Analog
+# JC Cheng Analog
 
 Analog IC Design Notes
 
 ## Topics
+- Small-signal Analysis
 - Current mirror
 - Opamp
 - LDO
 - Bandgap
 
 ## About Me
-3.5 years Analog IC Design Engineer
+4+ years Analog IC Design Engineer
