@@ -15,9 +15,34 @@
       background: #fafafa;
     }
 
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 8px;
+    }
+
     h1 {
       font-size: 42px;
-      margin-bottom: 8px;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    .name {
+      color: #0b2e59;
+    }
+
+    .analog {
+      color: #c99700;
+    }
+
+    .site-logo {
+      display: block;
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      flex: 0 0 auto;
     }
 
     h2 {
@@ -53,11 +78,41 @@
       padding: 2px 6px;
       border-radius: 4px;
     }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 32px 18px;
+      }
+
+      .site-header {
+        gap: 16px;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .site-logo {
+        width: 68px;
+        height: 68px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <h1>JC Cheng Analog</h1>
+  <header class="site-header">
+    <h1><span class="name">JC Cheng</span> <span class="analog">Analog</span></h1>
+
+    <!-- Upload your logo to the repository root and name it logo.png. -->
+    <img
+      class="site-logo"
+      src="logo.png"
+      alt="JC Cheng Analog logo"
+      onerror="this.style.display='none'"
+    />
+  </header>
+
   <p class="subtitle">Analog IC Design Notes / LDO / Bandgap / Power Management / Small-signal Analysis</p>
 
   <h2>About Me</h2>
@@ -69,6 +124,14 @@
   </div>
 
   <h2>Technical Notes</h2>
+
+  <div class="card">
+    <h3>Small-signal Analysis</h3>
+    <p>
+      TL431 Compensation loop, Constant Current(CC) Control loop, Constant Voltage(CV) Control loop, and different kinds of operating amplifier.
+    </p>
+    <a href="small-signal-analysis.html">Read more</a>
+  </div>
 
   <div class="card">
     <h3>LDO Stability</h3>
@@ -84,14 +147,6 @@
       Operating principle, stability analysis, and topology.
     </p>
     <a href="bandgap-ref.html">Read more</a>
-  </div>
-
-  <div class="card">
-    <h3>Small-signal Analysis</h3>
-    <p>
-      TL431 Compensation loop, Constant Current(CC) Control loop, Constant Voltage(CV) Control loop, and different kinds of operating amplifier.
-    </p>
-    <a href="small-signal-analysis.html">Read more</a>
   </div>
 
   <div class="card">
