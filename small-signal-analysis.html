@@ -27,7 +27,7 @@
     }
 
     html {
-      scroll-behavior: smooth;
+      scroll-behavior: auto;
     }
 
     body {
@@ -192,6 +192,48 @@
       color: #444444;
     }
 
+    .description h3 {
+      margin: 28px 0 10px;
+      color: var(--navy);
+      font-size: 20px;
+      line-height: 1.35;
+    }
+
+    .description h3:first-child {
+      margin-top: 0;
+    }
+
+    .description pre {
+      margin: 12px 0 18px;
+      padding: 16px;
+      overflow-x: auto;
+      color: #1f2933;
+      background: #f5f6f8;
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      font-family: "Courier New", Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    .description code {
+      font-family: inherit;
+    }
+
+    .page-divider {
+      margin: 38px 0 30px;
+      border: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .subpage-title {
+      margin: 0 0 18px;
+      color: var(--navy);
+      font-size: 23px;
+      line-height: 1.35;
+    }
+
     .page-footer {
       margin-top: 38px;
       padding-top: 20px;
@@ -244,10 +286,10 @@
       <span class="analog">Analog</span>
     </h1>
 
-    <!-- Keep logo.PNG in the same folder as this HTML file. -->
+    <!-- Keep logo.png in the same folder as this HTML file. -->
     <img
       class="site-logo"
-      src="logo.PNG"
+      src="logo.png"
       alt="JC Cheng Analog logo"
       onerror="this.style.display='none'"
     />
@@ -275,21 +317,148 @@
       <h2>TL431 Compensation</h2>
 
       <div class="image-frame">
-        <!-- Upload the PNG file to images/IMG000_TL431_CV_Loop_01.JPG -->
+        <!-- Upload the PNG file to images/tl431-compensation.png -->
         <img
           class="analysis-image"
-          src="images/IMG000_TL431_CV_Loop_01.JPG"
+          src="images/tl431-compensation.png"
           alt="TL431 compensation small-signal analysis"
           onload="this.nextElementSibling.style.display='none'"
           onerror="this.style.display='none'"
         />
         <div class="image-placeholder">
           <strong>PNG image placeholder</strong>
-          Upload as <code>images/IMG000_TL431_CV_Loop_01.JPG</code>
+          Upload as <code>images/tl431-compensation.png</code>
         </div>
       </div>
 
-      <p class="description">To be continued.</p>
+      <div class="description">
+        <h3>Overview</h3>
+
+        <p>
+          This note derives the small-signal transfer function of a TL431-based
+          constant-voltage feedback loop with Type-II compensation. The analysis
+          starts from the output perturbation and models the TL431, optocoupler,
+          and compensation network to obtain the loop transfer function. The
+          resulting equation reveals one compensation zero, one pole at the
+          origin, and one high-frequency pole.
+        </p>
+
+        <h3>Assumptions</h3>
+
+        <ul>
+          <li>VCC and VREF are treated as AC ground.</li>
+          <li>The TL431 REF pin is approximated as a virtual ground.</li>
+          <li>Rb provides DC bias only and is ignored in the AC model.</li>
+          <li>The optocoupler is modeled using a constant current transfer ratio (CTR).</li>
+        </ul>
+
+        <h3>Key Equations</h3>
+
+        <pre><code>i1 = Vo / RH
+
+Z2 = R2 + 1/(sC2)
+
+Vi = -i1·Z2
+
+i2 = (Vo - Vi)/RLED
+
+Zc = Rc || 1/(sCc)
+   = Rc/(1 + sCcRc)
+
+Vc = -CTR·i2·Zc</code></pre>
+
+        <h3>Transfer Function</h3>
+
+        <pre><code>          -CTR·Rc       1 + sC2(RH + R2)
+Vc/Vo = ------------- · ------------------
+        C2·RH·RLED      s(1 + sCcRc)</code></pre>
+
+        <h3>Poles and Zero</h3>
+
+        <pre><code>Zero:
+fz = 1/[2πC2(RH + R2)]
+
+Pole 1:
+fp1 = 0 Hz   (integrator)
+
+Pole 2:
+fp2 = 1/(2πCcRc)</code></pre>
+
+        <h3>Summary</h3>
+
+        <ul>
+          <li>The network forms a Type-II compensator.</li>
+          <li>C2 and RH + R2 set the compensation zero.</li>
+          <li>The origin pole provides integral action and high DC loop gain.</li>
+          <li>Rc and Cc set the high-frequency pole.</li>
+          <li>CTR changes the loop gain but does not move the pole-zero locations.</li>
+        </ul>
+
+        <hr class="page-divider" />
+
+        <h3 class="subpage-title">Page 2 — TL431 Equivalent Amplifier Model</h3>
+
+        <h3>Overview</h3>
+
+        <p>
+          This page replaces the TL431 symbol with an equivalent high-gain
+          amplifier model. Because the non-inverting input is connected to the
+          AC-grounded reference voltage, the feedback node is approximated as a
+          virtual ground. The resulting small-signal derivation is therefore
+          identical to the TL431 model used on Page 1.
+        </p>
+
+        <h3>Assumptions</h3>
+
+        <ul>
+          <li>VCC2 and VREF are treated as AC ground.</li>
+          <li>The amplifier input current is approximated as zero.</li>
+          <li>The feedback node is a virtual ground under high loop gain.</li>
+          <li>Rb provides DC bias only and is omitted from the AC model.</li>
+          <li>The optocoupler CTR is treated as constant.</li>
+        </ul>
+
+        <h3>Key Equations</h3>
+
+        <pre><code>i1 = Vo / RH
+
+Z2 = R2 + 1/(sC2)
+
+Vi = -i1·Z2
+
+i2 = (Vo - Vi)/RLED
+
+Zc = Rc || 1/(sCc)
+   = Rc/(1 + sCcRc)
+
+Vc = -CTR·i2·Zc</code></pre>
+
+        <h3>Transfer Function</h3>
+
+        <pre><code>          -CTR·Rc       1 + sC2(RH + R2)
+Vc/Vo = ------------- · ------------------
+        C2·RH·RLED      s(1 + sCcRc)</code></pre>
+
+        <h3>Poles and Zero</h3>
+
+        <pre><code>Zero:
+fz = 1/[2πC2(RH + R2)]
+
+Pole 1:
+fp1 = 0 Hz   (integrator)
+
+Pole 2:
+fp2 = 1/(2πCcRc)</code></pre>
+
+        <h3>Summary</h3>
+
+        <ul>
+          <li>The equivalent amplifier model produces the same transfer function as the TL431 model.</li>
+          <li>The virtual-ground approximation simplifies the compensation-network analysis.</li>
+          <li>The pole-zero locations are unchanged from Page 1.</li>
+          <li>The model is useful when interpreting the TL431 as an error amplifier.</li>
+        </ul>
+      </div>
     </section>
 
     <section class="note-card" id="cc-cv-loop">
@@ -299,38 +468,89 @@
       </h2>
 
       <div class="image-frame">
-        <!-- Upload the PNG file to images/IMG001_CV_loop_01.JPG -->
+        <!-- Upload the PNG file to images/cc-cv-loop.png -->
         <img
           class="analysis-image"
-          src="images/IMG001_CV_loop_01.JPG"
+          src="images/cc-cv-loop.png"
           alt="CC/CV loop analysis using sink-current and optocoupler methods"
           onload="this.nextElementSibling.style.display='none'"
           onerror="this.style.display='none'"
         />
         <div class="image-placeholder">
           <strong>PNG image placeholder</strong>
-          Upload as <code>images/IMG001_CV_loop_01.JPG</code>
+          Upload as <code>images/cc-cv-loop.png</code>
         </div>
       </div>
 
-      <p class="description">To be continued.</p>
+      <div class="description">
+        <h3>Overview</h3>
 
-      <div class="image-frame">
-        <!-- Upload the PNG file to images/IMG002_CC_loop_01.JPG -->
-        <img
-          class="analysis-image"
-          src="images/IMG002_CC_loop_01.JPG"
-          alt="CC/CV loop analysis using sink-current and optocoupler methods"
-          onload="this.nextElementSibling.style.display='none'"
-          onerror="this.style.display='none'"
-        />
-        <div class="image-placeholder">
-          <strong>PNG image placeholder</strong>
-          Upload as <code>images/IMG002_CC_loop_01.JPG</code>
-        </div>
+        <p>
+          This page derives the small-signal transfer function of the
+          constant-current regulation loop. The analysis begins with the
+          current-sense voltage, which is amplified by gain K and applied to
+          the Type-II compensation network. The optocoupler then transfers the
+          compensation current to the isolated side.
+        </p>
+
+        <h3>Assumptions</h3>
+
+        <ul>
+          <li>The current-sense signal is represented by VM = K·ILOAD·Rsen.</li>
+          <li>VCC1, VCC2, and VIREF are treated as AC ground.</li>
+          <li>The amplifier input current is approximated as zero.</li>
+          <li>The feedback node is treated as a virtual ground.</li>
+          <li>Rb provides DC bias only and is omitted from the AC model.</li>
+          <li>The optocoupler CTR is treated as constant.</li>
+        </ul>
+
+        <h3>Key Equations</h3>
+
+        <pre><code>VM = K·ILOAD·Rsen
+
+i1 = VM / R1
+
+Z2 = R2 + 1/(sC2)
+
+Vi = -i1·Z2
+
+i2 = -Vi/RLED
+
+i3 = CTR·i2
+
+Zc = Rc || 1/(sCc)
+   = Rc/(1 + sCcRc)
+
+Vc = -i3·Zc</code></pre>
+
+        <h3>Transfer Function</h3>
+
+        <pre><code>          CTR·Rc       1 + sC2R2
+Vc/VM = ------------ · -------------
+        C2·R1·RLED    s(1 + sCcRc)</code></pre>
+
+        <h3>Poles and Zero</h3>
+
+        <pre><code>Zero:
+fz = 1/(2πC2R2)
+
+Pole 1:
+fp1 = 0 Hz   (integrator)
+
+Pole 2:
+fp2 = 1/(2πCcRc)</code></pre>
+
+        <h3>Summary</h3>
+
+        <ul>
+          <li>The constant-current loop also forms a Type-II compensator.</li>
+          <li>R2 and C2 set the compensation zero.</li>
+          <li>The origin pole provides integral action and high DC loop gain.</li>
+          <li>Rc and Cc set the high-frequency pole.</li>
+          <li>The sense-amplifier gain K and Rsen scale the complete current-loop gain.</li>
+          <li>CTR changes the loop gain without moving the compensation pole or zero.</li>
+        </ul>
       </div>
-
-      <p class="description">To be continued.</p>
     </section>
 
     <section class="note-card" id="operational-amplifier">
@@ -358,5 +578,68 @@
   <footer class="page-footer">
     <a class="back-link" href="index.html">← Back to Home</a>
   </footer>
+
+  <script>
+    (() => {
+      const navLinks = document.querySelectorAll('.section-nav a[href^="#"]');
+      let activeAnimation = null;
+
+      function easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function scrollToSection(target) {
+        if (activeAnimation) {
+          cancelAnimationFrame(activeAnimation);
+          activeAnimation = null;
+        }
+
+        const scrollingElement =
+          document.scrollingElement || document.documentElement;
+
+        const startY = scrollingElement.scrollTop;
+        const targetRect = target.getBoundingClientRect();
+        const desiredY = Math.max(0, startY + targetRect.top - 20);
+        const distance = desiredY - startY;
+        const duration = Math.min(
+          1400,
+          Math.max(700, 650 + Math.abs(distance) * 0.35)
+        );
+        const startTime = performance.now();
+
+        function animate(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easedProgress = easeInOutCubic(progress);
+
+          scrollingElement.scrollTop = startY + distance * easedProgress;
+
+          if (progress < 1) {
+            activeAnimation = requestAnimationFrame(animate);
+          } else {
+            activeAnimation = null;
+            history.pushState(null, '', `#${target.id}`);
+          }
+        }
+
+        activeAnimation = requestAnimationFrame(animate);
+      }
+
+      navLinks.forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const targetId = link.getAttribute('href').slice(1);
+          const target = document.getElementById(targetId);
+
+          if (!target) return;
+
+          event.preventDefault();
+          scrollToSection(target);
+        });
+      });
+    })();
+  </script>
+
 </body>
 </html>
