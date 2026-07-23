@@ -334,19 +334,28 @@
     }
 
     .footer-navigation {
+      position: relative;
       display: flex;
       width: 100%;
       align-items: center;
-      justify-content: space-between;
-      gap: 22px;
+      justify-content: flex-start;
+      font-size: 110%;
     }
 
     .back-to-top-link {
+      position: absolute;
+      left: 50%;
       padding: 0;
       background: none;
       border: 0;
       font: inherit;
       cursor: pointer;
+      transform: translateX(-50%);
+    }
+
+    .back-to-top-link:hover {
+      transform: translate(-50%, -2px);
+      transition: transform 0.2s ease;
     }
 
     .page-footer {
@@ -713,8 +722,9 @@ fp2 = 1/(2πCcRc)</code></pre>
   <footer class="page-footer">
     <div class="footer-navigation">
       <a class="back-link" href="index.html">← Back to Home</a>
+
       <button class="back-link back-to-top-link" id="back-to-top" type="button">
-        ↑ Back to Top
+        ↑ Top
       </button>
     </div>
   </footer>
