@@ -236,7 +236,8 @@
 
     .return-to-figure {
       position: fixed;
-      right: 24px;
+      /* Align the button with the right edge of the 860 px content area. */
+      right: max(18px, calc((100vw - 860px) / 2 + 18px));
       bottom: 24px;
       z-index: 1000;
       display: flex;
@@ -313,6 +314,10 @@
     }
 
     @media (max-width: 600px) {
+      .footer-navigation {
+        gap: 14px;
+      }
+
       .return-to-figure {
         right: 16px;
         bottom: 16px;
@@ -326,6 +331,22 @@
       .return-to-figure:focus-visible {
         width: 126px;
       }
+    }
+
+    .footer-navigation {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+
+    .back-to-top-link {
+      padding: 0;
+      background: none;
+      border: 0;
+      font: inherit;
+      cursor: pointer;
     }
 
     .page-footer {
@@ -690,7 +711,12 @@ fp2 = 1/(2πCcRc)</code></pre>
   </main>
 
   <footer class="page-footer">
-    <a class="back-link" href="index.html">← Back to Home</a>
+    <div class="footer-navigation">
+      <a class="back-link" href="index.html">← Back to Home</a>
+      <button class="back-link back-to-top-link" id="back-to-top" type="button">
+        ↑ Back to Top
+      </button>
+    </div>
   </footer>
 
 
@@ -844,6 +870,12 @@ fp2 = 1/(2πCcRc)</code></pre>
       });
       window.addEventListener('resize', updateReturnToFigureButton);
       updateReturnToFigureButton();
+
+      const backToTopButton = document.getElementById('back-to-top');
+
+      backToTopButton?.addEventListener('click', () => {
+        scrollToSection(document.body);
+      });
     })();
   </script>
 
