@@ -21,10 +21,14 @@
 
     .site-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 24px;
-      margin-bottom: 8px;
+      margin-bottom: 24px;
+    }
+
+    .site-brand {
+      min-width: 0;
     }
 
     h1 {
@@ -41,12 +45,307 @@
       color: #b08d57;
     }
 
+    .brand-subtitle {
+      margin: 7px 0 0;
+      color: #666;
+      font-size: 21.6px;
+      line-height: 1.4;
+    }
+
     .site-logo {
       display: block;
       width: 88px;
       height: 88px;
       object-fit: contain;
       flex: 0 0 auto;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0 0;
+      flex-wrap: wrap;
+    }
+
+    .site-nav .note-search {
+      width: 220px;
+      margin-left: 2px;
+    }
+
+    .site-nav .note-search:hover,
+    .site-nav .note-search:focus-within {
+      width: 270px;
+    }
+
+    .site-nav-link,
+    .study-map-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 43px;
+      box-sizing: border-box;
+      padding: 9px 15px;
+      border: 1px solid #d5d9de;
+      border-radius: 10px;
+      background: #e9ecef;
+      color: #34485e;
+      font: inherit;
+      font-size: 16.8px;
+      font-weight: 600;
+      line-height: 1;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(11, 46, 89, 0.07);
+      transition:
+        color 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .site-nav-link:hover,
+    .site-nav-link:focus-visible,
+    .study-map-trigger:hover,
+    .study-map-trigger:focus-visible {
+      border-color: rgba(176, 141, 87, 0.48);
+      background: #fffdf7;
+      color: #0b2e59;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(11, 46, 89, 0.10);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .nav-icon {
+      display: block;
+      width: 23px;
+      height: 23px;
+      flex: 0 0 auto;
+      color: #b08d57;
+      transition: transform 0.18s ease;
+    }
+
+    .site-nav-link:hover .nav-icon,
+    .site-nav-link:focus-visible .nav-icon {
+      transform: scale(1.12);
+    }
+
+    .study-map-symbol {
+      display: inline-block;
+      color: #b08d57;
+      font-size: 20.4px;
+      line-height: 1;
+      transition: transform 0.18s ease;
+    }
+
+    .study-map-trigger:hover .study-map-symbol,
+    .study-map-trigger:focus-visible .study-map-symbol {
+      transform: scale(1.13);
+    }
+
+    .study-map-dialog {
+      width: min(700px, calc(100% - 32px));
+      max-height: min(82vh, 820px);
+      box-sizing: border-box;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(11, 46, 89, 0.18);
+      border-radius: 16px;
+      background: #fafafa;
+      color: #222;
+      box-shadow: 0 24px 70px rgba(11, 46, 89, 0.25);
+    }
+
+    .study-map-dialog::backdrop {
+      background: rgba(7, 22, 40, 0.48);
+      backdrop-filter: blur(2px);
+    }
+
+    .study-map-panel {
+      display: flex;
+      flex-direction: column;
+      max-height: min(82vh, 820px);
+    }
+
+    .study-map-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid #e2e5e8;
+      background: #ffffff;
+    }
+
+    .study-map-title {
+      margin: 0;
+      color: #0b2e59;
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .study-map-intro {
+      margin: 5px 0 0;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .study-map-close {
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: #536476;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .study-map-close:hover,
+    .study-map-close:focus-visible {
+      background: rgba(11, 46, 89, 0.08);
+      color: #0b2e59;
+      outline: none;
+    }
+
+    .study-map-legend {
+      display: flex;
+      gap: 18px;
+      padding: 12px 24px;
+      border-bottom: 1px solid #e2e5e8;
+      background: #f7f8fa;
+      color: #667085;
+      font-size: 12px;
+    }
+
+    .study-map-content {
+      padding: 18px 24px 26px;
+      overflow-y: auto;
+    }
+
+    .study-map-tree,
+    .study-map-tree ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .study-map-tree > li + li {
+      margin-top: 10px;
+    }
+
+    .study-map-tree details {
+      margin: 4px 0;
+    }
+
+    .study-map-tree summary {
+      display: flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 5px 8px;
+      border-radius: 8px;
+      color: #263b52;
+      font-weight: 650;
+      cursor: pointer;
+      list-style: none;
+      transition:
+        color 0.18s ease,
+        background-color 0.18s ease;
+    }
+
+    .study-map-tree summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .study-map-tree summary::before {
+      content: "›";
+      width: 18px;
+      color: #b08d57;
+      font-size: 20px;
+      line-height: 1;
+      transform: rotate(0deg);
+      transform-origin: 45% 50%;
+      transition: transform 0.18s ease;
+    }
+
+    .study-map-tree details[open] > summary::before {
+      transform: rotate(90deg);
+    }
+
+    .study-map-tree summary:hover,
+    .study-map-tree summary:focus-visible {
+      background: rgba(11, 46, 89, 0.055);
+      color: #0b2e59;
+      outline: none;
+    }
+
+    .study-map-tree details > ul {
+      margin-left: 17px;
+      padding-left: 17px;
+      border-left: 1px solid #d8dde3;
+    }
+
+    .study-map-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 34px;
+      padding: 4px 8px;
+      border-radius: 7px;
+      color: #465568;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    a.study-map-item {
+      color: #0b2e59;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    a.study-map-item:hover,
+    a.study-map-item:focus-visible {
+      background: #fffaf0;
+      color: #9a743a;
+      text-decoration: none;
+      outline: none;
+    }
+
+    a.study-map-item::after {
+      content: "→";
+      margin-left: auto;
+      color: #b08d57;
+    }
+
+    .map-status {
+      display: inline-block;
+      flex: 0 0 auto;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .map-status.available {
+      background: #b08d57;
+      box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.13);
+    }
+
+    .map-status.planned {
+      box-sizing: border-box;
+      border: 1.5px solid #a9b1bb;
+      background: transparent;
+    }
+
+    body.study-map-open {
+      overflow: hidden;
     }
 
     h2 {
@@ -183,11 +482,6 @@
       80% { transform: translateX(3px); }
     }
 
-    .subtitle {
-      color: #666;
-      font-size: 18px;
-    }
-
     .card {
       background: white;
       padding: 20px;
@@ -218,6 +512,12 @@
     .note-card h3,
     .note-card p {
       transition: color 0.22s ease;
+    }
+
+    .category-card {
+      width: 100%;
+      font: inherit;
+      text-align: left;
     }
 
     .note-card h3 {
@@ -314,6 +614,10 @@
         gap: 16px;
       }
 
+      .brand-subtitle {
+        font-size: 19px;
+      }
+
       h1 {
         font-size: 34px;
       }
@@ -342,13 +646,88 @@
       .technical-notes-header + .note-card {
         margin-top: 18px;
       }
+
+      .site-nav {
+        flex-wrap: wrap;
+      }
+
+      .site-nav .note-search,
+      .site-nav .note-search:hover,
+      .site-nav .note-search:focus-within {
+        width: min(100%, 280px);
+      }
+
+      .study-map-header {
+        padding: 18px 18px 15px;
+      }
+
+      .study-map-legend {
+        padding: 11px 18px;
+      }
+
+      .study-map-content {
+        padding: 14px 14px 22px;
+      }
+
+      .study-map-tree details > ul {
+        margin-left: 11px;
+        padding-left: 10px;
+      }
     }
   </style>
 </head>
 
 <body>
   <header class="site-header">
-    <h1><span class="name">JC Cheng</span> <span class="analog">Analog</span></h1>
+    <div class="site-brand">
+      <h1><span class="name">JC Cheng</span> <span class="analog">Analog</span></h1>
+      <p class="brand-subtitle">Analog IC Design Notes</p>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <button
+          class="study-map-trigger"
+          id="study-map-trigger"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="study-map-dialog"
+        >
+          <span class="study-map-symbol" aria-hidden="true">⌘</span>
+          <span>Study Map</span>
+        </button>
+        <a class="site-nav-link" href="#about">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+            <path d="M5.5 19c.8-4 3.1-6 6.5-6s5.7 2 6.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+          </svg>
+          <span>About</span>
+        </a>
+        <a class="site-nav-link" href="#contact">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
+            <path d="M5 7l7 5.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span>Contact</span>
+        </a>
+
+        <div class="note-search" id="note-search">
+          <input
+            class="note-search-input"
+            id="note-search-input"
+            type="search"
+            placeholder="Search keywords"
+            aria-label="Search technical notes"
+            autocomplete="off"
+          />
+          <button class="note-search-button" id="note-search-button" type="button" aria-label="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M16 16L21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+          </button>
+          <span class="note-search-status" id="note-search-status" aria-live="polite"></span>
+        </div>
+      </nav>
+    </div>
 
     <!-- Upload your logo to the repository root and name it logo.png. -->
     <img
@@ -359,9 +738,7 @@
     />
   </header>
 
-  <p class="subtitle">Analog IC Design Notes / LDO / Bandgap / Power Management / Small-signal Analysis</p>
-
-  <h2>About Me</h2>
+  <h2 id="about">About Me</h2>
   <div class="card">
     <p>
       Hi, I am an analog IC designer with 4+ years of experience in USB Power Delivery applications. 
@@ -371,59 +748,218 @@
 
   <div class="technical-notes-header">
     <h2>Technical Notes</h2>
-
-    <div class="note-search" id="note-search">
-      <input
-        class="note-search-input"
-        id="note-search-input"
-        type="search"
-        placeholder="Search keywords"
-        aria-label="Search technical notes"
-        autocomplete="off"
-      />
-      <button class="note-search-button" id="note-search-button" type="button" aria-label="Search">
-        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
-          <path d="M16 16L21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-      </button>
-      <span class="note-search-status" id="note-search-status" aria-live="polite"></span>
-    </div>
   </div>
 
-  <a class="card note-card" href="small-signal-analysis.html" aria-label="Open Small-signal Analysis">
-    <h3>Small-signal Analysis</h3>
+  <button
+    class="card note-card category-card"
+    type="button"
+    data-study-map-section="Power Management"
+    aria-label="Open Power Management in Study Map"
+  >
+    <h3>Power Management</h3>
     <p>
-      TL431 Compensation loop, Constant Current(CC) Control loop, Constant Voltage(CV) Control loop, and different kinds of operational amplifier.
+      Switching converters, linear regulators, feedback systems, loop stability, and compensation techniques.
     </p>
-  </a>
+  </button>
 
-  <a class="card note-card" href="ldo-stability.html" aria-label="Open LDO Stability">
-    <h3>LDO Stability</h3>
+  <button
+    class="card note-card category-card"
+    type="button"
+    data-study-map-section="Analog Building Blocks"
+    aria-label="Open Analog Building Blocks in Study Map"
+  >
+    <h3>Analog Building Blocks</h3>
     <p>
-      Small-signal model, output pole, ESR zero, load transient, and compensation.
+      Current mirrors, differential pairs, OTAs, operational amplifiers, voltage references, and oscillators.
     </p>
-  </a>
+  </button>
 
-  <a class="card note-card" href="bandgap-ref.html" aria-label="Open Bandgap Reference">
-    <h3>Bandgap Reference</h3>
+  <button
+    class="card note-card category-card"
+    type="button"
+    data-study-map-section="Practical Analysis & Debugging"
+    aria-label="Open Practical Analysis and Debugging in Study Map"
+  >
+    <h3>Practical Analysis &amp; Debugging</h3>
     <p>
-      Operating principle, stability analysis, and topology.
+      Fast circuit estimation, I–V analysis, operating-point checks, signal-path analysis, and statistical methods.
     </p>
-  </a>
+  </button>
 
-  <a class="card note-card" href="debug-cases.html" aria-label="Open Debug Cases">
+  <a class="card note-card category-card" href="debug-cases.html" aria-label="Open Debug Cases">
     <h3>Debug Cases</h3>
     <p>
       Practical IC debugging cases from design, simulation, evaluation, and production.
     </p>
   </a>
 
-  <h2>Contact</h2>
+  <h2 id="contact">Contact</h2>
   <p>
     GitHub:
     <a href="https://github.com/JC-Cheng-Analog">JC-Cheng-Analog</a>
   </p>
+
+  <dialog class="study-map-dialog" id="study-map-dialog" aria-labelledby="study-map-title">
+    <div class="study-map-panel">
+      <div class="study-map-header">
+        <div>
+          <h2 class="study-map-title" id="study-map-title">Study Map</h2>
+          <p class="study-map-intro">Explore the knowledge structure and open available notes.</p>
+        </div>
+        <button class="study-map-close" id="study-map-close" type="button" aria-label="Close Study Map">×</button>
+      </div>
+
+      <div class="study-map-legend" aria-label="Content status">
+        <span><span class="map-status available" aria-hidden="true"></span> Available</span>
+        <span><span class="map-status planned" aria-hidden="true"></span> Planned</span>
+      </div>
+
+      <div class="study-map-content">
+        <ul class="study-map-tree">
+          <li>
+            <details open>
+              <summary>Power Management</summary>
+              <ul>
+                <li>
+                  <details open>
+                    <summary>Switching Converters</summary>
+                    <ul>
+                      <li>
+                        <details>
+                          <summary>Buck Converter</summary>
+                          <ul>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Operating Principle</span></li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Steady-State Analysis</span></li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Small-Signal Modeling</span></li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details>
+                          <summary>Boost Converter</summary>
+                          <ul>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Operating Principle</span></li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Steady-State Analysis</span></li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Small-Signal Modeling</span></li>
+                          </ul>
+                        </details>
+                      </li>
+                      <li>
+                        <details open>
+                          <summary>Feedback &amp; Compensation</summary>
+                          <ul>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Loop Stability</span></li>
+                            <li>
+                              <a class="study-map-item" href="small-signal-analysis.html">
+                                <span class="map-status available"></span>TL431-Based Compensation
+                              </a>
+                            </li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Op-Amp-Based Compensation</span></li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>OTA-Based Compensation</span></li>
+                          </ul>
+                        </details>
+                      </li>
+                    </ul>
+                  </details>
+                </li>
+                <li>
+                  <details open>
+                    <summary>Linear Regulators</summary>
+                    <ul>
+                      <li>
+                        <details>
+                          <summary>LDO</summary>
+                          <ul>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Operating Principle</span></li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>DC Analysis</span></li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Small-Signal Modeling</span></li>
+                            <li>
+                              <a class="study-map-item" href="ldo-stability.html">
+                                <span class="map-status available"></span>Stability &amp; Compensation
+                              </a>
+                            </li>
+                            <li><span class="study-map-item"><span class="map-status planned"></span>Transient Response</span></li>
+                          </ul>
+                        </details>
+                      </li>
+                    </ul>
+                  </details>
+                </li>
+              </ul>
+            </details>
+          </li>
+
+          <li>
+            <details>
+              <summary>Analog Building Blocks</summary>
+              <ul>
+                <li><span class="study-map-item"><span class="map-status planned"></span>Current Mirrors</span></li>
+                <li><span class="study-map-item"><span class="map-status planned"></span>Differential Pairs</span></li>
+                <li><span class="study-map-item"><span class="map-status planned"></span>5-Transistor OTA</span></li>
+                <li>
+                  <details>
+                    <summary>Operational Amplifiers &amp; OTAs</summary>
+                    <ul>
+                      <li><span class="study-map-item"><span class="map-status planned"></span>DC Analysis</span></li>
+                      <li>
+                        <a class="study-map-item" href="small-signal-analysis.html">
+                          <span class="map-status available"></span>Small-Signal / AC Analysis
+                        </a>
+                      </li>
+                      <li><span class="study-map-item"><span class="map-status planned"></span>Large-Signal / Transient Analysis</span></li>
+                      <li><span class="study-map-item"><span class="map-status planned"></span>Stability</span></li>
+                      <li><span class="study-map-item"><span class="map-status planned"></span>Frequency Compensation</span></li>
+                    </ul>
+                  </details>
+                </li>
+                <li>
+                  <details open>
+                    <summary>Voltage References</summary>
+                    <ul>
+                      <li>
+                        <a class="study-map-item" href="bandgap-ref.html">
+                          <span class="map-status available"></span>Bandgap Reference
+                        </a>
+                      </li>
+                    </ul>
+                  </details>
+                </li>
+                <li><span class="study-map-item"><span class="map-status planned"></span>Oscillators</span></li>
+              </ul>
+            </details>
+          </li>
+
+          <li>
+            <details>
+              <summary>Practical Analysis &amp; Debugging</summary>
+              <ul>
+                <li><span class="study-map-item"><span class="map-status planned"></span>RC Time-Constant Estimation</span></li>
+                <li><span class="study-map-item"><span class="map-status planned"></span>I–V Curve Analysis</span></li>
+                <li><span class="study-map-item"><span class="map-status planned"></span>Operating-Point Analysis</span></li>
+                <li><span class="study-map-item"><span class="map-status planned"></span>Signal Path Analysis</span></li>
+                <li>
+                  <details>
+                    <summary>Statistical Analysis</summary>
+                    <ul>
+                      <li><span class="study-map-item"><span class="map-status planned"></span>Gaussian Distribution</span></li>
+                      <li><span class="study-map-item"><span class="map-status planned"></span>Process Variation</span></li>
+                      <li><span class="study-map-item"><span class="map-status planned"></span>Monte Carlo Analysis</span></li>
+                    </ul>
+                  </details>
+                </li>
+              </ul>
+            </details>
+          </li>
+
+          <li>
+            <a class="study-map-item" href="debug-cases.html">
+              <span class="map-status available"></span>Debug Cases
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </dialog>
 
   <script>
     (() => {
@@ -608,6 +1144,60 @@
       });
 
       searchInput.addEventListener("input", clearSearchFeedback);
+
+      const studyMapTrigger = document.getElementById("study-map-trigger");
+      const studyMapDialog = document.getElementById("study-map-dialog");
+      const studyMapClose = document.getElementById("study-map-close");
+
+      const openStudyMap = () => {
+        studyMapDialog.showModal();
+        document.body.classList.add("study-map-open");
+      };
+
+      const closeStudyMap = () => {
+        studyMapDialog.close();
+      };
+
+      const openStudyMapSection = (sectionName) => {
+        openStudyMap();
+
+        const summaries = Array.from(
+          studyMapDialog.querySelectorAll(".study-map-tree summary")
+        );
+        const targetSummary = summaries.find(
+          (summary) => summary.textContent.trim() === sectionName
+        );
+
+        if (!targetSummary) return;
+
+        const targetDetails = targetSummary.closest("details");
+        if (targetDetails) targetDetails.open = true;
+
+        window.requestAnimationFrame(() => {
+          targetSummary.scrollIntoView({ block: "center", behavior: "smooth" });
+          targetSummary.focus({ preventScroll: true });
+        });
+      };
+
+      document.querySelectorAll("[data-study-map-section]").forEach((button) => {
+        button.addEventListener("click", () => {
+          openStudyMapSection(button.dataset.studyMapSection);
+        });
+      });
+
+      studyMapTrigger.addEventListener("click", openStudyMap);
+      studyMapClose.addEventListener("click", closeStudyMap);
+
+      studyMapDialog.addEventListener("click", (event) => {
+        if (event.target === studyMapDialog) {
+          closeStudyMap();
+        }
+      });
+
+      studyMapDialog.addEventListener("close", () => {
+        document.body.classList.remove("study-map-open");
+        studyMapTrigger.focus();
+      });
     })();
   </script>
 </body>
