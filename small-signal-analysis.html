@@ -138,6 +138,28 @@
       line-height: 1.35;
     }
 
+    .note-card-heading-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 0 18px;
+    }
+
+    .note-card-heading-row h2 {
+      margin: 0;
+    }
+
+    .updated-date {
+      flex: 0 0 auto;
+      margin-top: 5px;
+      color: #8a8f96;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
     .method {
       display: block;
       margin-top: 4px;
@@ -396,6 +418,15 @@
         font-size: 22px;
       }
 
+      .note-card-heading-row {
+        gap: 12px;
+      }
+
+      .updated-date {
+        margin-top: 4px;
+        font-size: 12px;
+      }
+
       .image-frame {
         min-height: 230px;
       }
@@ -438,7 +469,10 @@
     </nav>
 
     <section class="note-card" id="tl431">
-      <h2>TL431 Compensation</h2>
+      <div class="note-card-heading-row">
+        <h2>TL431 Compensation</h2>
+        <span class="updated-date">Last updated · 2026.07.27</span>
+      </div>
 
       <div class="image-frame" id="figure-i">
         <!-- Upload the image file to images/IMG000_TL431_CV_Loop_01.JPG -->
@@ -521,10 +555,13 @@ fp2 = 1/(2πCcRc)</code></pre>
     </section>
 
     <section class="note-card" id="cc-cv-loop">
-      <h2>
-        CC/CV Loop Analysis
-        <span class="method">Sink Current + Optocoupler</span>
-      </h2>
+      <div class="note-card-heading-row">
+        <h2>
+          CC/CV Loop Analysis
+          <span class="method">Sink Current + Optocoupler</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.07.27</span>
+      </div>
 
       <div class="image-frame" id="figure-ii">
         <!-- Upload the image file to images/IMG001_CV_loop_01.JPG -->
@@ -698,7 +735,10 @@ fp2 = 1/(2πCcRc)</code></pre>
     </section>
 
     <section class="note-card" id="operational-amplifier">
-      <h2>Operational Amplifier</h2>
+      <div class="note-card-heading-row">
+        <h2>Operational Amplifier</h2>
+        <span class="updated-date">Last updated · 2026.07.27</span>
+      </div>
 
       <div class="image-frame">
         <!-- Upload the PNG file to images/operational-amplifier.png -->
