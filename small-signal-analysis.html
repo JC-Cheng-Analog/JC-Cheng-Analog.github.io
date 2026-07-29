@@ -677,7 +677,7 @@ fp2 = 1/(2πCcRc)</code></pre>
         <h3>Assumptions</h3>
 
         <ul>
-          <li>The current-sense signal is represented by VM = K·ILOAD·Rsen.</li>
+          <li>The current-sense signal is represented by Vin = K·ILOAD·Rsen.</li>
           <li>VCC1, VCC2, and VIREF are treated as AC ground.</li>
           <li>The amplifier input current is approximated as zero.</li>
           <li>The feedback node is treated as a virtual ground.</li>
@@ -687,9 +687,9 @@ fp2 = 1/(2πCcRc)</code></pre>
 
         <h3>Key Equations</h3>
 
-        <pre><code>VM = K·ILOAD·Rsen
+        <pre><code>Vin = K·ILOAD·Rsen
 
-i1 = VM / R1
+i1 = Vin / R1
 
 Z2 = R2 + 1/(sC2)
 
@@ -707,7 +707,7 @@ Vc = -i3·Zc</code></pre>
         <h3>Transfer Function</h3>
 
         <pre><code>          CTR·Rc       1 + sC2R2
-Vc/VM = ------------ · -------------
+Vc/Vin = ------------ · -------------
         C2·R1·RLED    s(1 + sCcRc)</code></pre>
 
         <h3>Poles and Zero</h3>
