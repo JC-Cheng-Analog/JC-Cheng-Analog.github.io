@@ -4,11 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Small-signal Analysis | JC Cheng Analog</title>
+  <title>Small-Signal Analysis: TL431, CC/CV &amp; Op-Amp | JC Cheng Analog</title>
   <meta
     name="description"
-    content="Small-signal analysis notes covering TL431 compensation, CC/CV loop analysis, and operational amplifiers."
+    content="Practical small-signal analysis notes for analog IC design, including TL431 Type-II compensation, CC/CV feedback loops, optocouplers, poles, zeros, and op-amp analysis."
   />
+  <link rel="canonical" href="https://jc-cheng-analog.github.io/small-signal-analysis.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="JC Cheng Analog" />
+  <meta property="og:title" content="Small-Signal Analysis: TL431, CC/CV &amp; Op-Amp | JC Cheng Analog" />
+  <meta
+    property="og:description"
+    content="Practical small-signal analysis notes for analog IC design, including TL431 Type-II compensation, CC/CV feedback loops, optocouplers, poles, zeros, and op-amp analysis."
+  />
+  <meta property="og:url" content="https://jc-cheng-analog.github.io/small-signal-analysis.html" />
 
   <style>
     :root {
@@ -436,10 +446,10 @@
 
 <body>
   <header class="site-header">
-    <h1 class="site-title">
+    <div class="site-title" aria-label="JC Cheng Analog">
       <span class="name">JC Cheng</span>
       <span class="analog">Analog</span>
-    </h1>
+    </div>
 
     <!-- Keep logo.png in the same folder as this HTML file. -->
     <img
@@ -457,7 +467,7 @@
   </nav>
 
   <main>
-    <h2 class="page-heading">Small-signal Analysis</h2>
+    <h1 class="page-heading">Small-Signal Analysis</h1>
     <p class="page-intro">
       Circuit models, transfer functions, and compensation-loop analysis.
     </p>
@@ -677,7 +687,7 @@ fp2 = 1/(2πCcRc)</code></pre>
         <h3>Assumptions</h3>
 
         <ul>
-          <li>The current-sense signal is represented by Vin = K·ILOAD·Rsen.</li>
+          <li>The current-sense signal is represented by VM = K·ILOAD·Rsen.</li>
           <li>VCC1, VCC2, and VIREF are treated as AC ground.</li>
           <li>The amplifier input current is approximated as zero.</li>
           <li>The feedback node is treated as a virtual ground.</li>
@@ -687,9 +697,9 @@ fp2 = 1/(2πCcRc)</code></pre>
 
         <h3>Key Equations</h3>
 
-        <pre><code>Vin = K·ILOAD·Rsen
+        <pre><code>VM = K·ILOAD·Rsen
 
-i1 = Vin / R1
+i1 = VM / R1
 
 Z2 = R2 + 1/(sC2)
 
@@ -707,7 +717,7 @@ Vc = -i3·Zc</code></pre>
         <h3>Transfer Function</h3>
 
         <pre><code>          CTR·Rc       1 + sC2R2
-Vc/Vin = ------------ · -------------
+Vc/VM = ------------ · -------------
         C2·R1·RLED    s(1 + sCcRc)</code></pre>
 
         <h3>Poles and Zero</h3>
