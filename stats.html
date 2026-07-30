@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="JC Cheng Analog website statistics and monthly growth record." />
+  <title>Statistics | JC Cheng Analog</title>
+
+  <style>
+    :root {
+      --jc-blue: #17324d;
+      --jc-blue-soft: #294b68;
+      --analog-gold: #b48a3c;
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #17202a;
+      --muted: #6f7882;
+      --line: #e4e7eb;
+      --positive: #48755b;
+      --shadow: 0 8px 24px rgba(23, 50, 77, 0.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .wrap {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--jc-blue);
+      color: white;
+      padding: 28px 0;
+    }
+
+    .brand {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .brand-title {
+      font-size: clamp(1.55rem, 4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-title span {
+      color: #d4af63;
+    }
+
+    .brand-subtitle {
+      color: #d7e0e8;
+      margin-top: 4px;
+      font-size: 0.98rem;
+    }
+
+    .home-btn {
+      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 10px;
+      padding: 9px 14px;
+      transition: .2s ease;
+    }
+
+    .home-btn:hover {
+      background: rgba(255,255,255,.1);
+    }
+
+    main {
+      padding: 38px 0 54px;
+    }
+
+    .page-heading {
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      color: var(--analog-gold);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 4px 0 8px;
+      color: var(--jc-blue);
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      line-height: 1.15;
+    }
+
+    .intro {
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 28px 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .metric-card {
+      padding: 22px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .metric-value {
+      color: var(--jc-blue);
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    .section-card {
+      padding: 26px;
+      margin-top: 18px;
+    }
+
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    h2 {
+      color: var(--jc-blue);
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .section-note {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .month-stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .month-stat small {
+      color: var(--muted);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .month-stat strong {
+      display: block;
+      color: var(--jc-blue);
+      font-size: 1.25rem;
+    }
+
+    .change {
+      color: var(--positive);
+      font-size: .82rem;
+      margin-top: 3px;
+    }
+
+    .chart-shell {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .chart {
+      min-width: 620px;
+      height: 250px;
+      position: relative;
+      border-left: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      margin: 12px 8px 34px 42px;
+    }
+
+    .grid-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      border-top: 1px dashed var(--line);
+    }
+
+    .bars {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 0 20px;
+    }
+
+    .bar-group {
+      height: 100%;
+      width: 90px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+    }
+
+    .bar {
+      width: 48px;
+      min-height: 5px;
+      background: var(--jc-blue-soft);
+      border-radius: 8px 8px 0 0;
+      transition: .2s ease;
+      position: relative;
+    }
+
+    .bar:hover {
+      transform: translateY(-3px);
+    }
+
+    .bar-value {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--jc-blue);
+      font-size: .82rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .bar-label {
+      position: absolute;
+      bottom: -30px;
+      width: 100%;
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .top-pages {
+      display: grid;
+      gap: 10px;
+    }
+
+    .page-row {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 4px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .page-row:last-child {
+      border-bottom: 0;
+    }
+
+    .rank {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: .92rem;
+      line-height: 1;
+      color: var(--jc-blue);
+      border: 1px solid var(--line);
+      background: #f7f8fa;
+    }
+
+    .rank-1 {
+      background: #fff7df;
+      border-color: #e3c56d;
+    }
+
+    .rank-2 {
+      background: #f2f4f6;
+      border-color: #c7ccd1;
+    }
+
+    .rank-3 {
+      background: #f8eee8;
+      border-color: #d7ad8f;
+    }
+
+    .page-name {
+      font-weight: 600;
+      color: var(--jc-blue);
+    }
+
+    .page-views {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    details {
+      border-top: 1px solid var(--line);
+      padding: 14px 0;
+    }
+
+    details:first-of-type {
+      border-top: 0;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--jc-blue);
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .archive-data {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .data-note {
+      margin-top: 22px;
+      padding: 14px 16px;
+      background: #eef2f6;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 22px 0 34px;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 760px) {
+      .summary-grid,
+      .month-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-value {
+        font-size: 1.7rem;
+      }
+
+      .section-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap brand">
+      <div>
+        <div class="brand-title">JC Cheng <span>Analog</span></div>
+        <div class="brand-subtitle">Analog IC Design Notes</div>
+      </div>
+
+      <a class="home-btn" href="index.html">← Back to Home</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="page-heading">
+      <div class="eyebrow">Website Growth Record</div>
+      <h1>Statistics</h1>
+      <p class="intro">
+        A simple record of JC Cheng Analog's traffic, readership growth, and most-viewed technical notes.
+      </p>
+    </section>
+
+    <!-- Overall summary -->
+    <section class="summary-grid">
+      <article class="card metric-card">
+        <div class="metric-label">Total Views</div>
+        <div class="metric-value" id="totalViews">—</div>
+      </article>
+
+      <article class="card metric-card">
+        <div class="metric-label">Total Visitors</div>
+        <div class="metric-value" id="totalVisitors">—</div>
+      </article>
+
+      <article class="card metric-card">
+        <div class="metric-label">Google Clicks</div>
+        <div class="metric-value" id="totalClicks">—</div>
+      </article>
+    </section>
+
+    <!-- Current month -->
+    <section class="card section-card">
+      <div class="section-title-row">
+        <h2 id="currentMonthTitle">This Month</h2>
+        <span class="section-note">Latest completed reporting period</span>
+      </div>
+
+      <div class="month-grid">
+        <div class="month-stat">
+          <small>Views</small>
+          <strong id="monthViews">—</strong>
+          <div class="change" id="viewsChange"></div>
+        </div>
+
+        <div class="month-stat">
+          <small>Visitors</small>
+          <strong id="monthVisitors">—</strong>
+          <div class="change" id="visitorsChange"></div>
+        </div>
+
+        <div class="month-stat">
+          <small>Google Clicks</small>
+          <strong id="monthClicks">—</strong>
+          <div class="change" id="clicksChange"></div>
+        </div>
+
+        <div class="month-stat">
+          <small>Top Page</small>
+          <strong id="monthTopPage">—</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trend -->
+    <section class="card section-card">
+      <div class="section-title-row">
+        <h2>Monthly Views</h2>
+        <span class="section-note">Historical trend</span>
+      </div>
+      <div class="chart-shell">
+        <div class="chart" id="monthlyChart">
+          <div class="grid-line" style="top: 25%;"></div>
+          <div class="grid-line" style="top: 50%;"></div>
+          <div class="grid-line" style="top: 75%;"></div>
+          <div class="bars" id="chartBars"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top pages -->
+    <section class="card section-card">
+      <div class="section-title-row">
+        <h2>Top 3 Notes</h2>
+        <span class="section-note" id="topNotesSubtitle">Most viewed technical notes · latest month</span>
+      </div>
+      <div class="top-pages" id="topPages"></div>
+    </section>
+
+    <!-- Archive -->
+    <section class="card section-card">
+      <div class="section-title-row">
+        <h2>Monthly Archive</h2>
+        <span class="section-note">Expand a month for details</span>
+      </div>
+
+      <div id="archive"></div>
+
+      <div class="data-note">
+        Data source: Google Analytics 4 and Google Search Console.
+        Monthly figures can later be updated from a separate <code>stats-data.json</code> file.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      JC Cheng Analog · Website Statistics
+    </div>
+  </footer>
+
+  <script>
+    /*
+      DEMO DATA ONLY.
+      Later, this object can be moved into stats-data.json and loaded with fetch().
+    */
+    const statsData = {
+      months: [
+        {
+          month: "2026.07",
+          label: "July 2026",
+          views: 156,
+          visitors: 82,
+          googleClicks: 21,
+          topPage: "Small-Signal Analysis",
+          topPages: [
+            { name: "Small-Signal Analysis", views: 71 },
+            { name: "Homepage", views: 52 },
+            { name: "TL431 Compensation", views: 33 }
+          ]
+        },
+        {
+          month: "2026.08",
+          label: "August 2026",
+          views: 812,
+          visitors: 384,
+          googleClicks: 126,
+          topPage: "TL431 Compensation",
+          topPages: [
+            { name: "TL431 Compensation", views: 312 },
+            { name: "Small-Signal Analysis", views: 206 },
+            { name: "Homepage", views: 148 }
+          ]
+        }
+      ]
+    };
+
+    const formatNumber = n => Number(n).toLocaleString("en-US");
+
+    function percentChange(current, previous) {
+      if (!previous) return "";
+      const change = ((current - previous) / previous) * 100;
+      const sign = change >= 0 ? "+" : "";
+      return `${sign}${change.toFixed(0)}% vs previous month`;
+    }
+
+    function renderStats(data) {
+      const months = data.months || [];
+      if (!months.length) return;
+
+      const latest = months[months.length - 1];
+      const previous = months.length > 1 ? months[months.length - 2] : null;
+
+      const totalViews = months.reduce((sum, m) => sum + m.views, 0);
+      const totalVisitors = months.reduce((sum, m) => sum + m.visitors, 0);
+      const totalClicks = months.reduce((sum, m) => sum + m.googleClicks, 0);
+
+      document.getElementById("totalViews").textContent = formatNumber(totalViews);
+      document.getElementById("totalVisitors").textContent = formatNumber(totalVisitors);
+      document.getElementById("totalClicks").textContent = formatNumber(totalClicks);
+
+      document.getElementById("currentMonthTitle").textContent = latest.label;
+      document.getElementById("monthViews").textContent = formatNumber(latest.views);
+      document.getElementById("monthVisitors").textContent = formatNumber(latest.visitors);
+      document.getElementById("monthClicks").textContent = formatNumber(latest.googleClicks);
+      document.getElementById("monthTopPage").textContent = latest.topPage;
+      document.getElementById("topNotesSubtitle").textContent =
+        `Most viewed technical notes · ${latest.label}`;
+
+      if (previous) {
+        document.getElementById("viewsChange").textContent =
+          percentChange(latest.views, previous.views);
+        document.getElementById("visitorsChange").textContent =
+          percentChange(latest.visitors, previous.visitors);
+        document.getElementById("clicksChange").textContent =
+          percentChange(latest.googleClicks, previous.googleClicks);
+      }
+
+      // Monthly chart
+      const maxViews = Math.max(...months.map(m => m.views), 1);
+      const bars = document.getElementById("chartBars");
+      bars.innerHTML = "";
+
+      months.forEach(m => {
+        const group = document.createElement("div");
+        group.className = "bar-group";
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+        bar.style.height = `${Math.max((m.views / maxViews) * 88, 3)}%`;
+
+        const value = document.createElement("span");
+        value.className = "bar-value";
+        value.textContent = formatNumber(m.views);
+
+        const label = document.createElement("span");
+        label.className = "bar-label";
+        label.textContent = m.month;
+
+        bar.appendChild(value);
+        group.appendChild(bar);
+        group.appendChild(label);
+        bars.appendChild(group);
+      });
+
+      // Top pages
+      const topPages = document.getElementById("topPages");
+      topPages.innerHTML = "";
+
+      latest.topPages.slice(0, 3).forEach((page, index) => {
+        const row = document.createElement("div");
+        row.className = "page-row";
+        row.innerHTML = `
+          <span class="rank rank-${index + 1}" aria-label="Rank ${index + 1}">${index + 1}</span>
+          <span class="page-name">${page.name}</span>
+          <span class="page-views">${formatNumber(page.views)} views</span>
+        `;
+        topPages.appendChild(row);
+      });
+
+      // Archive - newest first
+      const archive = document.getElementById("archive");
+      archive.innerHTML = "";
+
+      [...months].reverse().forEach(m => {
+        const item = document.createElement("details");
+        item.innerHTML = `
+          <summary>
+            <span>${m.label}</span>
+            <span>${formatNumber(m.views)} views</span>
+          </summary>
+          <div class="archive-data">
+            Visitors: ${formatNumber(m.visitors)}
+            &nbsp;·&nbsp;
+            Google Clicks: ${formatNumber(m.googleClicks)}
+            &nbsp;·&nbsp;
+            Top Page: ${m.topPage}
+          </div>
+        `;
+        archive.appendChild(item);
+      });
+    }
+
+    renderStats(statsData);
+
+    /*
+      FUTURE JSON VERSION:
+
+      fetch("stats-data.json")
+        .then(response => response.json())
+        .then(renderStats)
+        .catch(error => console.error("Unable to load statistics:", error));
+
+      When using this, remove:
+        renderStats(statsData);
+      and move the statsData object into stats-data.json.
+    */
+  </script>
+</body>
+</html>
