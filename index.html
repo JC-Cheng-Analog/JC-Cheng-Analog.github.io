@@ -610,6 +610,124 @@
       border-radius: 4px;
     }
 
+
+    .information-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .information-card {
+      overflow: hidden;
+      background: #ffffff;
+      border: 1px solid #dce1e6;
+      border-radius: 12px;
+      padding: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .information-card h3 {
+      margin: 0;
+      padding: 13px 18px;
+      background: #6c85aa;
+      color: #eee0c6;
+      font-size: 20.9px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .information-card-body {
+      padding: 18px 20px 20px;
+      background: #ffffff;
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .contact-link,
+    .stats-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #34485e;
+      text-decoration: none;
+      transition:
+        color 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .contact-link:hover,
+    .contact-link:focus-visible,
+    .stats-link:hover,
+    .stats-link:focus-visible {
+      color: #0b2e59;
+      text-decoration: none;
+      transform: translateX(2px);
+      outline: none;
+    }
+
+    .contact-link svg,
+    .stats-link svg {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      color: #b08d57;
+    }
+
+    .stats-card-link {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      background: #ffffff;
+    }
+
+    .stats-card-link:hover,
+    .stats-card-link:focus-visible {
+      text-decoration: none;
+      outline: none;
+    }
+
+    .stats-visual {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 72px;
+      padding: 4px 0;
+    }
+
+    .stats-visual-icon {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      color: #b08d57;
+    }
+
+    .stats-title {
+      color: #0b2e59;
+      font-weight: 400;
+      margin-bottom: 2px;
+    }
+
+    .stats-subtitle {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .stats-arrow {
+      margin-left: auto;
+      color: #b08d57;
+      font-size: 20px;
+      transition: transform 0.18s ease;
+    }
+
+    .stats-card-link:hover .stats-arrow,
+    .stats-card-link:focus-visible .stats-arrow {
+      transform: translateX(3px);
+    }
+
     .page-bottom-nav {
       display: flex;
       justify-content: center;
@@ -717,6 +835,10 @@
         width: min(100%, 280px);
       }
 
+      .information-grid {
+        grid-template-columns: 1fr;
+      }
+
       .study-map-header {
         padding: 18px 18px 15px;
       }
@@ -761,12 +883,12 @@
           </svg>
           <span>About</span>
         </a>
-        <a class="site-nav-link" href="#contact">
+        <a class="site-nav-link" href="#information">
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
             <path d="M5 7l7 5.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>
-          <span>Contact</span>
+          <span>Information</span>
         </a>
 
         <div class="note-search" id="note-search">
@@ -853,11 +975,71 @@
     </p>
   </a>
 
-  <h2 id="contact">Contact</h2>
-  <p>
-    GitHub:
-    <a href="https://github.com/JC-Cheng-Analog">JC-Cheng-Analog</a>
-  </p>
+  <h2 id="information">Information</h2>
+
+  <div class="information-grid">
+    <section class="information-card" aria-labelledby="contact-title">
+      <h3 id="contact-title">Contact</h3>
+
+      <div class="information-card-body">
+        <div class="contact-list">
+          <a
+            class="contact-link"
+            href="https://github.com/JC-Cheng-Analog"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 2.8a9.4 9.4 0 0 0-3 18.3c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.7-1.4-2.3-.3-4.7-1.1-4.7-5a3.9 3.9 0 0 1 1-2.7 3.6 3.6 0 0 1 .1-2.7s.8-.3 2.8 1a9.7 9.7 0 0 1 5 0c2-1.3 2.8-1 2.8-1a3.6 3.6 0 0 1 .1 2.7 3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.7 5 .4.3.7 1 .7 2v3c0 .3.2.6.7.5A9.4 9.4 0 0 0 12 2.8Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+            <span>GitHub: JC-Cheng-Analog</span>
+          </a>
+
+          <a
+            class="contact-link"
+            href="mailto:jcchenganalog@gmail.com?subject=JC%20Cheng%20Analog%20-%20Technical%20Note%20Feedback"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
+              <path d="M5 7l7 5.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span>jcchenganalog@gmail.com</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="information-card" aria-labelledby="statistics-title">
+      <a class="stats-card-link" href="stats.html">
+        <h3 id="statistics-title">Site Statistics</h3>
+
+        <div class="information-card-body">
+          <div class="stats-visual">
+          <svg class="stats-visual-icon" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="7" y="24" width="7" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"></rect>
+            <rect x="20.5" y="14" width="7" height="25" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"></rect>
+            <rect x="34" y="8" width="7" height="31" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"></rect>
+            <path d="M5 40.5h38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+
+          <div>
+            <div class="stats-title">Website Statistics</div>
+            <div class="stats-subtitle">Traffic &amp; growth record</div>
+          </div>
+
+          <span class="stats-arrow" aria-hidden="true">→</span>
+          </div>
+        </div>
+      </a>
+    </section>
+  </div>
 
   <div class="page-bottom-nav">
     <a class="back-to-top" href="#top" aria-label="Back to top">
