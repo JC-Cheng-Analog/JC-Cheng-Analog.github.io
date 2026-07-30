@@ -122,13 +122,6 @@
       margin: 0;
     }
 
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin: 28px 0;
-    }
-
     .card {
       background: var(--card);
       border: 1px solid var(--line);
@@ -136,25 +129,13 @@
       box-shadow: var(--shadow);
     }
 
-    .metric-card {
-      padding: 22px;
-    }
-
-    .metric-label {
-      color: var(--muted);
-      font-size: .9rem;
-    }
-
-    .metric-value {
-      color: var(--jc-blue);
-      font-size: 2rem;
-      font-weight: 700;
-      margin-top: 3px;
-    }
-
     .section-card {
       padding: 26px;
       margin-top: 18px;
+    }
+
+    .current-month-card {
+      margin-top: 28px;
     }
 
     .section-title-row {
@@ -205,6 +186,11 @@
       color: var(--positive);
       font-size: .82rem;
       margin-top: 3px;
+      min-height: 1.25em;
+    }
+
+    .change.is-muted {
+      color: var(--muted);
     }
 
     .chart-shell {
@@ -370,6 +356,64 @@
       font-size: .86rem;
     }
 
+    .all-time-summary {
+      display: flex;
+      justify-content: center;
+      gap: 18px 28px;
+      flex-wrap: wrap;
+      margin: 34px 0 4px;
+      padding: 14px 16px;
+      color: #98a0a9;
+      font-size: .78rem;
+      text-align: center;
+    }
+
+    .all-time-item {
+      white-space: nowrap;
+    }
+
+    .all-time-item strong {
+      color: #7d8791;
+      font-weight: 600;
+    }
+
+    .page-bottom-nav {
+      display: flex;
+      justify-content: center;
+      margin: 34px 0 8px;
+    }
+
+    .back-to-top {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      color: var(--jc-blue);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, border-color .2s ease, background-color .2s ease;
+    }
+
+    .back-to-top:hover,
+    .back-to-top:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--analog-gold);
+      background: #fffdf7;
+      outline: none;
+    }
+
+    .back-to-top-icon {
+      color: var(--analog-gold);
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
     footer {
       border-top: 1px solid var(--line);
       padding: 22px 0 34px;
@@ -378,13 +422,8 @@
     }
 
     @media (max-width: 760px) {
-      .summary-grid,
       .month-grid {
         grid-template-columns: 1fr;
-      }
-
-      .metric-value {
-        font-size: 1.7rem;
       }
 
       .section-card {
@@ -394,7 +433,7 @@
   </style>
 </head>
 
-<body>
+<body id="top">
   <header>
     <div class="wrap brand">
       <div>
@@ -415,22 +454,34 @@
       </p>
     </section>
 
-    <!-- Overall summary -->
-    <section class="summary-grid">
-      <article class="card metric-card">
-        <div class="metric-label">Total Views</div>
-        <div class="metric-value" id="totalViews">—</div>
-      </article>
+    <!-- Current month -->
+    <section class="card section-card current-month-card">
+      <div class="section-title-row">
+        <h2 id="liveMonthTitle">Current Month</h2>
+        <span class="section-note">Current reporting period</span>
+      </div>
 
-      <article class="card metric-card">
-        <div class="metric-label">Total Visitors</div>
-        <div class="metric-value" id="totalVisitors">—</div>
-      </article>
+      <div class="month-grid">
+        <div class="month-stat">
+          <small>Views</small>
+          <strong id="liveViews">—</strong>
+        </div>
 
-      <article class="card metric-card">
-        <div class="metric-label">Google Clicks</div>
-        <div class="metric-value" id="totalClicks">—</div>
-      </article>
+        <div class="month-stat">
+          <small>Visitors</small>
+          <strong id="liveVisitors">—</strong>
+        </div>
+
+        <div class="month-stat">
+          <small>Google Clicks</small>
+          <strong id="liveClicks">—</strong>
+        </div>
+
+        <div class="month-stat">
+          <small>Top Page</small>
+          <strong id="liveTopPage">—</strong>
+        </div>
+      </div>
     </section>
 
     <!-- Current month -->
@@ -505,6 +556,18 @@
         Monthly figures can later be updated from a separate <code>stats-data.json</code> file.
       </div>
     </section>
+    <div class="all-time-summary" aria-label="All-time website statistics">
+      <span class="all-time-item">All time · Views <strong id="allTimeViews">—</strong></span>
+      <span class="all-time-item">Visitors <strong id="allTimeVisitors">—</strong></span>
+      <span class="all-time-item">Google Clicks <strong id="allTimeClicks">—</strong></span>
+    </div>
+
+    <div class="page-bottom-nav">
+      <a class="back-to-top" href="#top" aria-label="Back to top">
+        <span class="back-to-top-icon" aria-hidden="true">↑</span>
+        <span>Top</span>
+      </a>
+    </div>
   </main>
 
   <footer>
@@ -515,35 +578,22 @@
 
   <script>
     /*
-      DEMO DATA ONLY.
-      Later, this object can be moved into stats-data.json and loaded with fetch().
+      INITIAL DATA.
+      Replace these values with monthly GA4 / Search Console results.
     */
     const statsData = {
       months: [
         {
           month: "2026.07",
           label: "July 2026",
-          views: 156,
-          visitors: 82,
-          googleClicks: 21,
-          topPage: "Small-Signal Analysis",
+          views: 1,
+          visitors: 1,
+          googleClicks: 0,
+          topPage: "—",
           topPages: [
-            { name: "Small-Signal Analysis", views: 71 },
-            { name: "Homepage", views: 52 },
-            { name: "TL431 Compensation", views: 33 }
-          ]
-        },
-        {
-          month: "2026.08",
-          label: "August 2026",
-          views: 812,
-          visitors: 384,
-          googleClicks: 126,
-          topPage: "TL431 Compensation",
-          topPages: [
-            { name: "TL431 Compensation", views: 312 },
-            { name: "Small-Signal Analysis", views: 206 },
-            { name: "Homepage", views: 148 }
+            { name: "—", views: 0 },
+            { name: "—", views: 0 },
+            { name: "—", views: 0 }
           ]
         }
       ]
@@ -552,10 +602,27 @@
     const formatNumber = n => Number(n).toLocaleString("en-US");
 
     function percentChange(current, previous) {
-      if (!previous) return "";
+      if (previous === undefined || previous === null || previous === 0) {
+        return { text: "— vs previous month", muted: true };
+      }
+
       const change = ((current - previous) / previous) * 100;
       const sign = change >= 0 ? "+" : "";
-      return `${sign}${change.toFixed(0)}% vs previous month`;
+      return {
+        text: `${sign}${change.toFixed(0)}% vs previous month`,
+        muted: false
+      };
+    }
+
+    function currentMonthInfo() {
+      const now = new Date();
+      const monthKey = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}`;
+      const monthLabel = now.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric"
+      });
+
+      return { monthKey, monthLabel };
     }
 
     function renderStats(data) {
@@ -564,14 +631,30 @@
 
       const latest = months[months.length - 1];
       const previous = months.length > 1 ? months[months.length - 2] : null;
+      const { monthKey, monthLabel } = currentMonthInfo();
+      const liveMonth = months.find(m => m.month === monthKey) || {
+        month: monthKey,
+        label: monthLabel,
+        views: 0,
+        visitors: 0,
+        googleClicks: 0,
+        topPage: "—",
+        topPages: []
+      };
 
       const totalViews = months.reduce((sum, m) => sum + m.views, 0);
       const totalVisitors = months.reduce((sum, m) => sum + m.visitors, 0);
       const totalClicks = months.reduce((sum, m) => sum + m.googleClicks, 0);
 
-      document.getElementById("totalViews").textContent = formatNumber(totalViews);
-      document.getElementById("totalVisitors").textContent = formatNumber(totalVisitors);
-      document.getElementById("totalClicks").textContent = formatNumber(totalClicks);
+      document.getElementById("liveMonthTitle").textContent = monthLabel;
+      document.getElementById("liveViews").textContent = formatNumber(liveMonth.views);
+      document.getElementById("liveVisitors").textContent = formatNumber(liveMonth.visitors);
+      document.getElementById("liveClicks").textContent = formatNumber(liveMonth.googleClicks);
+      document.getElementById("liveTopPage").textContent = liveMonth.topPage || "—";
+
+      document.getElementById("allTimeViews").textContent = formatNumber(totalViews);
+      document.getElementById("allTimeVisitors").textContent = formatNumber(totalVisitors);
+      document.getElementById("allTimeClicks").textContent = formatNumber(totalClicks);
 
       document.getElementById("currentMonthTitle").textContent = latest.label;
       document.getElementById("monthViews").textContent = formatNumber(latest.views);
@@ -581,14 +664,21 @@
       document.getElementById("topNotesSubtitle").textContent =
         `Most viewed technical notes · ${latest.label}`;
 
-      if (previous) {
-        document.getElementById("viewsChange").textContent =
-          percentChange(latest.views, previous.views);
-        document.getElementById("visitorsChange").textContent =
-          percentChange(latest.visitors, previous.visitors);
-        document.getElementById("clicksChange").textContent =
-          percentChange(latest.googleClicks, previous.googleClicks);
-      }
+      const viewChange = percentChange(latest.views, previous?.views);
+      const visitorChange = percentChange(latest.visitors, previous?.visitors);
+      const clickChange = percentChange(latest.googleClicks, previous?.googleClicks);
+
+      const changeItems = [
+        ["viewsChange", viewChange],
+        ["visitorsChange", visitorChange],
+        ["clicksChange", clickChange]
+      ];
+
+      changeItems.forEach(([id, result]) => {
+        const el = document.getElementById(id);
+        el.textContent = result.text;
+        el.classList.toggle("is-muted", result.muted);
+      });
 
       // Monthly chart
       const maxViews = Math.max(...months.map(m => m.views), 1);
