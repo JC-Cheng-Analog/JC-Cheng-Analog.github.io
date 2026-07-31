@@ -686,6 +686,36 @@
       color: #b08d57;
     }
 
+    .email-copy {
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .email-copy .copy-icon {
+      width: 18.7px;
+      height: 18.7px;
+      margin-left: 2px;
+      color: #8b96a3;
+    }
+
+    .email-copy .copy-status {
+      margin-left: 2px;
+      color: #b08d57;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+
+    .email-copy .copy-status.is-visible {
+      opacity: 1;
+    }
+
     .stats-card-link {
       display: block;
       color: inherit;
@@ -1011,16 +1041,25 @@
             <span>GitHub: JC-Cheng-Analog</span>
           </a>
 
-          <a
-            class="contact-link"
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=jcchenganalog%40gmail.com&su=JC%20Cheng%20Analog%20-%20Technical%20Note%20Feedback&body=Hello%2C%0A%0AThank%20you%20for%20visiting%20JC%20Cheng%20Analog.%0A%0APage%20/%20Note%3A%0ASection%3A%0AFeedback%20/%20Question%3A%0A%0AFeel%20free%20to%20contact%20me%20in%20%E4%B8%AD%E6%96%87%20/%20English%20/%20%E6%97%A5%E6%9C%AC%E8%AA%9E.%0A%0AThank%20you." target="_blank" rel="noopener noreferrer"
+          <button
+            class="contact-link email-copy"
+            id="email-copy"
+            type="button"
+            data-email="jcchenganalog@gmail.com"
+            aria-label="Copy email address"
+            title="Copy email"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
               <path d="M5 7l7 5.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
             </svg>
             <span>jcchenganalog@gmail.com</span>
-          </a>
+            <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="8" y="8" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"></rect>
+              <path d="M6 15H5.5A1.5 1.5 0 0 1 4 13.5v-8A1.5 1.5 0 0 1 5.5 4h8A1.5 1.5 0 0 1 15 5.5V6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+            </svg>
+            <span class="copy-status" id="copy-status" aria-live="polite"></span>
+          </button>
         </div>
       </div>
     </section>
@@ -1402,6 +1441,41 @@
       });
 
       searchInput.addEventListener("input", clearSearchFeedback);
+
+      const emailCopy = document.getElementById("email-copy");
+      const copyStatus = document.getElementById("copy-status");
+      let copyStatusTimer;
+
+      const copyEmailAddress = async () => {
+        const email = emailCopy.dataset.email;
+
+        try {
+          await navigator.clipboard.writeText(email);
+        } catch (error) {
+          const textArea = document.createElement("textarea");
+          textArea.value = email;
+          textArea.setAttribute("readonly", "");
+          textArea.style.position = "fixed";
+          textArea.style.opacity = "0";
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand("copy");
+          textArea.remove();
+        }
+
+        window.clearTimeout(copyStatusTimer);
+        copyStatus.textContent = "Copied!";
+        copyStatus.classList.add("is-visible");
+
+        copyStatusTimer = window.setTimeout(() => {
+          copyStatus.classList.remove("is-visible");
+          window.setTimeout(() => {
+            copyStatus.textContent = "";
+          }, 180);
+        }, 1500);
+      };
+
+      emailCopy.addEventListener("click", copyEmailAddress);
 
       const studyMapTrigger = document.getElementById("study-map-trigger");
       const studyMapDialog = document.getElementById("study-map-dialog");
