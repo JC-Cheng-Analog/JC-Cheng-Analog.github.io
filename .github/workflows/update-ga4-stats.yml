@@ -38,14 +38,15 @@ jobs:
 
       - name: Commit updated statistics
         run: |
-          if git diff --quiet -- stats-data.json; then
-            echo "No stats-data.json changes to commit."
-            exit 0
-          fi
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add stats-data.json
+
+          if git diff --cached --quiet; then
+            echo "No statistics changes to commit."
+            exit 0
+          fi
+
           git commit -m "Update GA4 monthly statistics"
           git push
