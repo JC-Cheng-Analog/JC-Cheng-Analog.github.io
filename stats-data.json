@@ -1,8 +1,12 @@
 {
-  "month": "2026-07",
-  "start_date": "2026-07-01",
-  "end_date": "2026-07-31",
-  "users": 3,
-  "sessions": 5,
-  "views": 13
+  "months": [
+    {
+      "month": "2026-07",
+      "start_date": "2026-07-01",
+      "end_date": "2026-07-31",
+      "users": 3,
+      "sessions": 5,
+      "views": 13
+    }
+  ]
 }
