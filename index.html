@@ -462,15 +462,15 @@
 
     .note-search-status {
       position: absolute;
-      top: 50%;
-      right: 92px;
+      top: calc(100% + 5px);
+      left: 4px;
       color: #e0a0b1;
       font-size: 12px;
-      line-height: 1;
+      line-height: 1.2;
       white-space: nowrap;
       pointer-events: none;
       opacity: 0;
-      transform: translateY(-50%);
+      transform: none;
       transition: opacity 0.42s ease;
     }
 
@@ -857,7 +857,9 @@
       }
 
       .note-search-status {
-        right: 92px;
+        top: calc(100% + 5px);
+        left: 4px;
+        right: auto;
       }
 
       .technical-notes-header + .note-card {
