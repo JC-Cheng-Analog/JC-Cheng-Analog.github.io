@@ -458,7 +458,7 @@
     <section class="card section-card current-month-card">
       <div class="section-title-row">
         <h2 id="liveMonthTitle">Current Month</h2>
-        <span class="section-note">Current reporting period</span>
+        <span class="section-note" id="livePeriodNote">Month to date · updated daily</span>
       </div>
 
       <div class="month-grid">
@@ -468,13 +468,13 @@
         </div>
 
         <div class="month-stat">
-          <small>Visitors</small>
-          <strong id="liveVisitors">—</strong>
+          <small>Users</small>
+          <strong id="liveUsers">—</strong>
         </div>
 
         <div class="month-stat">
-          <small>Google Clicks</small>
-          <strong id="liveClicks">—</strong>
+          <small>Sessions</small>
+          <strong id="liveSessions">—</strong>
         </div>
 
         <div class="month-stat">
@@ -499,15 +499,15 @@
         </div>
 
         <div class="month-stat">
-          <small>Visitors</small>
-          <strong id="monthVisitors">—</strong>
-          <div class="change" id="visitorsChange"></div>
+          <small>Users</small>
+          <strong id="monthUsers">—</strong>
+          <div class="change" id="usersChange"></div>
         </div>
 
         <div class="month-stat">
-          <small>Google Clicks</small>
-          <strong id="monthClicks">—</strong>
-          <div class="change" id="clicksChange"></div>
+          <small>Sessions</small>
+          <strong id="monthSessions">—</strong>
+          <div class="change" id="sessionsChange"></div>
         </div>
 
         <div class="month-stat">
@@ -552,14 +552,13 @@
       <div id="archive"></div>
 
       <div class="data-note">
-        Data source: Google Analytics 4 and Google Search Console.
-        Monthly figures can later be updated from a separate <code>stats-data.json</code> file.
+        Data source: Google Analytics 4. Current month data is updated daily; completed months are archived automatically in <code>stats-data.json</code>.
       </div>
     </section>
     <div class="all-time-summary" aria-label="All-time website statistics">
       <span class="all-time-item">All time · Views <strong id="allTimeViews">—</strong></span>
-      <span class="all-time-item">Visitors <strong id="allTimeVisitors">—</strong></span>
-      <span class="all-time-item">Google Clicks <strong id="allTimeClicks">—</strong></span>
+      <span class="all-time-item">Users <strong id="allTimeUsers">—</strong></span>
+      <span class="all-time-item">Sessions <strong id="allTimeSessions">—</strong></span>
     </div>
 
     <div class="page-bottom-nav">
@@ -577,113 +576,125 @@
   </footer>
 
   <script>
-    /*
-      INITIAL DATA.
-      Replace these values with monthly GA4 / Search Console results.
-    */
-    const statsData = {
-      months: [
-        {
-          month: "2026.07",
-          label: "July 2026",
-          views: 1,
-          visitors: 1,
-          googleClicks: 0,
-          topPage: "—",
-          topPages: [
-            { name: "—", views: 0 },
-            { name: "—", views: 0 },
-            { name: "—", views: 0 }
-          ]
-        }
-      ]
+    const formatNumber = value => Number(value ?? 0).toLocaleString("en-US");
+
+    const monthLabel = key => {
+      if (!key) return "—";
+      const [year, month] = key.split("-").map(Number);
+      return new Date(year, month - 1, 1).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric"
+      });
     };
 
-    const formatNumber = n => Number(n).toLocaleString("en-US");
+    const shortMonthLabel = key => {
+      if (!key) return "—";
+      const [year, month] = key.split("-").map(Number);
+      const mon = new Date(year, month - 1, 1)
+        .toLocaleDateString("en-US", { month: "short" })
+        .toUpperCase();
+      return `${mon} ${year}`;
+    };
 
-    function percentChange(current, previous) {
-      if (previous === undefined || previous === null || previous === 0) {
-        return { text: "— vs previous month", muted: true };
+    function percentChange(current, previous, label = "vs previous month") {
+      current = Number(current ?? 0);
+      previous = Number(previous ?? 0);
+
+      if (previous === 0) {
+        return { text: "— " + label, muted: true };
       }
 
       const change = ((current - previous) / previous) * 100;
-      const sign = change >= 0 ? "+" : "";
       return {
-        text: `${sign}${change.toFixed(0)}% vs previous month`,
+        text: `${change >= 0 ? "+" : ""}${change.toFixed(0)}% ${label}`,
         muted: false
       };
     }
 
-    function currentMonthInfo() {
-      const now = new Date();
-      const monthKey = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}`;
-      const monthLabel = now.toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric"
-      });
-
-      return { monthKey, monthLabel };
+    function setChange(id, result) {
+      const el = document.getElementById(id);
+      el.textContent = result.text;
+      el.classList.toggle("is-muted", result.muted);
     }
 
     function renderStats(data) {
-      const months = data.months || [];
-      if (!months.length) return;
+      const months = [...(data.months || [])]
+        .filter(m => m && m.month)
+        .sort((a, b) => a.month.localeCompare(b.month));
 
-      const latest = months[months.length - 1];
+      const current = data.current || {};
+      const comparison = data.comparison || {};
+      const latest = months.length ? months[months.length - 1] : null;
       const previous = months.length > 1 ? months[months.length - 2] : null;
-      const { monthKey, monthLabel } = currentMonthInfo();
-      const liveMonth = months.find(m => m.month === monthKey) || {
-        month: monthKey,
-        label: monthLabel,
-        views: 0,
-        visitors: 0,
-        googleClicks: 0,
-        topPage: "—",
-        topPages: []
-      };
 
-      const totalViews = months.reduce((sum, m) => sum + m.views, 0);
-      const totalVisitors = months.reduce((sum, m) => sum + m.visitors, 0);
-      const totalClicks = months.reduce((sum, m) => sum + m.googleClicks, 0);
+      // Current month-to-date
+      document.getElementById("liveMonthTitle").textContent =
+        shortMonthLabel(current.month);
 
-      document.getElementById("liveMonthTitle").textContent = monthLabel;
-      document.getElementById("liveViews").textContent = formatNumber(liveMonth.views);
-      document.getElementById("liveVisitors").textContent = formatNumber(liveMonth.visitors);
-      document.getElementById("liveClicks").textContent = formatNumber(liveMonth.googleClicks);
-      document.getElementById("liveTopPage").textContent = liveMonth.topPage || "—";
+      document.getElementById("liveViews").textContent = formatNumber(current.views);
+      document.getElementById("liveUsers").textContent = formatNumber(current.users);
+      document.getElementById("liveSessions").textContent = formatNumber(current.sessions);
+      document.getElementById("liveTopPage").textContent = "—";
 
-      document.getElementById("allTimeViews").textContent = formatNumber(totalViews);
-      document.getElementById("allTimeVisitors").textContent = formatNumber(totalVisitors);
-      document.getElementById("allTimeClicks").textContent = formatNumber(totalClicks);
+      const liveNote = document.getElementById("livePeriodNote");
+      if (current.end_date) {
+        liveNote.textContent =
+          `Through ${current.end_date} · compared with ${comparison.start_date || "—"} to ${comparison.end_date || "—"}`;
+      } else {
+        liveNote.textContent = "Waiting for the first completed day of this month";
+      }
 
-      document.getElementById("currentMonthTitle").textContent = latest.label;
-      document.getElementById("monthViews").textContent = formatNumber(latest.views);
-      document.getElementById("monthVisitors").textContent = formatNumber(latest.visitors);
-      document.getElementById("monthClicks").textContent = formatNumber(latest.googleClicks);
-      document.getElementById("monthTopPage").textContent = latest.topPage;
-      document.getElementById("topNotesSubtitle").textContent =
-        `Most viewed technical notes · ${latest.label}`;
-
-      const viewChange = percentChange(latest.views, previous?.views);
-      const visitorChange = percentChange(latest.visitors, previous?.visitors);
-      const clickChange = percentChange(latest.googleClicks, previous?.googleClicks);
-
-      const changeItems = [
-        ["viewsChange", viewChange],
-        ["visitorsChange", visitorChange],
-        ["clicksChange", clickChange]
+      // Add MTD comparison text below the first three live metrics.
+      const liveCards = [
+        ["liveViews", current.views, comparison.views],
+        ["liveUsers", current.users, comparison.users],
+        ["liveSessions", current.sessions, comparison.sessions]
       ];
 
-      changeItems.forEach(([id, result]) => {
-        const el = document.getElementById(id);
-        el.textContent = result.text;
-        el.classList.toggle("is-muted", result.muted);
+      liveCards.forEach(([id, value, prev]) => {
+        const strong = document.getElementById(id);
+        let change = strong.parentElement.querySelector(".live-change");
+        if (!change) {
+          change = document.createElement("div");
+          change.className = "change live-change";
+          strong.insertAdjacentElement("afterend", change);
+        }
+        const result = percentChange(value, prev, "vs prev. month same period");
+        change.textContent = result.text;
+        change.classList.toggle("is-muted", result.muted);
       });
 
+      // Latest completed month
+      if (latest) {
+        document.getElementById("currentMonthTitle").textContent =
+          shortMonthLabel(latest.month);
+        document.getElementById("monthViews").textContent = formatNumber(latest.views);
+        document.getElementById("monthUsers").textContent = formatNumber(latest.users);
+        document.getElementById("monthSessions").textContent = formatNumber(latest.sessions);
+        document.getElementById("monthTopPage").textContent = latest.topPage || "—";
+
+        setChange("viewsChange", percentChange(latest.views, previous?.views));
+        setChange("usersChange", percentChange(latest.users, previous?.users));
+        setChange("sessionsChange", percentChange(latest.sessions, previous?.sessions));
+
+        document.getElementById("topNotesSubtitle").textContent =
+          `Most viewed technical notes · ${monthLabel(latest.month)}`;
+      } else {
+        document.getElementById("currentMonthTitle").textContent = "No completed month yet";
+      }
+
+      // Totals of archived completed months only.
+      document.getElementById("allTimeViews").textContent =
+        formatNumber(months.reduce((sum, m) => sum + Number(m.views || 0), 0));
+      document.getElementById("allTimeUsers").textContent =
+        formatNumber(months.reduce((sum, m) => sum + Number(m.users || 0), 0));
+      document.getElementById("allTimeSessions").textContent =
+        formatNumber(months.reduce((sum, m) => sum + Number(m.sessions || 0), 0));
+
       // Monthly chart
-      const maxViews = Math.max(...months.map(m => m.views), 1);
       const bars = document.getElementById("chartBars");
       bars.innerHTML = "";
+      const maxViews = Math.max(...months.map(m => Number(m.views || 0)), 1);
 
       months.forEach(m => {
         const group = document.createElement("div");
@@ -691,7 +702,7 @@
 
         const bar = document.createElement("div");
         bar.className = "bar";
-        bar.style.height = `${Math.max((m.views / maxViews) * 88, 3)}%`;
+        bar.style.height = `${Math.max((Number(m.views || 0) / maxViews) * 88, 3)}%`;
 
         const value = document.createElement("span");
         value.className = "bar-value";
@@ -707,22 +718,14 @@
         bars.appendChild(group);
       });
 
-      // Top pages
-      const topPages = document.getElementById("topPages");
-      topPages.innerHTML = "";
+      // Top pages are not exported yet.
+      document.getElementById("topPages").innerHTML = `
+        <div class="archive-data">
+          Top-page data is not included in the current GA4 export yet.
+        </div>
+      `;
 
-      latest.topPages.slice(0, 3).forEach((page, index) => {
-        const row = document.createElement("div");
-        row.className = "page-row";
-        row.innerHTML = `
-          <span class="rank rank-${index + 1}" aria-label="Rank ${index + 1}">${index + 1}</span>
-          <span class="page-name">${page.name}</span>
-          <span class="page-views">${formatNumber(page.views)} views</span>
-        `;
-        topPages.appendChild(row);
-      });
-
-      // Archive - newest first
+      // Archive
       const archive = document.getElementById("archive");
       archive.innerHTML = "";
 
@@ -730,35 +733,37 @@
         const item = document.createElement("details");
         item.innerHTML = `
           <summary>
-            <span>${m.label}</span>
+            <span>${monthLabel(m.month)}</span>
             <span>${formatNumber(m.views)} views</span>
           </summary>
           <div class="archive-data">
-            Visitors: ${formatNumber(m.visitors)}
+            Users: ${formatNumber(m.users)}
             &nbsp;·&nbsp;
-            Google Clicks: ${formatNumber(m.googleClicks)}
+            Sessions: ${formatNumber(m.sessions)}
             &nbsp;·&nbsp;
-            Top Page: ${m.topPage}
+            Period: ${m.start_date || "—"} to ${m.end_date || "—"}
           </div>
         `;
         archive.appendChild(item);
       });
     }
 
-    renderStats(statsData);
+    async function loadStats() {
+      try {
+        const response = await fetch(`stats-data.json?v=${Date.now()}`, {
+          cache: "no-store"
+        });
 
-    /*
-      FUTURE JSON VERSION:
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      fetch("stats-data.json")
-        .then(response => response.json())
-        .then(renderStats)
-        .catch(error => console.error("Unable to load statistics:", error));
+        renderStats(await response.json());
+      } catch (error) {
+        console.error("Unable to load statistics:", error);
+        document.getElementById("liveMonthTitle").textContent = "Statistics unavailable";
+      }
+    }
 
-      When using this, remove:
-        renderStats(statsData);
-      and move the statsData object into stats-data.json.
-    */
+    loadStats();
   </script>
 </body>
 </html>
