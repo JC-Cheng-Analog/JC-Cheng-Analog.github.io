@@ -1,8 +1,29 @@
 {
-  "month": "2026-07",
-  "start_date": "2026-07-01",
-  "end_date": "2026-07-31",
-  "users": 3,
-  "sessions": 6,
-  "views": 14
+  "months": [
+    {
+      "month": "2026-07",
+      "start_date": "2026-07-01",
+      "end_date": "2026-07-31",
+      "users": 3,
+      "sessions": 6,
+      "views": 14
+    }
+  ],
+  "current": {
+    "month": "2026-08",
+    "start_date": null,
+    "end_date": null,
+    "users": 0,
+    "sessions": 0,
+    "views": 0
+  },
+  "comparison": {
+    "month": "2026-07",
+    "start_date": null,
+    "end_date": null,
+    "users": 0,
+    "sessions": 0,
+    "views": 0
+  },
+  "updated_at": "2026-08-01T11:25:05+08:00"
 }
