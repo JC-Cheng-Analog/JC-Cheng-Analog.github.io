@@ -1,16 +1,19 @@
-name: Update GA4 Monthly Stats
+name: Update GA4 Daily Stats
 
 on:
   workflow_dispatch:
 
   # GitHub Actions cron uses UTC.
   # 18:00 UTC = 02:00 the next day in Taiwan (UTC+8).
-  # The Python script itself checks whether the Taiwan date is the 1st.
   schedule:
     - cron: "0 18 * * *"
 
 permissions:
   contents: write
+
+concurrency:
+  group: update-ga4-stats
+  cancel-in-progress: false
 
 jobs:
   update-ga4-stats:
@@ -30,7 +33,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install google-analytics-data google-auth
 
-      - name: Export previous month GA4 data
+      - name: Export GA4 statistics
         env:
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
           GA4_CREDENTIALS: ${{ secrets.GA4_CREDENTIALS }}
@@ -47,5 +50,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add stats-data.json
-          git commit -m "Update GA4 monthly statistics"
+          git commit -m "Update GA4 website statistics"
           git push
