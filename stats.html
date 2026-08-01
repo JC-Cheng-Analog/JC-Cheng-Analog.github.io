@@ -176,6 +176,14 @@
       margin-bottom: 2px;
     }
 
+    .metric-description {
+      color: var(--analog-gold);
+      margin-left: 5px;
+      font-size: .88em;
+      font-weight: 400;
+      white-space: normal;
+    }
+
     .month-stat strong {
       display: block;
       color: var(--jc-blue);
@@ -463,17 +471,17 @@
 
       <div class="month-grid">
         <div class="month-stat">
-          <small>Views</small>
+          <small>Views <span class="metric-description">— Total page views; repeat views by the same person are counted.</span></small>
           <strong id="liveViews">—</strong>
         </div>
 
         <div class="month-stat">
-          <small>Users</small>
+          <small>Users <span class="metric-description">— Visitors who viewed the website.</span></small>
           <strong id="liveUsers">—</strong>
         </div>
 
         <div class="month-stat">
-          <small>Sessions</small>
+          <small>Sessions <span class="metric-description">— Website visits; one visitor may create multiple sessions.</span></small>
           <strong id="liveSessions">—</strong>
         </div>
 
@@ -484,7 +492,7 @@
       </div>
     </section>
 
-    <!-- Current month -->
+    <!-- Latest completed month -->
     <section class="card section-card">
       <div class="section-title-row">
         <h2 id="currentMonthTitle">This Month</h2>
@@ -493,19 +501,19 @@
 
       <div class="month-grid">
         <div class="month-stat">
-          <small>Views</small>
+          <small>Views <span class="metric-description">— Total page views; repeat views by the same person are counted.</span></small>
           <strong id="monthViews">—</strong>
           <div class="change" id="viewsChange"></div>
         </div>
 
         <div class="month-stat">
-          <small>Users</small>
+          <small>Users <span class="metric-description">— Visitors who viewed the website.</span></small>
           <strong id="monthUsers">—</strong>
           <div class="change" id="usersChange"></div>
         </div>
 
         <div class="month-stat">
-          <small>Sessions</small>
+          <small>Sessions <span class="metric-description">— Website visits; one visitor may create multiple sessions.</span></small>
           <strong id="monthSessions">—</strong>
           <div class="change" id="sessionsChange"></div>
         </div>
@@ -531,15 +539,6 @@
           <div class="bars" id="chartBars"></div>
         </div>
       </div>
-    </section>
-
-    <!-- Top pages -->
-    <section class="card section-card">
-      <div class="section-title-row">
-        <h2>Top 3 Notes</h2>
-        <span class="section-note" id="topNotesSubtitle">Most viewed technical notes · latest month</span>
-      </div>
-      <div class="top-pages" id="topPages"></div>
     </section>
 
     <!-- Archive -->
@@ -596,6 +595,18 @@
       return `${mon} ${year}`;
     };
 
+    const taipeiMonthKey = () => {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Taipei",
+        year: "numeric",
+        month: "2-digit"
+      }).formatToParts(new Date());
+
+      const year = parts.find(part => part.type === "year")?.value;
+      const month = parts.find(part => part.type === "month")?.value;
+      return year && month ? `${year}-${month}` : "";
+    };
+
     function percentChange(current, previous, label = "vs previous month") {
       current = Number(current ?? 0);
       previous = Number(previous ?? 0);
@@ -617,24 +628,51 @@
       el.classList.toggle("is-muted", result.muted);
     }
 
+    function setLiveMonthFallback() {
+      document.getElementById("liveMonthTitle").textContent =
+        shortMonthLabel(taipeiMonthKey());
+      document.getElementById("liveViews").textContent = "0";
+      document.getElementById("liveUsers").textContent = "0";
+      document.getElementById("liveSessions").textContent = "0";
+      document.getElementById("liveTopPage").textContent = "—";
+    }
+
     function renderStats(data) {
-      const months = [...(data.months || [])]
+      // Backward compatibility: the old Python file wrote one flat monthly record.
+      const rawMonths = Array.isArray(data.months)
+        ? data.months
+        : (data.month ? [data] : []);
+
+      const months = [...rawMonths]
         .filter(m => m && m.month)
         .sort((a, b) => a.month.localeCompare(b.month));
 
-      const current = data.current || {};
-      const comparison = data.comparison || {};
+      const current = {
+        month: data.current?.month || taipeiMonthKey(),
+        users: 0,
+        sessions: 0,
+        views: 0,
+        ...data.current
+      };
+
+      const comparison = {
+        users: 0,
+        sessions: 0,
+        views: 0,
+        ...data.comparison
+      };
+
       const latest = months.length ? months[months.length - 1] : null;
       const previous = months.length > 1 ? months[months.length - 2] : null;
 
       // Current month-to-date
       document.getElementById("liveMonthTitle").textContent =
-        shortMonthLabel(current.month);
+        shortMonthLabel(current.month || taipeiMonthKey());
 
       document.getElementById("liveViews").textContent = formatNumber(current.views);
       document.getElementById("liveUsers").textContent = formatNumber(current.users);
       document.getElementById("liveSessions").textContent = formatNumber(current.sessions);
-      document.getElementById("liveTopPage").textContent = "—";
+      document.getElementById("liveTopPage").textContent = current.topPage || "—";
 
       const liveNote = document.getElementById("livePeriodNote");
       if (current.end_date) {
@@ -676,9 +714,6 @@
         setChange("viewsChange", percentChange(latest.views, previous?.views));
         setChange("usersChange", percentChange(latest.users, previous?.users));
         setChange("sessionsChange", percentChange(latest.sessions, previous?.sessions));
-
-        document.getElementById("topNotesSubtitle").textContent =
-          `Most viewed technical notes · ${monthLabel(latest.month)}`;
       } else {
         document.getElementById("currentMonthTitle").textContent = "No completed month yet";
       }
@@ -718,13 +753,6 @@
         bars.appendChild(group);
       });
 
-      // Top pages are not exported yet.
-      document.getElementById("topPages").innerHTML = `
-        <div class="archive-data">
-          Top-page data is not included in the current GA4 export yet.
-        </div>
-      `;
-
       // Archive
       const archive = document.getElementById("archive");
       archive.innerHTML = "";
@@ -749,6 +777,8 @@
     }
 
     async function loadStats() {
+      setLiveMonthFallback();
+
       try {
         const response = await fetch(`stats-data.json?v=${Date.now()}`, {
           cache: "no-store"
@@ -759,7 +789,8 @@
         renderStats(await response.json());
       } catch (error) {
         console.error("Unable to load statistics:", error);
-        document.getElementById("liveMonthTitle").textContent = "Statistics unavailable";
+        document.getElementById("livePeriodNote").textContent =
+          "Statistics data is temporarily unavailable";
       }
     }
 
