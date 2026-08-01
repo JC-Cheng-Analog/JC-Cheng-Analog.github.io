@@ -176,12 +176,37 @@
       margin-bottom: 2px;
     }
 
-    .metric-description {
+    .metric-notes-card {
+      margin-top: 18px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    .metric-notes-title {
+      margin: 0 0 10px;
+      color: var(--jc-blue);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .metric-notes-list {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .metric-notes-list li + li {
+      margin-top: 8px;
+    }
+
+    .metric-note-label {
+      color: var(--jc-blue);
+      font-weight: 700;
+    }
+
+    .metric-note-desc {
       color: var(--analog-gold);
-      margin-left: 5px;
-      font-size: .88em;
       font-weight: 400;
-      white-space: normal;
     }
 
     .month-stat strong {
@@ -471,17 +496,17 @@
 
       <div class="month-grid">
         <div class="month-stat">
-          <small>Views <span class="metric-description">— Total page views; repeat views by the same person are counted.</span></small>
+          <small>Views</small>
           <strong id="liveViews">—</strong>
         </div>
 
         <div class="month-stat">
-          <small>Users <span class="metric-description">— Visitors who viewed the website.</span></small>
+          <small>Users</small>
           <strong id="liveUsers">—</strong>
         </div>
 
         <div class="month-stat">
-          <small>Sessions <span class="metric-description">— Website visits; one visitor may create multiple sessions.</span></small>
+          <small>Sessions</small>
           <strong id="liveSessions">—</strong>
         </div>
 
@@ -496,24 +521,24 @@
     <section class="card section-card">
       <div class="section-title-row">
         <h2 id="currentMonthTitle">This Month</h2>
-        <span class="section-note">Latest completed reporting period</span>
+        <span class="section-note" id="currentPeriodNote">Record period: —</span>
       </div>
 
       <div class="month-grid">
         <div class="month-stat">
-          <small>Views <span class="metric-description">— Total page views; repeat views by the same person are counted.</span></small>
+          <small>Views</small>
           <strong id="monthViews">—</strong>
           <div class="change" id="viewsChange"></div>
         </div>
 
         <div class="month-stat">
-          <small>Users <span class="metric-description">— Visitors who viewed the website.</span></small>
+          <small>Users</small>
           <strong id="monthUsers">—</strong>
           <div class="change" id="usersChange"></div>
         </div>
 
         <div class="month-stat">
-          <small>Sessions <span class="metric-description">— Website visits; one visitor may create multiple sessions.</span></small>
+          <small>Sessions</small>
           <strong id="monthSessions">—</strong>
           <div class="change" id="sessionsChange"></div>
         </div>
@@ -523,6 +548,15 @@
           <strong id="monthTopPage">—</strong>
         </div>
       </div>
+    </section>
+
+    <section class="card section-card metric-notes-card">
+      <div class="metric-notes-title">Metric Notes</div>
+      <ul class="metric-notes-list">
+        <li><span class="metric-note-label">Views</span> <span class="metric-note-desc">— Total page views; repeat views by the same person are counted.</span></li>
+        <li><span class="metric-note-label">Users</span> <span class="metric-note-desc">— Visitors who viewed the website.</span></li>
+        <li><span class="metric-note-label">Sessions</span> <span class="metric-note-desc">— Website visits; one visitor may create multiple sessions.</span></li>
+      </ul>
     </section>
 
     <!-- Trend -->
@@ -607,6 +641,29 @@
       return year && month ? `${year}-${month}` : "";
     };
 
+    const shortDate = value => {
+      if (!value) return "—";
+      const [year, month, day] = value.split("-");
+      return `${Number(month)}/${day}`;
+    };
+
+    const periodLabel = (start, end) => {
+      if (!start || !end) return "Record period: —";
+      return `Record period: ${shortDate(start)} ~ ${shortDate(end)}`;
+    };
+
+    const updatedAtLabel = value => {
+      if (!value) return "Last updated: —";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Last updated: —";
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      const hh = String(date.getHours()).padStart(2, "0");
+      const mm = String(date.getMinutes()).padStart(2, "0");
+      return `Last updated: ${y}/${m}/${d} ${hh}:${mm}`;
+    };
+
     function percentChange(current, previous, label = "vs previous month") {
       current = Number(current ?? 0);
       previous = Number(previous ?? 0);
@@ -675,12 +732,7 @@
       document.getElementById("liveTopPage").textContent = current.topPage || "—";
 
       const liveNote = document.getElementById("livePeriodNote");
-      if (current.end_date) {
-        liveNote.textContent =
-          `Through ${current.end_date} · compared with ${comparison.start_date || "—"} to ${comparison.end_date || "—"}`;
-      } else {
-        liveNote.textContent = "Waiting for the first completed day of this month";
-      }
+      liveNote.textContent = updatedAtLabel(data.updated_at);
 
       // Add MTD comparison text below the first three live metrics.
       const liveCards = [
@@ -703,6 +755,8 @@
       });
 
       // Latest completed month
+      const currentPeriodNote = document.getElementById("currentPeriodNote");
+
       if (latest) {
         document.getElementById("currentMonthTitle").textContent =
           shortMonthLabel(latest.month);
@@ -710,12 +764,14 @@
         document.getElementById("monthUsers").textContent = formatNumber(latest.users);
         document.getElementById("monthSessions").textContent = formatNumber(latest.sessions);
         document.getElementById("monthTopPage").textContent = latest.topPage || "—";
+        currentPeriodNote.textContent = periodLabel(latest.start_date, latest.end_date);
 
         setChange("viewsChange", percentChange(latest.views, previous?.views));
         setChange("usersChange", percentChange(latest.users, previous?.users));
         setChange("sessionsChange", percentChange(latest.sessions, previous?.sessions));
       } else {
         document.getElementById("currentMonthTitle").textContent = "No completed month yet";
+        currentPeriodNote.textContent = "Record period: —";
       }
 
       // Totals of archived completed months only.
@@ -790,7 +846,9 @@
       } catch (error) {
         console.error("Unable to load statistics:", error);
         document.getElementById("livePeriodNote").textContent =
-          "Statistics data is temporarily unavailable";
+          "Last updated: unavailable";
+        document.getElementById("currentPeriodNote").textContent =
+          "Record period: —";
       }
     }
 
