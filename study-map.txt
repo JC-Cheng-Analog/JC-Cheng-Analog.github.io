@@ -1,0 +1,120 @@
+JC Cheng Analog — Study Map Master List
+=======================================
+Updated: 2026-08-01
+
+PURPOSE
+-------
+This file is the master outline for the Study Map.
+Use indentation to represent hierarchy.
+
+FORMAT
+------
+[GROUP] = expandable category; no separate HTML page required.
+[PAGE][AVAILABLE] = clickable page that already exists.
+[PAGE][PLANNED] = clickable page planned for generation.
+
+Each page line follows:
+[PAGE][STATUS] Display Title | filename.html
+
+MANAGEMENT RULES
+----------------
+1. Add, remove, rename, or move an item in this file first.
+2. Keep every HTML filename lowercase and use hyphens between words.
+3. Do not reuse one filename for unrelated topics.
+4. When a planned page is created, change [PLANNED] to [AVAILABLE].
+5. For a large map, use this file as the single source of truth and run a generator script to:
+   - update the Study Map section in index.html;
+   - create missing HTML pages from the page template;
+   - preserve existing completed pages;
+   - report duplicate filenames or broken links.
+6. The generator script will be prepared during Step 3 after the first page is reviewed.
+
+STUDY MAP
+---------
+[GROUP] Power Management
+  [GROUP] Switching Converters
+    [GROUP] Buck Converter
+      [PAGE][PLANNED] Operating Principle | buck-operating-principle.html
+      [PAGE][PLANNED] Steady-State Analysis | buck-steady-state-analysis.html
+      [PAGE][PLANNED] Small-Signal Modeling | buck-small-signal-modeling.html
+
+    [GROUP] Boost Converter
+      [PAGE][PLANNED] Operating Principle | boost-operating-principle.html
+      [PAGE][PLANNED] Steady-State Analysis | boost-steady-state-analysis.html
+      [PAGE][PLANNED] Small-Signal Modeling | boost-small-signal-modeling.html
+
+    [GROUP] Feedback & Compensation
+      [PAGE][PLANNED] Loop Stability | loop-stability.html
+      [PAGE][AVAILABLE] TL431-Based Compensation | small-signal-analysis.html
+      [PAGE][PLANNED] Op-Amp-Based Compensation | op-amp-based-compensation.html
+      [PAGE][PLANNED] OTA-Based Compensation | ota-based-compensation.html
+
+  [GROUP] Linear Regulators
+    [GROUP] LDO
+      [PAGE][PLANNED] Operating Principle | ldo-operating-principle.html
+      [PAGE][PLANNED] DC Analysis | ldo-dc-analysis.html
+      [PAGE][PLANNED] Small-Signal Modeling | ldo-small-signal-modeling.html
+      [PAGE][PLANNED] Stability & Compensation | ldo-stability.html
+      [PAGE][PLANNED] Transient Response | ldo-transient-response.html
+
+[GROUP] Analog Building Blocks
+  [PAGE][PLANNED] Current Mirrors | current-mirrors.html
+  [PAGE][PLANNED] Differential Pairs | differential-pairs.html
+  [PAGE][PLANNED] 5-Transistor OTA | five-transistor-ota.html
+
+  [GROUP] Operational Amplifiers & OTAs
+    [PAGE][PLANNED] DC Analysis | op-amp-dc-analysis.html
+    [PAGE][PLANNED] Small-Signal / AC Analysis | small-signal-analysis-opamp.html
+    [PAGE][PLANNED] Large-Signal / Transient Analysis | op-amp-transient-analysis.html
+    [PAGE][PLANNED] Stability | op-amp-stability.html
+    [PAGE][PLANNED] Frequency Compensation | op-amp-frequency-compensation.html
+
+  [GROUP] Voltage References
+    [PAGE][PLANNED] Bandgap Reference | bandgap-ref.html
+
+  [PAGE][PLANNED] Oscillators | oscillators.html
+
+[GROUP] Practical Analysis & Debugging
+  [PAGE][PLANNED] RC Time-Constant Estimation | rc-time-constant-estimation.html
+  [PAGE][PLANNED] I–V Curve Analysis | iv-curve-analysis.html
+  [PAGE][PLANNED] Operating-Point Analysis | operating-point-analysis.html
+  [PAGE][PLANNED] Signal Path Analysis | signal-path-analysis.html
+
+  [GROUP] Statistical Analysis
+    [PAGE][PLANNED] Gaussian Distribution | gaussian-distribution.html
+    [PAGE][PLANNED] Process Variation | process-variation.html
+    [PAGE][PLANNED] Monte Carlo Analysis | monte-carlo-analysis.html
+
+[PAGE][PLANNED] Debug Cases | debug-cases.html
+
+STEP 3 PAGE ORDER
+-----------------
+Generate and review one page at a time in this order:
+1. buck-operating-principle.html
+2. buck-steady-state-analysis.html
+3. buck-small-signal-modeling.html
+4. boost-operating-principle.html
+5. boost-steady-state-analysis.html
+6. boost-small-signal-modeling.html
+7. loop-stability.html
+8. op-amp-based-compensation.html
+9. ota-based-compensation.html
+10. ldo-operating-principle.html
+11. ldo-dc-analysis.html
+12. ldo-small-signal-modeling.html
+13. ldo-transient-response.html
+14. current-mirrors.html
+15. differential-pairs.html
+16. five-transistor-ota.html
+17. op-amp-dc-analysis.html
+18. op-amp-transient-analysis.html
+19. op-amp-stability.html
+20. op-amp-frequency-compensation.html
+21. oscillators.html
+22. rc-time-constant-estimation.html
+23. iv-curve-analysis.html
+24. operating-point-analysis.html
+25. signal-path-analysis.html
+26. gaussian-distribution.html
+27. process-variation.html
+28. monte-carlo-analysis.html

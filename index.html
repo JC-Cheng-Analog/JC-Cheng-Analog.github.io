@@ -230,14 +230,52 @@
       outline: none;
     }
 
-    .study-map-legend {
+    .study-map-toolbar {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 18px;
-      padding: 12px 24px;
+      padding: 10px 24px;
       border-bottom: 1px solid #e2e5e8;
       background: #f7f8fa;
+    }
+
+    .study-map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
       color: #667085;
       font-size: 12px;
+    }
+
+    .study-map-toggle {
+      flex: 0 0 auto;
+      min-height: 34px;
+      padding: 7px 12px;
+      border: 1px solid #cfd5dc;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #34485e;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(11, 46, 89, 0.06);
+      transition:
+        color 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .study-map-toggle:hover,
+    .study-map-toggle:focus-visible {
+      border-color: rgba(176, 141, 87, 0.62);
+      background: #fffdf7;
+      color: #0b2e59;
+      transform: translateY(-1px);
+      outline: none;
     }
 
     .study-map-content {
@@ -884,8 +922,19 @@
         padding: 18px 18px 15px;
       }
 
+      .study-map-toolbar {
+        align-items: flex-start;
+        padding: 10px 18px;
+      }
+
       .study-map-legend {
-        padding: 11px 18px;
+        gap: 10px 16px;
+      }
+
+      .study-map-toggle {
+        min-height: 32px;
+        padding: 7px 10px;
+        font-size: 12px;
       }
 
       .study-map-content {
@@ -1108,13 +1157,25 @@
         <button class="study-map-close" id="study-map-close" type="button" aria-label="Close Study Map">×</button>
       </div>
 
-      <div class="study-map-legend" aria-label="Content status">
-        <span><span class="map-status available" aria-hidden="true"></span> Available</span>
-        <span><span class="map-status planned" aria-hidden="true"></span> Planned</span>
+      <div class="study-map-toolbar">
+        <div class="study-map-legend" aria-label="Content status">
+          <span><span class="map-status available" aria-hidden="true"></span> Available</span>
+          <span><span class="map-status planned" aria-hidden="true"></span> Planned</span>
+        </div>
+
+        <button
+          class="study-map-toggle"
+          id="study-map-toggle"
+          type="button"
+          aria-controls="study-map-tree"
+          aria-expanded="false"
+        >
+          Expand All
+        </button>
       </div>
 
       <div class="study-map-content">
-        <ul class="study-map-tree">
+        <ul class="study-map-tree" id="study-map-tree">
           <li>
             <details open>
               <summary>Power Management</summary>
@@ -1482,6 +1543,36 @@
       const studyMapTrigger = document.getElementById("study-map-trigger");
       const studyMapDialog = document.getElementById("study-map-dialog");
       const studyMapClose = document.getElementById("study-map-close");
+      const studyMapToggle = document.getElementById("study-map-toggle");
+      const studyMapTree = document.getElementById("study-map-tree");
+      const studyMapDetails = Array.from(
+        studyMapTree.querySelectorAll("details")
+      );
+      const topLevelDetails = Array.from(studyMapTree.children)
+        .map((item) => item.querySelector(":scope > details"))
+        .filter(Boolean);
+
+      const setStudyMapToggleState = (isExpanded) => {
+        studyMapToggle.textContent = isExpanded ? "Collapse All" : "Expand All";
+        studyMapToggle.setAttribute("aria-expanded", String(isExpanded));
+      };
+
+      const expandStudyMap = () => {
+        studyMapDetails.forEach((details) => {
+          details.open = true;
+        });
+        setStudyMapToggleState(true);
+      };
+
+      const collapseStudyMapToSecondLevel = () => {
+        studyMapDetails.forEach((details) => {
+          details.open = false;
+        });
+        topLevelDetails.forEach((details) => {
+          details.open = true;
+        });
+        setStudyMapToggleState(false);
+      };
 
       const openStudyMap = () => {
         studyMapDialog.showModal();
@@ -1519,8 +1610,21 @@
         });
       });
 
+      studyMapToggle.addEventListener("click", () => {
+        const isExpanded = studyMapToggle.getAttribute("aria-expanded") === "true";
+
+        if (isExpanded) {
+          collapseStudyMapToSecondLevel();
+        } else {
+          expandStudyMap();
+        }
+      });
+
       studyMapTrigger.addEventListener("click", openStudyMap);
       studyMapClose.addEventListener("click", closeStudyMap);
+
+      // Default view: show only the first and second levels.
+      collapseStudyMapToSecondLevel();
 
       studyMapDialog.addEventListener("click", (event) => {
         if (event.target === studyMapDialog) {
