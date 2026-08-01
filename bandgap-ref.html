@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8VZV3YWSBB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-8VZV3YWSBB');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Bandgap Reference | JC Cheng Analog</title>
+  <meta
+    name="description"
+    content="JC Cheng Analog technical note for Analog Building Blocks / Voltage References / Bandgap Reference. Bandgap-reference principles, temperature compensation, and design considerations."
+  />
+  <link rel="canonical" href="https://jc-cheng-analog.github.io/bandgap-ref.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="JC Cheng Analog" />
+  <meta property="og:title" content="Bandgap Reference | JC Cheng Analog" />
+  <meta
+    property="og:description"
+    content="JC Cheng Analog technical note for Analog Building Blocks / Voltage References / Bandgap Reference. Bandgap-reference principles, temperature compensation, and design considerations."
+  />
+  <meta property="og:url" content="https://jc-cheng-analog.github.io/bandgap-ref.html" />
+
+  <style>
+    :root {
+      --navy: #0b2e59;
+      --gold: #c99700;
+      --text: #222222;
+      --muted: #666666;
+      --background: #fafafa;
+      --card: #ffffff;
+      --border: #dddddd;
+      --link: #005fcc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px;
+      color: var(--text);
+      background: var(--background);
+      font-family: Arial, "Noto Sans TC", sans-serif;
+      line-height: 1.7;
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 8px;
+    }
+
+    .site-title {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.1;
+    }
+
+    .name {
+      color: var(--navy);
+    }
+
+    .analog {
+      color: var(--gold);
+    }
+
+    .site-logo {
+      display: block;
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .breadcrumb {
+      margin: 18px 0 28px;
+      font-size: 15px;
+    }
+
+    .breadcrumb a,
+    .back-link {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover,
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .page-heading {
+      margin: 0;
+      padding-bottom: 10px;
+      color: var(--navy);
+      font-size: 34px;
+      line-height: 1.25;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .page-intro {
+      margin: 12px 0 30px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .section-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0 0 28px;
+    }
+
+    .section-nav a {
+      padding: 7px 12px;
+      color: var(--navy);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .section-nav a:hover {
+      border-color: var(--gold);
+    }
+
+    .note-card {
+      margin: 20px 0;
+      padding: 24px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      scroll-margin-top: 20px;
+    }
+
+    .note-card h2 {
+      margin: 0 0 18px;
+      color: var(--navy);
+      font-size: 25px;
+      line-height: 1.35;
+    }
+
+    .note-card-heading-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 0 18px;
+    }
+
+    .note-card-heading-row h2 {
+      margin: 0;
+    }
+
+    .updated-date {
+      flex: 0 0 auto;
+      margin-top: 5px;
+      color: #8a8f96;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    .method {
+      display: block;
+      margin-top: 4px;
+      color: var(--gold);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .image-frame {
+      position: relative;
+      display: grid;
+      min-height: 320px;
+      margin: 0 0 20px;
+      overflow: hidden;
+      place-items: center;
+      background: #f5f6f8;
+      border: 2px dashed #c8cdd3;
+      border-radius: 10px;
+    }
+
+    .analysis-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 720px;
+      object-fit: contain;
+      background: #ffffff;
+    }
+
+    .image-placeholder {
+      padding: 32px;
+      color: #7a7f86;
+      text-align: center;
+    }
+
+    .image-placeholder strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #4c535b;
+      font-size: 18px;
+    }
+
+    .image-placeholder code {
+      padding: 3px 7px;
+      background: #e9ecef;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .description {
+      margin: 0;
+      color: #444444;
+    }
+
+    .description h3 {
+      margin: 28px 0 10px;
+      color: var(--navy);
+      font-size: 20px;
+      line-height: 1.35;
+    }
+
+    .description h3:first-child {
+      margin-top: 0;
+    }
+
+    .description pre {
+      margin: 12px 0 18px;
+      padding: 16px;
+      overflow-x: auto;
+      color: #1f2933;
+      background: #f5f6f8;
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      font-family: "Courier New", Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    .description code {
+      font-family: inherit;
+    }
+
+    .page-divider {
+      margin: 38px 0 30px;
+      border: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .subpage-title {
+      margin: 0 0 18px;
+      color: var(--navy);
+      font-size: 23px;
+      line-height: 1.35;
+    }
+
+    .return-to-figure {
+      position: fixed;
+      /* Align the button with the right edge of the 860 px content area. */
+      right: max(18px, calc((100vw - 860px) / 2 + 18px));
+      bottom: 24px;
+      z-index: 1000;
+      display: flex;
+      width: 52px;
+      height: 52px;
+      padding: 0 14px;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px;
+      overflow: hidden;
+      white-space: nowrap;
+      color: #ffffff;
+      background: var(--navy);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 26px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition:
+        width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 180ms ease,
+        transform 180ms ease,
+        visibility 180ms ease,
+        background 180ms ease;
+    }
+
+    .return-to-figure.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .return-to-figure:hover,
+    .return-to-figure:focus-visible {
+      width: 138px;
+      background: #123f75;
+    }
+
+    .return-to-figure:focus-visible {
+      outline: 3px solid rgba(201, 151, 0, 0.45);
+      outline-offset: 3px;
+    }
+
+    .return-to-figure svg {
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.9;
+    }
+
+    .return-to-figure-label {
+      display: block;
+      min-width: 76px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateX(-5px);
+      transition:
+        opacity 150ms ease 45ms,
+        transform 180ms ease 45ms;
+    }
+
+    .return-to-figure:hover .return-to-figure-label,
+    .return-to-figure:focus-visible .return-to-figure-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    @media (max-width: 600px) {
+      .footer-navigation {
+        gap: 14px;
+      }
+
+      .return-to-figure {
+        right: 16px;
+        bottom: 16px;
+        width: 48px;
+        height: 48px;
+        padding: 0 12px;
+        border-radius: 24px;
+      }
+
+      .return-to-figure:hover,
+      .return-to-figure:focus-visible {
+        width: 126px;
+      }
+    }
+
+    .footer-navigation {
+      position: relative;
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: flex-start;
+      font-size: 110%;
+    }
+
+    .back-to-top-link {
+      position: absolute;
+      left: 50%;
+      padding: 0;
+      background: none;
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+      transform: translateX(-50%);
+    }
+
+    .back-to-top-link:hover {
+      transform: translate(-50%, -2px);
+      transition: transform 0.2s ease;
+    }
+
+    .page-footer {
+      margin-top: 38px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 32px 18px;
+      }
+
+      .site-header {
+        gap: 16px;
+      }
+
+      .site-title {
+        font-size: 34px;
+      }
+
+      .site-logo {
+        width: 68px;
+        height: 68px;
+      }
+
+      .page-heading {
+        font-size: 29px;
+      }
+
+      .note-card {
+        padding: 20px;
+      }
+
+      .note-card h2 {
+        font-size: 22px;
+      }
+
+      .note-card-heading-row {
+        gap: 12px;
+      }
+
+      .updated-date {
+        margin-top: 4px;
+        font-size: 12px;
+      }
+
+      .image-frame {
+        min-height: 230px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="site-title" aria-label="JC Cheng Analog">
+      <span class="name">JC Cheng</span>
+      <span class="analog">Analog</span>
+    </div>
+
+    <!-- Keep logo.png in the same folder as this HTML file. -->
+    <img
+      class="site-logo"
+      src="logo.png"
+      alt="JC Cheng Analog logo"
+      onerror="this.style.display='none'"
+    />
+  </header>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="index.html">Home</a>
+    <span aria-hidden="true"> / </span>
+    <span>Analog Building Blocks</span>
+    <span aria-hidden="true"> / </span>
+    <span>Voltage References</span>
+    <span aria-hidden="true"> / </span>
+    <span>Bandgap Reference</span>
+  </nav>
+
+  <main>
+    <h1 class="page-heading">Bandgap Reference</h1>
+    <p class="page-intro">
+      Bandgap-reference principles, temperature compensation, and design considerations.
+    </p>
+
+        <nav class="section-nav" aria-label="Page sections">
+      <a href="#bandgap-ref">Bandgap Reference</a>
+    </nav>
+
+    <section class="note-card" id="bandgap-ref">
+      <div class="note-card-heading-row">
+        <h2>Bandgap Reference</h2>
+        <span class="updated-date">Last updated · 2026.08.01</span>
+      </div>
+
+      <div class="image-frame" id="figure-i">
+        <div class="image-placeholder">
+          <strong>Image placeholder</strong>
+        </div>
+      </div>
+
+      <p class="description">To be continued.</p>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <div class="footer-navigation">
+      <a class="back-link" href="index.html">← Back to Home</a>
+
+      <button class="back-link back-to-top-link" id="back-to-top" type="button">
+        ↑ Top
+      </button>
+    </div>
+  </footer>
+
+
+  <button
+    class="return-to-figure"
+    id="return-to-figure"
+    type="button"
+    aria-label="Return to the latest figure"
+    title="Return to the latest figure"
+  >
+    <!-- Inline SVG icon: image frame with an upward return arrow -->
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="5.5" width="17" height="14" rx="2"></rect>
+      <circle cx="8.25" cy="10" r="1.35"></circle>
+      <path d="M5.5 17l4.2-4.1 3.1 3 2.2-2.2 3.5 3.3"></path>
+      <path d="M12 2.75v5"></path>
+      <path d="M9.7 5.05 12 2.75l2.3 2.3"></path>
+    </svg>
+    <span class="return-to-figure-label" id="return-to-figure-label">
+      Figure
+    </span>
+  </button>
+
+  <script>
+    (() => {
+      const navLinks = document.querySelectorAll('.section-nav a[href^="#"]');
+      const figureFrames = Array.from(
+        document.querySelectorAll('.image-frame[id^="figure-"]')
+      );
+      const returnToFigureButton =
+        document.getElementById('return-to-figure');
+      const returnToFigureLabel =
+        document.getElementById('return-to-figure-label');
+
+      let activeAnimation = null;
+      let currentFigure = null;
+
+      function easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function scrollToSection(target) {
+        if (activeAnimation) {
+          cancelAnimationFrame(activeAnimation);
+          activeAnimation = null;
+        }
+
+        const scrollingElement =
+          document.scrollingElement || document.documentElement;
+
+        const startY = scrollingElement.scrollTop;
+        const targetRect = target.getBoundingClientRect();
+        const desiredY = Math.max(0, startY + targetRect.top - 20);
+        const distance = desiredY - startY;
+        const duration = Math.min(
+          1400,
+          Math.max(700, 650 + Math.abs(distance) * 0.35)
+        );
+        const startTime = performance.now();
+
+        function animate(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easedProgress = easeInOutCubic(progress);
+
+          scrollingElement.scrollTop = startY + distance * easedProgress;
+
+          if (progress < 1) {
+            activeAnimation = requestAnimationFrame(animate);
+          } else {
+            activeAnimation = null;
+            history.pushState(null, '', `#${target.id}`);
+          }
+        }
+
+        activeAnimation = requestAnimationFrame(animate);
+      }
+
+      navLinks.forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const targetId = link.getAttribute('href').slice(1);
+          const target = document.getElementById(targetId);
+
+          if (!target) return;
+
+          event.preventDefault();
+          scrollToSection(target);
+        });
+      });
+
+
+      function updateReturnToFigureButton() {
+        const referenceLine = 90;
+        let latestPassedFigure = null;
+
+        figureFrames.forEach((figure) => {
+          const rect = figure.getBoundingClientRect();
+
+          if (rect.top <= referenceLine) {
+            latestPassedFigure = figure;
+          }
+        });
+
+        currentFigure = latestPassedFigure;
+
+        if (!currentFigure) {
+          returnToFigureButton.classList.remove('is-visible');
+          return;
+        }
+
+        const currentRect = currentFigure.getBoundingClientRect();
+        const imageHasLeftViewport = currentRect.bottom < referenceLine;
+
+        returnToFigureButton.classList.toggle(
+          'is-visible',
+          imageHasLeftViewport
+        );
+
+        const image = currentFigure.querySelector('img');
+        const label = image?.alt || 'latest figure';
+        const figureNameMap = {
+          'figure-i': 'Figure'
+        };
+        const shortLabel =
+          figureNameMap[currentFigure.id] || 'Figure';
+
+        returnToFigureLabel.textContent = shortLabel;
+
+        returnToFigureButton.setAttribute(
+          'aria-label',
+          `Return to ${label}`
+        );
+        returnToFigureButton.setAttribute(
+          'title',
+          `Return to ${label}`
+        );
+      }
+
+      returnToFigureButton.addEventListener('click', () => {
+        if (currentFigure) {
+          scrollToSection(currentFigure);
+        }
+      });
+
+      window.addEventListener('scroll', updateReturnToFigureButton, {
+        passive: true
+      });
+      window.addEventListener('resize', updateReturnToFigureButton);
+      updateReturnToFigureButton();
+
+      const backToTopButton = document.getElementById('back-to-top');
+
+      backToTopButton?.addEventListener('click', () => {
+        scrollToSection(document.body);
+      });
+    })();
+  </script>
+
+</body>
+</html>
