@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive comparison of simple, cascode, and gain-boosted current mirrors." />
+  <title>Current Mirror Explorer | JC Cheng Analog</title>
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --card: #f8fafc;
+      --text: #172033;
+      --muted: #667085;
+      --border: #d9e0ea;
+      --accent: #17345c;
+      --accent-soft: #eef3f8;
+      --gold: #b18a3b;
+
+      --simple: #2d6cdf;
+      --cascode: #c28b2c;
+      --gain: #7b4db3;
+      --danger-soft: rgba(186, 64, 64, 0.08);
+
+      --shadow: 0 10px 30px rgba(23, 32, 51, 0.07);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans TC", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page-shell {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .eyebrow-name {
+      color: #0b2e59;
+    }
+
+    .eyebrow-analog {
+      color: #b08d57;
+    }
+
+    .eyebrow-tool {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(1.8rem, 3vw, 2.7rem);
+      line-height: 1.15;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-size: 1.08rem;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .header-links {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 176px;
+      padding: 9px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--accent);
+      background: var(--panel);
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+    }
+
+    .brand-link:hover,
+    .brand-link:focus-visible {
+      border-color: rgba(177, 138, 59, 0.65);
+      background: #fffdf7;
+      text-decoration: none;
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: minmax(250px, 310px) minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel,
+    .metric-card,
+    .result-card,
+    .equation-card,
+    .sensitivity-card,
+    .chart-wrap,
+    .callout {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+    }
+
+    .controls-panel {
+      position: sticky;
+      top: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .control-group {
+      margin-bottom: 18px;
+    }
+
+    .control-group:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 0.93rem;
+    }
+
+    .control-label strong {
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .divider {
+      height: 1px;
+      margin: 20px 0;
+      background: var(--border);
+    }
+
+    .switch-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    .switch-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .reset-button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 11px 14px;
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      color: #ffffff;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    .reset-button:hover {
+      transform: translateY(-1px);
+      opacity: 0.92;
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .metrics-grid,
+    .results-grid,
+    .equation-grid,
+    .sensitivity-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .metrics-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .results-grid,
+    .equation-grid,
+    .sensitivity-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .metric-card,
+    .result-card,
+    .equation-card,
+    .sensitivity-card {
+      padding: 16px;
+    }
+
+    .metric-label,
+    .section-note,
+    .muted {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .metric-value {
+      margin-top: 4px;
+      font-size: 1.35rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+    }
+
+    .section-block {
+      display: grid;
+      gap: 10px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .chart-wrap {
+      overflow: hidden;
+      padding: 4px;
+      background: var(--panel);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      touch-action: none;
+    }
+
+    #mainPlot {
+      height: 410px;
+    }
+
+    #zoomPlot {
+      height: 330px;
+    }
+
+    #internalPlot {
+      height: 250px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-line {
+      width: 30px;
+      height: 4px;
+      border-radius: 999px;
+    }
+
+    .legend-line.simple {
+      background: var(--simple);
+    }
+
+    .legend-line.cascode {
+      background: var(--cascode);
+    }
+
+    .legend-line.gain {
+      background: var(--gain);
+    }
+
+    .legend-line.ideal {
+      height: 0;
+      border-top: 2px dashed var(--text);
+      border-radius: 0;
+    }
+
+    .result-title,
+    .equation-title,
+    .sensitivity-title {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .result-current {
+      margin: 5px 0 2px;
+      font-size: 1.28rem;
+      font-weight: 750;
+    }
+
+    .equation-main {
+      margin: 8px 0;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+    }
+
+    .callout {
+      padding: 16px 18px;
+      border-left: 4px solid var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .sensitivity-row {
+      display: grid;
+      gap: 4px;
+      margin-top: 11px;
+    }
+
+    .sensitivity-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    .bar-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--border);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .controls-panel {
+        position: static;
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        width: min(100% - 20px, 1440px);
+        padding-top: 18px;
+      }
+
+      .page-header {
+        display: block;
+      }
+
+      .header-links {
+        align-items: stretch;
+        margin-top: 14px;
+      }
+
+      .brand-link {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .results-grid,
+      .equation-grid,
+      .sensitivity-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #mainPlot {
+        height: 350px;
+      }
+
+      #zoomPlot {
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls-panel,
+      .metric-card,
+      .result-card,
+      .equation-card,
+      .sensitivity-card {
+        padding: 14px;
+      }
+
+      #mainPlot {
+        height: 320px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow"><span class="eyebrow-name">JC Cheng</span> <span class="eyebrow-analog">Analog</span><span class="eyebrow-tool"> · Interactive Tool</span></p>
+        <h1>Complete Current Mirror Explorer</h1>
+        <p class="subtitle">
+          Compare Simple, Cascode, and Gain-Boosted current mirrors through output-current overlays,
+          compliance voltage, target-current zoom, internal-node regulation, equations, and sensitivity.
+        </p>
+      </div>
+      <nav class="header-links" aria-label="Page navigation">
+        <a class="brand-link" href="./index.html">← Back to Home</a>
+        <a class="brand-link" href="./current-mirrors.html">← Back to Current Mirror</a>
+      </nav>
+    </header>
+
+    <div class="app-layout">
+      <aside class="panel controls-panel" aria-label="Current mirror controls">
+        <div class="control-group">
+          <label class="control-label" for="iref">
+            <span>Reference current IREF</span>
+            <strong id="irefOut">100 μA</strong>
+          </label>
+          <input id="iref" type="range" min="10" max="500" step="5" value="100" />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="ratio">
+            <span>Mirror ratio K</span>
+            <strong id="ratioOut">1.00×</strong>
+          </label>
+          <input id="ratio" type="range" min="0.25" max="4" step="0.05" value="1" />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="vout">
+            <span>Cursor VOUT</span>
+            <strong id="voutOut">1.20 V</strong>
+          </label>
+          <input id="vout" type="range" min="0" max="3" step="0.01" value="1.20" />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="vov">
+            <span>Overdrive VOV</span>
+            <strong id="vovOut">0.20 V</strong>
+          </label>
+          <input id="vov" type="range" min="0.08" max="0.50" step="0.01" value="0.20" />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="lambda">
+            <span>Channel modulation λ</span>
+            <strong id="lambdaOut">0.050 V⁻¹</strong>
+          </label>
+          <input id="lambda" type="range" min="0.005" max="0.20" step="0.005" value="0.05" />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="gmro">
+            <span>Intrinsic gain gm·ro</span>
+            <strong id="gmroOut">20</strong>
+          </label>
+          <input id="gmro" type="range" min="5" max="100" step="1" value="20" />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="gain">
+            <span>Gain-boost amplifier A</span>
+            <strong id="gainOut">20 V/V</strong>
+          </label>
+          <input id="gain" type="range" min="0" max="100" step="1" value="20" />
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="control-group">
+          <label class="control-label" for="zoomPercent">
+            <span>Target-current zoom</span>
+            <strong id="zoomPercentOut">±5%</strong>
+          </label>
+          <input id="zoomPercent" type="range" min="1" max="10" step="1" value="5" />
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="switch-list">
+          <label class="switch-row">
+            <input id="showInternal" type="checkbox" checked />
+            <span>Show internal node</span>
+          </label>
+
+          <label class="switch-row">
+            <input id="showEquation" type="checkbox" checked />
+            <span>Show equations</span>
+          </label>
+
+          <label class="switch-row">
+            <input id="showSensitivity" type="checkbox" checked />
+            <span>Show sensitivity</span>
+          </label>
+        </div>
+
+        <button id="reset" class="reset-button" type="button">Reset parameters</button>
+      </aside>
+
+      <section class="content">
+        <div class="metrics-grid" aria-live="polite">
+          <article class="metric-card">
+            <div class="metric-label">Target current</div>
+            <div id="targetCurrent" class="metric-value">100 μA</div>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-label">Simple VOUT,min<br><span class="muted">(Compliance)</span></div>
+            <div id="simpleCompliance" class="metric-value">0.20 V</div>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-label">Cascode VOUT,min<br><span class="muted">(Compliance)</span></div>
+            <div id="cascodeCompliance" class="metric-value">0.40 V</div>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-label">Gain-boost Rout gain</div>
+            <div id="routGain" class="metric-value">420×</div>
+          </article>
+        </div>
+
+        <section class="section-block">
+          <div class="section-heading">
+            <h2>Full IOUT–VOUT comparison</h2>
+            <span class="badge">Drag directly on graph</span>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="mainPlot" aria-label="Full current mirror comparison plot"></canvas>
+          </div>
+        </section>
+
+        <div class="legend" aria-label="Curve legend">
+          <span class="legend-item"><span class="legend-line simple"></span>Simple</span>
+          <span class="legend-item"><span class="legend-line cascode"></span>Cascode</span>
+          <span class="legend-item"><span class="legend-line gain"></span>Gain boost</span>
+          <span class="legend-item"><span class="legend-line ideal"></span>Ideal target</span>
+        </div>
+
+        <div class="results-grid" aria-live="polite">
+          <article class="result-card">
+            <div class="result-title">Simple @ cursor</div>
+            <div id="simpleCurrent" class="result-current">104.8 μA</div>
+            <div id="simpleInfo" class="muted"></div>
+          </article>
+
+          <article class="result-card">
+            <div class="result-title">Cascode @ cursor</div>
+            <div id="cascodeCurrent" class="result-current">100.2 μA</div>
+            <div id="cascodeInfo" class="muted"></div>
+          </article>
+
+          <article class="result-card">
+            <div class="result-title">Gain boost @ cursor</div>
+            <div id="gainCurrent" class="result-current">100.0 μA</div>
+            <div id="gainInfo" class="muted"></div>
+          </article>
+        </div>
+
+        <section class="section-block">
+          <div class="section-heading">
+            <h2>Target-current zoom</h2>
+            <span id="zoomBadge" class="badge">95–105 μA</span>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="zoomPlot" aria-label="Zoomed current comparison around target current"></canvas>
+          </div>
+        </section>
+
+        <section id="internalSection" class="section-block">
+          <h2>Internal drain-node response</h2>
+          <div class="chart-wrap">
+            <canvas id="internalPlot" aria-label="Internal drain-node response"></canvas>
+          </div>
+        </section>
+
+        <section id="equationSection" class="equation-grid">
+          <article class="equation-card">
+            <div class="equation-title">Simple mirror</div>
+            <div class="equation-main">Rout ≈ ro</div>
+            <div id="simpleEquation" class="muted"></div>
+          </article>
+
+          <article class="equation-card">
+            <div class="equation-title">Cascode mirror</div>
+            <div class="equation-main">Rout ≈ gm·ro²</div>
+            <div id="cascodeEquation" class="muted"></div>
+          </article>
+
+          <article class="equation-card">
+            <div class="equation-title">Gain-boosted cascode</div>
+            <div class="equation-main">Rout ≈ (1+A)gm·ro²</div>
+            <div id="gainEquation" class="muted"></div>
+          </article>
+        </section>
+
+        <section id="sensitivitySection" class="section-block">
+          <h2>Output-error sensitivity</h2>
+
+          <div class="sensitivity-grid">
+            <article class="sensitivity-card">
+              <div class="sensitivity-title">Simple mirror</div>
+              <div id="simpleSensitivity"></div>
+            </article>
+
+            <article class="sensitivity-card">
+              <div class="sensitivity-title">Cascode mirror</div>
+              <div id="cascodeSensitivity"></div>
+            </article>
+
+            <article class="sensitivity-card">
+              <div class="sensitivity-title">Gain boost</div>
+              <div id="gainSensitivity"></div>
+            </article>
+          </div>
+        </section>
+
+        <div id="explanation" class="callout" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <p class="footer-note">
+      Educational long-channel approximation. This tool is intended for conceptual comparison, not sign-off simulation.
+    </p>
+  </main>
+
+  <script>
+    "use strict";
+
+    const controlIds = ["iref", "ratio", "vout", "vov", "lambda", "gmro", "gain", "zoomPercent"];
+    const controls = Object.fromEntries(
+      controlIds.map((id) => [id, document.getElementById(id)])
+    );
+
+    const showInternal = document.getElementById("showInternal");
+    const showEquation = document.getElementById("showEquation");
+    const showSensitivity = document.getElementById("showSensitivity");
+
+    const mainPlot = document.getElementById("mainPlot");
+    const zoomPlot = document.getElementById("zoomPlot");
+    const internalPlot = document.getElementById("internalPlot");
+
+    const mainCtx = mainPlot.getContext("2d");
+    const zoomCtx = zoomPlot.getContext("2d");
+    const internalCtx = internalPlot.getContext("2d");
+
+    const xMax = 3;
+
+    function readParams() {
+      return {
+        iref: Number(controls.iref.value),
+        ratio: Number(controls.ratio.value),
+        vout: Number(controls.vout.value),
+        vov: Number(controls.vov.value),
+        lambda: Number(controls.lambda.value),
+        gmro: Number(controls.gmro.value),
+        gain: Number(controls.gain.value),
+        zoomPercent: Number(controls.zoomPercent.value)
+      };
+    }
+
+    function architecture(type, p) {
+      if (type === "simple") {
+        return { compliance: p.vov, suppression: 1 };
+      }
+
+      if (type === "cascode") {
+        return { compliance: 2 * p.vov, suppression: p.gmro };
+      }
+
+      return {
+        compliance: 2 * p.vov,
+        suppression: p.gmro * (1 + p.gain)
+      };
+    }
+
+    function model(type, vout, p) {
+      const ideal = p.iref * p.ratio;
+      const arch = architecture(type, p);
+      const effectiveLambda = p.lambda / arch.suppression;
+
+      let current = ideal * (1 + effectiveLambda * (vout - arch.compliance));
+
+      if (vout < arch.compliance) {
+        const normalized = Math.max(0, vout / arch.compliance);
+        current *= normalized * (2 - normalized);
+      }
+
+      current = Math.max(0, current);
+
+      const rout = 1 / Math.max(1e-15, effectiveLambda * ideal * 1e-6);
+
+      return {
+        ideal,
+        current,
+        compliance: arch.compliance,
+        suppression: arch.suppression,
+        effectiveLambda,
+        rout,
+        error: (current / ideal - 1) * 100,
+        regulated: vout >= arch.compliance
+      };
+    }
+
+    function internalNode(type, vout, p) {
+      if (type === "simple") return vout;
+
+      const excess = Math.max(0, vout - 2 * p.vov);
+
+      if (type === "cascode") {
+        return p.vov + excess / p.gmro;
+      }
+
+      return p.vov + excess / (p.gmro * (1 + p.gain));
+    }
+
+    function css(name, fallback) {
+      const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return value || fallback;
+    }
+
+    function palette() {
+      return {
+        simple: css("--simple", "#2d6cdf"),
+        cascode: css("--cascode", "#c28b2c"),
+        gain: css("--gain", "#7b4db3"),
+        text: css("--text", "#172033"),
+        muted: css("--muted", "#667085"),
+        border: css("--border", "#d9e0ea"),
+        fill: css("--danger-soft", "rgba(186, 64, 64, 0.08)")
+      };
+    }
+
+    function resizeCanvas(canvas, context) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = Math.max(1, Math.round(rect.width * dpr));
+      canvas.height = Math.max(1, Math.round(rect.height * dpr));
+
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function drawAxes(context, canvas, yMin, yMax, yTicks = 4, yDecimals = 0) {
+      const c = palette();
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const margin = { left: 66, right: 22, top: 25, bottom: 48 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+
+      const X = (value) => margin.left + (value / xMax) * plotWidth;
+      const Y = (value) =>
+        margin.top + plotHeight - ((value - yMin) / (yMax - yMin)) * plotHeight;
+
+      context.strokeStyle = c.border;
+      context.fillStyle = c.muted;
+      context.lineWidth = 1;
+      context.font = "12px system-ui";
+
+      context.textAlign = "center";
+
+      for (let index = 0; index <= 6; index += 1) {
+        const value = (xMax * index) / 6;
+
+        context.beginPath();
+        context.moveTo(X(value), margin.top);
+        context.lineTo(X(value), margin.top + plotHeight);
+        context.stroke();
+
+        context.fillText(value.toFixed(1), X(value), height - 21);
+      }
+
+      context.textAlign = "right";
+
+      for (let index = 0; index <= yTicks; index += 1) {
+        const value = yMin + ((yMax - yMin) * index) / yTicks;
+
+        context.beginPath();
+        context.moveTo(margin.left, Y(value));
+        context.lineTo(width - margin.right, Y(value));
+        context.stroke();
+
+        context.fillText(value.toFixed(yDecimals), margin.left - 8, Y(value) + 4);
+      }
+
+      context.strokeStyle = c.text;
+      context.lineWidth = 1.5;
+      context.beginPath();
+      context.moveTo(margin.left, margin.top);
+      context.lineTo(margin.left, margin.top + plotHeight);
+      context.lineTo(width - margin.right, margin.top + plotHeight);
+      context.stroke();
+
+      context.fillStyle = c.text;
+      context.textAlign = "center";
+      context.fillText("VOUT (V)", margin.left + plotWidth / 2, height - 5);
+
+      context.save();
+      context.translate(15, margin.top + plotHeight / 2);
+      context.rotate(-Math.PI / 2);
+      context.fillText("IOUT (μA)", 0, 0);
+      context.restore();
+
+      return {
+        width,
+        height,
+        margin,
+        plotWidth,
+        plotHeight,
+        X,
+        Y
+      };
+    }
+
+    function drawCurve(context, type, p, X, Y, color) {
+      context.save();
+      context.beginPath();
+      context.rect(X(0), 0, X(xMax) - X(0), context.canvas.clientHeight);
+      context.clip();
+
+      context.strokeStyle = color;
+      context.lineWidth = 3;
+      context.beginPath();
+
+      for (let index = 0; index <= 320; index += 1) {
+        const voltage = (xMax * index) / 320;
+        const current = model(type, voltage, p).current;
+
+        if (index === 0) {
+          context.moveTo(X(voltage), Y(current));
+        } else {
+          context.lineTo(X(voltage), Y(current));
+        }
+      }
+
+      context.stroke();
+      context.restore();
+    }
+
+    function drawCursor(context, axes, p, yMin, yMax) {
+      const c = palette();
+
+      context.strokeStyle = c.text;
+      context.setLineDash([4, 5]);
+      context.lineWidth = 1.2;
+
+      context.beginPath();
+      context.moveTo(axes.X(p.vout), axes.margin.top);
+      context.lineTo(axes.X(p.vout), axes.margin.top + axes.plotHeight);
+      context.stroke();
+
+      context.setLineDash([]);
+
+      [
+        ["simple", c.simple],
+        ["cascode", c.cascode],
+        ["gain", c.gain]
+      ].forEach(([type, color]) => {
+        const point = model(type, p.vout, p);
+
+        if (point.current >= yMin && point.current <= yMax) {
+          context.fillStyle = color;
+          context.beginPath();
+          context.arc(axes.X(p.vout), axes.Y(point.current), 5.5, 0, Math.PI * 2);
+          context.fill();
+        }
+      });
+    }
+
+    function drawMain() {
+      resizeCanvas(mainPlot, mainCtx);
+
+      const p = readParams();
+      const c = palette();
+      const ideal = p.iref * p.ratio;
+
+      let yMax = ideal * 1.18;
+
+      ["simple", "cascode", "gain"].forEach((type) => {
+        for (let index = 0; index <= 150; index += 1) {
+          const voltage = (xMax * index) / 150;
+          yMax = Math.max(yMax, model(type, voltage, p).current * 1.08);
+        }
+      });
+
+      mainCtx.clearRect(0, 0, mainPlot.clientWidth, mainPlot.clientHeight);
+
+      const axes = drawAxes(mainCtx, mainPlot, 0, yMax, 4, 0);
+
+      mainCtx.fillStyle = c.fill;
+      mainCtx.fillRect(
+        axes.X(0),
+        axes.margin.top,
+        axes.X(2 * p.vov) - axes.X(0),
+        axes.plotHeight
+      );
+
+      mainCtx.strokeStyle = c.text;
+      mainCtx.setLineDash([7, 5]);
+      mainCtx.beginPath();
+      mainCtx.moveTo(axes.X(0), axes.Y(ideal));
+      mainCtx.lineTo(axes.X(xMax), axes.Y(ideal));
+      mainCtx.stroke();
+      mainCtx.setLineDash([]);
+
+      drawCurve(mainCtx, "simple", p, axes.X, axes.Y, c.simple);
+      drawCurve(mainCtx, "cascode", p, axes.X, axes.Y, c.cascode);
+      drawCurve(mainCtx, "gain", p, axes.X, axes.Y, c.gain);
+      drawCursor(mainCtx, axes, p, 0, yMax);
+
+      mainCtx.fillStyle = c.text;
+      mainCtx.textAlign = "left";
+      mainCtx.fillText("Out of Compliance", axes.X(0.04), axes.margin.top + 16);
+
+      mainCtx.textAlign = "center";
+      mainCtx.fillText("Simple VOUT,min", axes.X(p.vov), axes.margin.top + 34);
+      mainCtx.fillText("Cascode VOUT,min", axes.X(2 * p.vov), axes.margin.top + 50);
+    }
+
+    function drawZoom() {
+      resizeCanvas(zoomPlot, zoomCtx);
+
+      const p = readParams();
+      const c = palette();
+      const ideal = p.iref * p.ratio;
+      const fraction = p.zoomPercent / 100;
+      const yMin = ideal * (1 - fraction);
+      const yMax = ideal * (1 + fraction);
+      const decimals = ideal < 50 ? 1 : 0;
+
+      zoomCtx.clearRect(0, 0, zoomPlot.clientWidth, zoomPlot.clientHeight);
+
+      const axes = drawAxes(zoomCtx, zoomPlot, yMin, yMax, 4, decimals);
+
+      zoomCtx.strokeStyle = c.text;
+      zoomCtx.setLineDash([7, 5]);
+      zoomCtx.beginPath();
+      zoomCtx.moveTo(axes.X(0), axes.Y(ideal));
+      zoomCtx.lineTo(axes.X(xMax), axes.Y(ideal));
+      zoomCtx.stroke();
+      zoomCtx.setLineDash([]);
+
+      drawCurve(zoomCtx, "simple", p, axes.X, axes.Y, c.simple);
+      drawCurve(zoomCtx, "cascode", p, axes.X, axes.Y, c.cascode);
+      drawCurve(zoomCtx, "gain", p, axes.X, axes.Y, c.gain);
+      drawCursor(zoomCtx, axes, p, yMin, yMax);
+    }
+
+    function drawInternal() {
+      if (!showInternal.checked) return;
+
+      resizeCanvas(internalPlot, internalCtx);
+
+      const p = readParams();
+      const c = palette();
+      const width = internalPlot.clientWidth;
+      const height = internalPlot.clientHeight;
+      const margin = { left: 60, right: 22, top: 22, bottom: 44 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+
+      const X = (value) => margin.left + (value / xMax) * plotWidth;
+      const Y = (value) => margin.top + plotHeight - (value / xMax) * plotHeight;
+
+      internalCtx.clearRect(0, 0, width, height);
+      internalCtx.strokeStyle = c.border;
+      internalCtx.fillStyle = c.muted;
+      internalCtx.font = "12px system-ui";
+      internalCtx.lineWidth = 1;
+
+      internalCtx.textAlign = "center";
+
+      for (let index = 0; index <= 6; index += 1) {
+        const value = (xMax * index) / 6;
+
+        internalCtx.beginPath();
+        internalCtx.moveTo(X(value), margin.top);
+        internalCtx.lineTo(X(value), margin.top + plotHeight);
+        internalCtx.stroke();
+
+        internalCtx.fillText(value.toFixed(1), X(value), height - 19);
+      }
+
+      internalCtx.textAlign = "right";
+
+      for (let index = 0; index <= 3; index += 1) {
+        internalCtx.beginPath();
+        internalCtx.moveTo(margin.left, Y(index));
+        internalCtx.lineTo(width - margin.right, Y(index));
+        internalCtx.stroke();
+
+        internalCtx.fillText(index.toFixed(0), margin.left - 7, Y(index) + 4);
+      }
+
+      internalCtx.strokeStyle = c.text;
+      internalCtx.lineWidth = 1.5;
+      internalCtx.beginPath();
+      internalCtx.moveTo(margin.left, margin.top);
+      internalCtx.lineTo(margin.left, margin.top + plotHeight);
+      internalCtx.lineTo(width - margin.right, margin.top + plotHeight);
+      internalCtx.stroke();
+
+      internalCtx.fillStyle = c.text;
+      internalCtx.textAlign = "center";
+      internalCtx.fillText("VOUT (V)", margin.left + plotWidth / 2, height - 4);
+
+      internalCtx.save();
+      internalCtx.translate(14, margin.top + plotHeight / 2);
+      internalCtx.rotate(-Math.PI / 2);
+      internalCtx.fillText("Internal node (V)", 0, 0);
+      internalCtx.restore();
+
+      [
+        ["simple", c.simple],
+        ["cascode", c.cascode],
+        ["gain", c.gain]
+      ].forEach(([type, color]) => {
+        internalCtx.strokeStyle = color;
+        internalCtx.lineWidth = 2.7;
+        internalCtx.beginPath();
+
+        for (let index = 0; index <= 260; index += 1) {
+          const voltage = (xMax * index) / 260;
+          const node = internalNode(type, voltage, p);
+
+          if (index === 0) {
+            internalCtx.moveTo(X(voltage), Y(node));
+          } else {
+            internalCtx.lineTo(X(voltage), Y(node));
+          }
+        }
+
+        internalCtx.stroke();
+
+        internalCtx.fillStyle = color;
+        internalCtx.beginPath();
+        internalCtx.arc(
+          X(p.vout),
+          Y(internalNode(type, p.vout, p)),
+          5,
+          0,
+          Math.PI * 2
+        );
+        internalCtx.fill();
+      });
+    }
+
+    function formatResistance(value) {
+      if (value >= 1e9) return `${(value / 1e9).toFixed(2)} GΩ`;
+      if (value >= 1e6) return `${(value / 1e6).toFixed(2)} MΩ`;
+      return `${(value / 1e3).toFixed(1)} kΩ`;
+    }
+
+    function sensitivityHTML(type, p) {
+      const baseError = Math.abs(model(type, p.vout, p).error);
+
+      const tests = [
+        ["λ", { ...p, lambda: p.lambda * 1.1 }],
+        ["VOV", { ...p, vov: p.vov * 1.1 }],
+        ["gm·ro", { ...p, gmro: p.gmro * 1.1 }],
+        ["Gain A", { ...p, gain: p.gain + 10 }]
+      ];
+
+      const changes = tests.map(([label, testParams]) => {
+        const nextError = Math.abs(model(type, p.vout, testParams).error);
+
+        return {
+          label,
+          value: Math.abs(nextError - baseError)
+        };
+      });
+
+      const maxValue = Math.max(...changes.map((item) => item.value), 0.0001);
+
+      return changes
+        .map((item) => {
+          const width = Math.max(2, (item.value / maxValue) * 100);
+
+          return `
+            <div class="sensitivity-row">
+              <div class="sensitivity-meta">
+                <span>${item.label}</span>
+                <span>${item.value.toFixed(3)}%</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:${width}%"></div>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function setCursorFromPointer(event, canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const marginLeft = 66;
+      const marginRight = 22;
+      const usableWidth = rect.width - marginLeft - marginRight;
+
+      const localX = Math.max(
+        0,
+        Math.min(usableWidth, event.clientX - rect.left - marginLeft)
+      );
+
+      controls.vout.value = ((localX / usableWidth) * xMax).toFixed(2);
+      update();
+    }
+
+    let dragging = false;
+
+    [mainPlot, zoomPlot].forEach((canvas) => {
+      canvas.addEventListener("pointerdown", (event) => {
+        dragging = true;
+        canvas.setPointerCapture(event.pointerId);
+        setCursorFromPointer(event, canvas);
+      });
+
+      canvas.addEventListener("pointermove", (event) => {
+        if (dragging) setCursorFromPointer(event, canvas);
+      });
+
+      canvas.addEventListener("pointerup", () => {
+        dragging = false;
+      });
+
+      canvas.addEventListener("pointercancel", () => {
+        dragging = false;
+      });
+    });
+
+    function update() {
+      const p = readParams();
+      const ideal = p.iref * p.ratio;
+
+      const simple = model("simple", p.vout, p);
+      const cascode = model("cascode", p.vout, p);
+      const gain = model("gain", p.vout, p);
+
+      const lower = ideal * (1 - p.zoomPercent / 100);
+      const upper = ideal * (1 + p.zoomPercent / 100);
+
+      document.getElementById("irefOut").textContent = `${p.iref.toFixed(0)} μA`;
+      document.getElementById("ratioOut").textContent = `${p.ratio.toFixed(2)}×`;
+      document.getElementById("voutOut").textContent = `${p.vout.toFixed(2)} V`;
+      document.getElementById("vovOut").textContent = `${p.vov.toFixed(2)} V`;
+      document.getElementById("lambdaOut").textContent = `${p.lambda.toFixed(3)} V⁻¹`;
+      document.getElementById("gmroOut").textContent = p.gmro.toFixed(0);
+      document.getElementById("gainOut").textContent = `${p.gain.toFixed(0)} V/V`;
+      document.getElementById("zoomPercentOut").textContent =
+        `±${p.zoomPercent.toFixed(0)}%`;
+
+      document.getElementById("targetCurrent").textContent = `${ideal.toFixed(1)} μA`;
+      document.getElementById("simpleCompliance").textContent =
+        `${p.vov.toFixed(2)} V`;
+      document.getElementById("cascodeCompliance").textContent =
+        `${(2 * p.vov).toFixed(2)} V`;
+      document.getElementById("routGain").textContent =
+        `${(p.gmro * (1 + p.gain)).toFixed(0)}×`;
+      document.getElementById("zoomBadge").textContent =
+        `${lower.toFixed(1)}–${upper.toFixed(1)} μA`;
+
+      [
+        ["simple", simple],
+        ["cascode", cascode],
+        ["gain", gain]
+      ].forEach(([name, result]) => {
+        document.getElementById(`${name}Current`).textContent =
+          `${result.current.toFixed(3)} μA`;
+
+        document.getElementById(`${name}Info`).textContent =
+          `Error ${result.error >= 0 ? "+" : ""}${result.error.toFixed(3)}% · ` +
+          `Rout ${formatResistance(result.rout)} · ` +
+          `${result.regulated ? "In Compliance" : "Out of Compliance"}`;
+      });
+
+      document.getElementById("simpleEquation").textContent =
+        `Effective λ = ${simple.effectiveLambda.toFixed(5)} V⁻¹; ` +
+        `Rout = ${formatResistance(simple.rout)}.`;
+
+      document.getElementById("cascodeEquation").textContent =
+        `gm·ro = ${p.gmro.toFixed(0)}, so effective λ ≈ ` +
+        `${cascode.effectiveLambda.toExponential(2)} V⁻¹ and ` +
+        `Rout ≈ ${formatResistance(cascode.rout)}.`;
+
+      document.getElementById("gainEquation").textContent =
+        `(1+A)gm·ro = ${(1 + p.gain).toFixed(0)}×${p.gmro.toFixed(0)} = ` +
+        `${(p.gmro * (1 + p.gain)).toFixed(0)}, giving ` +
+        `Rout ≈ ${formatResistance(gain.rout)}.`;
+
+      document.getElementById("simpleSensitivity").innerHTML =
+        sensitivityHTML("simple", p);
+      document.getElementById("cascodeSensitivity").innerHTML =
+        sensitivityHTML("cascode", p);
+      document.getElementById("gainSensitivity").innerHTML =
+        sensitivityHTML("gain", p);
+
+      document.getElementById("internalSection").classList.toggle(
+        "hidden",
+        !showInternal.checked
+      );
+
+      document.getElementById("equationSection").classList.toggle(
+        "hidden",
+        !showEquation.checked
+      );
+
+      document.getElementById("sensitivitySection").classList.toggle(
+        "hidden",
+        !showSensitivity.checked
+      );
+
+      const simpleNode = internalNode("simple", p.vout, p);
+      const cascodeNode = internalNode("cascode", p.vout, p);
+      const gainNode = internalNode("gain", p.vout, p);
+
+      document.getElementById("explanation").textContent =
+        `At VOUT = ${p.vout.toFixed(2)} V, the lower-device drain nodes are ` +
+        `${simpleNode.toFixed(3)} V, ${cascodeNode.toFixed(3)} V, and ` +
+        `${gainNode.toFixed(3)} V for Simple, Cascode, and Gain Boost. ` +
+        `The corresponding current errors are ${simple.error.toFixed(3)}%, ` +
+        `${cascode.error.toFixed(3)}%, and ${gain.error.toFixed(4)}%. ` +
+        `Cascode shields the lower MOS, while Gain Boost actively regulates ` +
+        `that internal node more tightly.`;
+
+      drawMain();
+      drawZoom();
+      drawInternal();
+    }
+
+    controlIds.forEach((id) => {
+      controls[id].addEventListener("input", update);
+    });
+
+    showInternal.addEventListener("change", update);
+    showEquation.addEventListener("change", update);
+    showSensitivity.addEventListener("change", update);
+
+    window.addEventListener("resize", update);
+
+    document.getElementById("reset").addEventListener("click", () => {
+      const defaults = {
+        iref: 100,
+        ratio: 1,
+        vout: 1.2,
+        vov: 0.2,
+        lambda: 0.05,
+        gmro: 20,
+        gain: 20,
+        zoomPercent: 5
+      };
+
+      Object.entries(defaults).forEach(([key, value]) => {
+        controls[key].value = value;
+      });
+
+      showInternal.checked = true;
+      showEquation.checked = true;
+      showSensitivity.checked = true;
+
+      update();
+    });
+
+    update();
+  </script>
+</body>
+</html>

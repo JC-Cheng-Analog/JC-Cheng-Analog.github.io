@@ -354,6 +354,109 @@
       transform: translateX(0);
     }
 
+
+    .formula-highlight {
+      margin: 16px 0 0;
+      padding: 16px 18px;
+      color: #1f2933;
+      background: #f7f8fa;
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+    }
+
+    .formula-highlight strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--navy);
+      font-size: 15px;
+    }
+
+    .formula-highlight code {
+      display: block;
+      overflow-x: auto;
+      font-family: "Courier New", Consolas, monospace;
+      font-size: 15px;
+      line-height: 1.7;
+      white-space: nowrap;
+    }
+
+    .key-point-list {
+      margin: 12px 0 0;
+      padding-left: 22px;
+    }
+
+    .key-point-list li + li {
+      margin-top: 6px;
+    }
+
+    .open-explorer {
+      position: fixed;
+      right: max(18px, calc((100vw - 860px) / 2 + 18px));
+      bottom: 88px;
+      z-index: 1001;
+      display: flex;
+      width: 52px;
+      height: 52px;
+      padding: 0 14px;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px;
+      overflow: hidden;
+      white-space: nowrap;
+      color: #ffffff;
+      background: var(--gold);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 26px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+      text-decoration: none;
+      transition:
+        width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms ease,
+        background 180ms ease;
+    }
+
+    .open-explorer:hover,
+    .open-explorer:focus-visible {
+      width: 238px;
+      background: #b78900;
+      transform: translateY(-1px);
+    }
+
+    .open-explorer:focus-visible {
+      outline: 3px solid rgba(11, 46, 89, 0.28);
+      outline-offset: 3px;
+    }
+
+    .open-explorer svg {
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.9;
+    }
+
+    .open-explorer-label {
+      display: block;
+      min-width: 178px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      opacity: 0;
+      transform: translateX(-5px);
+      transition:
+        opacity 150ms ease 45ms,
+        transform 180ms ease 45ms;
+    }
+
+    .open-explorer:hover .open-explorer-label,
+    .open-explorer:focus-visible .open-explorer-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
     @media (max-width: 600px) {
       .footer-navigation {
         gap: 14px;
@@ -371,6 +474,20 @@
       .return-to-figure:hover,
       .return-to-figure:focus-visible {
         width: 126px;
+      }
+
+      .open-explorer {
+        right: 16px;
+        bottom: 76px;
+        width: 48px;
+        height: 48px;
+        padding: 0 12px;
+        border-radius: 24px;
+      }
+
+      .open-explorer:hover,
+      .open-explorer:focus-visible {
+        width: 226px;
       }
     }
 
@@ -483,24 +600,156 @@
       Current-mirror operation, matching, output resistance, and practical limitations.
     </p>
 
-        <nav class="section-nav" aria-label="Page sections">
-      <a href="#current-mirrors">Current Mirrors</a>
+    <nav class="section-nav" aria-label="Page sections">
+      <a href="#why-cascode">Why Cascode?</a>
+      <a href="#regulated-cascode">Regulated Cascode</a>
+      <a href="#gain-boosted-cascode">Gain-Boosted Cascode</a>
     </nav>
 
-    <section class="note-card" id="current-mirrors">
+    <section class="note-card" id="why-cascode">
       <div class="note-card-heading-row">
-        <h2>Current Mirrors</h2>
-        <span class="updated-date">Last updated · 2026.08.01</span>
+        <h2>
+          Why Cascode Current Mirror?
+          <span class="method">Output-resistance improvement by drain-voltage isolation</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.03</span>
       </div>
 
-      <div class="image-frame" id="figure-i">
-        <div class="image-placeholder">
-          <strong>Image placeholder</strong>
+      <div class="image-frame" id="figure-1">
+        <img
+          class="analysis-image"
+          src="./images/current_mirror/IMG_0106.JPG"
+          alt="Figure 1. Small-signal comparison between simple and cascode current mirrors"
+        />
+      </div>
+
+      <div class="description">
+        <h3>Concept</h3>
+        <p>
+          In a simple current mirror, the output voltage directly appears across the
+          output transistor. Therefore, a change in <strong>V<sub>OUT</sub></strong>
+          produces a comparable change in its drain-source voltage and causes the
+          output current to vary through channel-length modulation.
+        </p>
+        <p>
+          The upper common-gate transistor in a cascode mirror isolates the lower
+          transistor from the output node. Most of the output-voltage variation is
+          absorbed by the upper device, while the lower-device drain voltage changes
+          only by approximately a factor of <strong>1/(g<sub>m</sub>r<sub>o</sub>)</strong>.
+        </p>
+
+        <ul class="key-point-list">
+          <li>Simple mirror: the lower MOS directly sees the output-voltage variation.</li>
+          <li>Cascode mirror: the upper common-gate MOS shields the lower drain node.</li>
+          <li>The reduced drain-voltage variation produces a much larger output resistance.</li>
+        </ul>
+
+        <div class="formula-highlight">
+          <strong>Key formulas</strong>
+          <code>Rout,simple = ro1</code>
+          <code>Rout,cascode = ro1 + ro2 + gm2·ro1·ro2</code>
+          <code>Rout,cascode ≈ gm2·ro1·ro2,  when gm·ro ≫ 1</code>
+          <code>ΔVDS1 ≈ ΔVOUT / (gm2·ro2)</code>
         </div>
       </div>
-
-      <p class="description">To be continued.</p>
     </section>
+
+    <section class="note-card" id="regulated-cascode">
+      <div class="note-card-heading-row">
+        <h2>
+          Regulated Cascode Current Mirror
+          <span class="method">Additional local gain further suppresses the internal-node variation</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.03</span>
+      </div>
+
+      <div class="image-frame" id="figure-2">
+        <img
+          class="analysis-image"
+          src="./images/current_mirror/IMG_0107.JPG"
+          alt="Figure 2. Small-signal derivation of a regulated cascode current mirror"
+        />
+      </div>
+
+      <div class="description">
+        <h3>Small-signal interpretation</h3>
+        <p>
+          The regulating transistor introduces an additional intrinsic-gain factor.
+          A disturbance at the output is first attenuated by the cascode device and
+          then attenuated again by the local regulating action. As a result, the
+          drain voltage of the lower output transistor becomes substantially less
+          sensitive to <strong>V<sub>OUT</sub></strong>.
+        </p>
+        <p>
+          The exact expression contains the individual output resistances and the
+          transconductance terms. Under the usual condition
+          <strong>g<sub>m</sub>r<sub>o</sub> ≫ 1</strong>, the dominant product clearly
+          shows two gain-enhancement factors.
+        </p>
+
+        <ul class="key-point-list">
+          <li>The cascode device contributes approximately g<sub>m5</sub>r<sub>o5</sub>.</li>
+          <li>The regulating device contributes approximately g<sub>m6</sub>r<sub>o6</sub>.</li>
+          <li>The lower-device drain variation is reduced by the product of both factors.</li>
+        </ul>
+
+        <div class="formula-highlight">
+          <strong>Key formulas</strong>
+          <code>Rout = ro5 + ro2(1 + gm6·ro6)gm5·ro5 + ro2</code>
+          <code>Rout ≈ gm5·ro5·ro2·gm6·ro6</code>
+          <code>ΔVDS2 ≈ ΔVOUT / (gm5·ro5·gm6·ro6)</code>
+        </div>
+      </div>
+    </section>
+
+    <section class="note-card" id="gain-boosted-cascode">
+      <div class="note-card-heading-row">
+        <h2>
+          Gain-Boosted Cascode Current Mirror
+          <span class="method">Amplifier-assisted regulation of the cascode gate</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.03</span>
+      </div>
+
+      <div class="image-frame" id="figure-3">
+        <img
+          class="analysis-image"
+          src="./images/current_mirror/IMG_0110.JPG"
+          alt="Figure 3. Small-signal derivation of a gain-boosted cascode current mirror"
+        />
+      </div>
+
+      <div class="description">
+        <h3>Gain-boosting mechanism</h3>
+        <p>
+          The amplifier senses the internal drain voltage and adjusts the cascode-gate
+          voltage so that the internal node remains nearly constant. The cascode
+          transistor still provides the basic output-resistance multiplication, while
+          the amplifier contributes an additional factor of approximately
+          <strong>1 + A</strong>.
+        </p>
+        <p>
+          Increasing amplifier gain makes the output-current curve flatter, but the
+          practical design must also consider amplifier bandwidth, stability, noise,
+          output swing, and power consumption. Therefore, the DC gain shown here is
+          only one part of a complete gain-boost design.
+        </p>
+
+        <ul class="key-point-list">
+          <li>The amplifier actively regulates the lower-device drain voltage.</li>
+          <li>The output-resistance enhancement is approximately proportional to 1 + A.</li>
+          <li>If A is comparable to an intrinsic-gain factor, the result approaches the regulated-cascode case.</li>
+        </ul>
+
+        <div class="formula-highlight">
+          <strong>Key formulas</strong>
+          <code>Rout = ro2 + [1 + ro2(1 + A)gm4]ro4</code>
+          <code>Rout ≈ (1 + A)gm4·ro4·ro2</code>
+          <code>Gain-boost factor ≈ 1 + A</code>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <footer class="page-footer">
@@ -512,6 +761,24 @@
       </button>
     </div>
   </footer>
+
+
+  <a
+    class="open-explorer"
+    href="current-mirror-explorer.html"
+    aria-label="Open Current Mirror Explorer"
+    title="Open Current Mirror Explorer"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 18.5h16"></path>
+      <path d="M6.5 16V9.5"></path>
+      <path d="M11 16V5.5"></path>
+      <path d="M15.5 16v-4"></path>
+      <path d="M20 16V7.5"></path>
+      <path d="M4.5 7.5 9 4l4.2 4 6.3-5"></path>
+    </svg>
+    <span class="open-explorer-label">Current Mirror Explorer</span>
+  </a>
 
 
   <button
@@ -634,7 +901,9 @@
         const image = currentFigure.querySelector('img');
         const label = image?.alt || 'latest figure';
         const figureNameMap = {
-          'figure-i': 'Figure'
+          'figure-1': 'Figure 1',
+          'figure-2': 'Figure 2',
+          'figure-3': 'Figure 3'
         };
         const shortLabel =
           figureNameMap[currentFigure.id] || 'Figure';
