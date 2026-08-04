@@ -1,0 +1,1202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RC Charge / Discharge Explorer</title>
+<style>
+
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --card: #f8fafc;
+      --text: #172033;
+      --muted: #667085;
+      --border: #d9e0ea;
+      --accent: #17345c;
+      --accent-soft: #eef3f8;
+      --gold: #b18a3b;
+      --blue: #2d6cdf;
+      --green: #2f8f6b;
+      --red: #ba4040;
+      --purple: #7b4db3;
+      --shadow: 0 10px 30px rgba(23, 32, 51, 0.07);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 110%;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans TC", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .wrap {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .eyebrow-name {
+      color: #0b2e59;
+    }
+
+    .eyebrow-analog {
+      color: #b08d57;
+    }
+
+    .eyebrow-tool {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(1.8rem, 3vw, 2.7rem);
+      line-height: 1.15;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-size: 1.08rem;
+    }
+
+    .subtitle {
+      max-width: 780px;
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .header-links {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 176px;
+      padding: 9px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--accent);
+      background: var(--panel);
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+    }
+
+    .brand-link:hover,
+    .brand-link:focus-visible {
+      border-color: rgba(177, 138, 59, 0.65);
+      background: #fffdf7;
+      text-decoration: none;
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: minmax(400px, 480px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+
+    .card,
+    .kpi,
+    .table-wrap,
+    svg,
+    .info,
+    .formula {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: var(--radius);
+    }
+
+    .card {
+      padding: 15px;
+      margin: 0;
+    }
+
+    .grid2 > .card:first-child {
+      position: sticky;
+      top: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .wrap > section.card {
+      margin-top: 14px;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+      font-weight: 700;
+    }
+
+    /* The entire settings area is now an explicit 2-column × 3-row grid. */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 12px;
+      align-items: end;
+    }
+
+    .setting-item {
+      min-width: 0;
+    }
+
+    label {
+      display: block;
+      min-height: 1.4em;
+      margin-bottom: 5px;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-width: 0;
+      height: 42px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      background: var(--panel);
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(23, 52, 92, 0.11);
+    }
+
+    .input-unit {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 54px 20px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .prefix-select {
+      padding-left: 5px;
+      padding-right: 5px;
+      text-align: center;
+      text-align-last: center;
+    }
+
+    .unit-suffix {
+      color: var(--muted);
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .calculate-slot {
+      display: flex;
+      align-items: end;
+    }
+
+    button {
+      width: 100%;
+      height: 42px;
+      padding: 9px 14px;
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      color: #ffffff;
+      background: var(--accent);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.92;
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .formula {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-left: 4px solid var(--gold);
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .kpi {
+      min-height: 78px;
+      padding: 12px 14px;
+    }
+
+    .kpi .name {
+      color: var(--muted);
+      font-size: 0.80rem;
+      line-height: 1.25;
+    }
+
+    .kpi .value {
+      margin-top: 3px;
+      font-size: 1.05rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      word-break: break-word;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .info {
+      margin-top: 12px;
+      padding: 16px 18px;
+      border-left: 4px solid var(--accent);
+      color: var(--text);
+      background: var(--accent-soft);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .circuit-card {
+      padding-bottom: 10px;
+    }
+
+    .circuit-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .circuit-mode-tag {
+      color: var(--gold);
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    #circuit {
+      max-height: 190px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin: 8px 0 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 30px;
+      height: 4px;
+      margin-right: 8px;
+      border-radius: 999px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      background: var(--panel);
+    }
+
+    th,
+    td {
+      padding: 12px 11px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th {
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 0.88rem;
+    }
+
+    td {
+      font-size: 0.9rem;
+    }
+
+    .highlight {
+      color: var(--green);
+      font-weight: 750;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    @media (max-width: 1100px) {
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+
+      .grid2 > .card:first-child {
+        position: static;
+      }
+
+      .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .wrap {
+        width: min(100% - 20px, 1440px);
+        padding-top: 18px;
+      }
+
+      .page-header {
+        display: block;
+      }
+
+      .header-links {
+        align-items: stretch;
+        margin-top: 14px;
+      }
+
+      .brand-link {
+        min-width: 0;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .settings-grid,
+      .kpis,
+      .key-results {
+        grid-template-columns: 1fr;
+      }
+
+      .card,
+      .kpi {
+        padding: 14px;
+      }
+    }
+
+
+    .key-results {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    #timeChart {
+      cursor: ew-resize;
+      touch-action: none;
+      user-select: none;
+    }
+
+    #timeChart.dragging {
+      cursor: grabbing;
+    }
+
+    @media (max-width: 760px) {
+      .key-results {
+        grid-template-columns: 1fr;
+      }
+    }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow"><span class="eyebrow-name">JC Cheng</span> <span class="eyebrow-analog">Analog</span><span class="eyebrow-tool"> · Interactive Tool</span></p>
+      <h1>RC Charge / Discharge Explorer</h1>
+      <p class="subtitle">
+        Explore the RC time constant, charging and discharging behavior, cutoff frequency,
+        the −3 dB point, and practical 1τ–5τ settling.
+      </p>
+    </div>
+
+    <nav class="header-links" aria-label="Page navigation">
+      <a class="brand-link" href="./index.html">← Back to Home</a>
+    </nav>
+  </header>
+
+  <div class="grid2">
+    <section class="card">
+      <h2 class="section-title">1. Circuit Settings</h2>
+
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label for="mode">Operation Mode</label>
+          <select id="mode">
+            <option value="charge">Charging</option>
+            <option value="discharge">Discharging</option>
+          </select>
+        </div>
+
+        <div class="setting-item">
+          <label for="vfinal">Final / Initial Voltage</label>
+          <div class="input-unit">
+            <input id="vfinal" type="number" min="0.001" step="0.1" value="5">
+            <span></span>
+            <span class="unit-suffix">V</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="r">Resistance R</label>
+          <div class="input-unit">
+            <input id="r" type="number" min="0.001" step="1" value="10">
+            <select id="rUnit" class="prefix-select" aria-label="Resistance prefix">
+              <option value="m">m</option>
+              <option value="k" selected>k</option>
+              <option value="M">M</option>
+            </select>
+            <span class="unit-suffix">Ω</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="c">Capacitance C</label>
+          <div class="input-unit">
+            <input id="c" type="number" min="0.001" step="0.1" value="1">
+            <select id="cUnit" class="prefix-select" aria-label="Capacitance prefix">
+              <option value="f">f</option>
+              <option value="p">p</option>
+              <option value="n">n</option>
+              <option value="u" selected>u</option>
+            </select>
+            <span class="unit-suffix">F</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label for="observe">Observation Time</label>
+          <div class="input-unit">
+            <input id="observe" type="number" min="0" step="any" value="10">
+            <span></span>
+            <span class="unit-suffix">ms</span>
+          </div>
+        </div>
+
+        <div class="setting-item calculate-slot">
+          <button id="calculate" type="button">Calculate</button>
+        </div>
+      </div>
+
+      <div id="formula" class="formula"></div>
+    </section>
+
+    <section class="card circuit-card">
+      <div class="circuit-title-row">
+        <h2 class="section-title" style="margin-bottom:0">2. RC Circuit</h2>
+        <span id="circuitModeTag" class="circuit-mode-tag">Charging</span>
+      </div>
+      <svg id="circuit" viewBox="0 0 650 180" role="img" aria-label="RC charge and discharge circuit"></svg>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2 class="section-title">3. Key Results</h2>
+    <div class="kpis key-results">
+      <div class="kpi"><div class="name">Time Constant τ = RC</div><div id="tauOut" class="value">—</div></div>
+      <div class="kpi"><div class="name">Cutoff Frequency fc</div><div id="fcOut" class="value">—</div></div>
+      <div class="kpi"><div class="name">Voltage at Observation Time</div><div id="vobsOut" class="value">—</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title">4. Time-Domain Response</h2>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--blue)"></span>Capacitor voltage</span>
+      <span><span class="dot" style="background:var(--gold)"></span>Drag observation cursor (0–7τ)</span>
+      <span><span class="dot" style="background:var(--green)"></span>3τ–5τ settling region</span>
+    </div>
+    <svg id="timeChart" viewBox="0 0 920 570" role="img" aria-label="RC charge or discharge waveform"></svg>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title">5. RC Time Constant Reference</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Charging Level</th>
+            <th>Remaining During Discharge</th>
+            <th>Interpretation</th>
+          </tr>
+        </thead>
+        <tbody id="tauTable"></tbody>
+      </table>
+    </div>
+    <p class="note">
+      The 3τ–5τ interval is commonly treated as the practical settling region:
+      approximately 95.0% to 99.3% charged, or 5.0% to 0.7% remaining during discharge.
+      The time-domain plot shows both τ-based ticks and the corresponding real time values.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title">6. Frequency Response</h2>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--purple)"></span>Magnitude</span>
+      <span><span class="dot" style="background:var(--red)"></span>−3 dB</span>
+      <span><span class="dot" style="background:var(--green)"></span>Cutoff frequency fc</span>
+    </div>
+    <svg id="freqChart" viewBox="0 0 920 480" role="img" aria-label="RC low-pass magnitude response"></svg>
+  </section>
+
+  <section class="card">
+    <span class="badge">Ideal educational model</span>
+    <p class="note">
+      This tool assumes ideal R and C components and a first-order RC low-pass response.
+      Parasitics, capacitor ESR, leakage current, and source/load impedance are not included.
+    </p>
+  </section>
+
+  <footer>JC Cheng Analog · RC Charge / Discharge Explorer</footer>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  function value(id, fallback, allowZero=false){
+    const n = Number($(id).value);
+    if (!Number.isFinite(n)) return fallback;
+    if (allowZero) return Math.max(0,n);
+    return n > 0 ? n : fallback;
+  }
+
+  function fmtTime(seconds){
+    const a = Math.abs(seconds);
+    if (a >= 1) return seconds.toFixed(4) + ' s';
+    if (a >= 1e-3) return (seconds*1e3).toFixed(3) + ' ms';
+    if (a >= 1e-6) return (seconds*1e6).toFixed(3) + ' µs';
+    return (seconds*1e9).toFixed(3) + ' ns';
+  }
+
+  function fmtFreq(hz){
+    if (hz >= 1e6) return (hz/1e6).toFixed(3) + ' MHz';
+    if (hz >= 1e3) return (hz/1e3).toFixed(3) + ' kHz';
+    return hz.toFixed(3) + ' Hz';
+  }
+
+  function svgNode(tag,attrs={},text=''){
+    const n=document.createElementNS(NS,tag);
+    Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
+    if(text!=='')n.textContent=text;
+    return n;
+  }
+
+  function clear(svg){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+  }
+
+  function drawCircuit(mode){
+    const svg=$('circuit');
+    clear(svg);
+
+    const wire='#172033';
+    const rColor='#ba4040';
+    const cColor='#2f8f6b';
+    const sourceColor='#b18a3b';
+
+    if($('circuitModeTag')){
+      $('circuitModeTag').textContent = mode==='charge' ? 'Charging' : 'Discharging';
+    }
+
+    svg.appendChild(svgNode('rect',{x:0,y:0,width:650,height:180,rx:14,fill:'#ffffff'}));
+
+    const line=(x1,y1,x2,y2,color=wire,width=4)=>
+      svg.appendChild(svgNode('line',{x1,y1,x2,y2,stroke:color,'stroke-width':width,'stroke-linecap':'round'}));
+    const text=(x,y,t,color=wire,size=17)=>
+      svg.appendChild(svgNode('text',{x,y,fill:color,'font-size':size,'font-weight':700,'text-anchor':'middle'},t));
+
+    if(mode==='charge'){
+      line(62,88,98,88);
+      svg.appendChild(svgNode('circle',{cx:52,cy:88,r:24,fill:'none',stroke:sourceColor,'stroke-width':4}));
+      text(52,95,'V',sourceColor,18);
+
+      svg.appendChild(svgNode('path',{
+        d:'M98 88 l14 -22 l28 44 l28 -44 l28 44 l28 -44 l14 22',
+        fill:'none',stroke:rColor,'stroke-width':4
+      }));
+
+      line(238,88,355,88);
+      line(368,55,368,121,cColor,5);
+      line(392,55,392,121,cColor,5);
+      line(355,88,368,88);
+      line(392,88,500,88);
+      line(500,88,500,150);
+      line(52,112,52,150);
+      line(52,150,500,150);
+
+      text(170,52,'R',rColor,16);
+      text(380,40,'C',cColor,16);
+      text(280,172,'Charging RC Circuit',wire,13);
+    }else{
+      line(84,88,120,88);
+      svg.appendChild(svgNode('path',{
+        d:'M120 88 l14 -22 l28 44 l28 -44 l28 44 l28 -44 l14 22',
+        fill:'none',stroke:rColor,'stroke-width':4
+      }));
+
+      line(260,88,355,88);
+      line(368,55,368,121,cColor,5);
+      line(392,55,392,121,cColor,5);
+      line(355,88,368,88);
+      line(392,88,508,88);
+      line(508,88,508,150);
+      line(84,88,84,150);
+      line(84,150,508,150);
+
+      text(192,52,'R',rColor,16);
+      text(380,40,'C',cColor,16);
+      text(296,172,'Discharging RC Circuit',wire,13);
+    }
+  }
+
+  let timeChartState=null;
+  let draggingObservation=false;
+
+  function formatAxisTime(seconds){
+    if(seconds>=1)return seconds.toFixed(2)+' s';
+    if(seconds>=1e-3)return (seconds*1e3).toFixed(1)+' ms';
+    if(seconds>=1e-6)return (seconds*1e6).toFixed(1)+' µs';
+    if(seconds>=1e-9)return (seconds*1e9).toFixed(1)+' ns';
+    return (seconds*1e12).toFixed(1)+' ps';
+  }
+
+  function addLabelBox(svg,x,y,line1,line2,anchor='start'){
+    const charWidth=11;
+    const width=Math.max(line1.length,line2.length)*charWidth+18;
+    const height=54;
+    let rectX=x;
+    let textX=x+9;
+
+    if(anchor==='end'){
+      rectX=x-width;
+      textX=x-9;
+    }else if(anchor==='middle'){
+      rectX=x-width/2;
+      textX=x;
+    }
+
+    svg.appendChild(svgNode('rect',{
+      x:rectX,y:y-27,width,height,rx:7,
+      fill:'#ffffff',stroke:'#d9e0ea','stroke-width':1,opacity:.96
+    }));
+    svg.appendChild(svgNode('text',{
+      x:textX,y:y-7,fill:'#172033','font-size':20,'font-weight':700,'text-anchor':anchor
+    },line1));
+    svg.appendChild(svgNode('text',{
+      x:textX,y:y+17,fill:'#667085','font-size':18,'text-anchor':anchor
+    },line2));
+  }
+
+  function drawTimeChart(mode,tau,vLevel,observeTime){
+    const svg=$('timeChart');
+    clear(svg);
+
+    const W=920,H=570,left=105,right=42,top=105,bottom=105;
+    const tMax=7*tau;
+    const X=t=>left+(t/tMax)*(W-left-right);
+    const Y=v=>H-bottom-(v/vLevel)*(H-top-bottom);
+
+    timeChartState={W,H,left,right,top,bottom,tMax,tau};
+
+    svg.appendChild(svgNode('rect',{
+      x:0,y:0,width:W,height:H,rx:14,fill:'#ffffff'
+    }));
+
+    const bandX1=X(3*tau),bandX2=X(5*tau);
+    svg.appendChild(svgNode('rect',{
+      x:bandX1,y:top,width:bandX2-bandX1,height:H-top-bottom,
+      fill:'#2f8f6b',opacity:.12
+    }));
+
+    // Keep the settling-region title away from the upper point labels.
+    svg.appendChild(svgNode('text',{
+      x:(bandX1+bandX2)/2,
+      y:H-bottom-18,
+      fill:'#2f8f6b',
+      'font-size':18,
+      'font-weight':700,
+      'text-anchor':'middle'
+    },'3τ–5τ settling region'));
+
+    for(let i=0;i<=7;i++){
+      const x=X(i*tau);
+
+      svg.appendChild(svgNode('line',{
+        x1:x,y1:top,x2:x,y2:H-bottom,
+        stroke:'#d9e0ea','stroke-width':1.2
+      }));
+
+      svg.appendChild(svgNode('text',{
+        x,y:H-57,
+        fill:'#44546a',
+        'font-size':22,
+        'font-weight':700,
+        'text-anchor':'middle'
+      },i+'τ'));
+
+      svg.appendChild(svgNode('text',{
+        x,y:H-28,
+        fill:'#667085',
+        'font-size':19,
+        'text-anchor':'middle'
+      },formatAxisTime(i*tau)));
+    }
+
+    for(let i=0;i<=4;i++){
+      const frac=i/4;
+      const y=Y(frac*vLevel);
+
+      svg.appendChild(svgNode('line',{
+        x1:left,y1:y,x2:W-right,y2:y,
+        stroke:'#d9e0ea','stroke-width':1.2
+      }));
+
+      svg.appendChild(svgNode('text',{
+        x:left-16,y:y+7,
+        fill:'#667085',
+        'font-size':22,
+        'text-anchor':'end'
+      },(frac*100).toFixed(0)+'%'));
+    }
+
+    let d='';
+    for(let i=0;i<=560;i++){
+      const t=tMax*i/560;
+      const v=mode==='charge'
+        ? vLevel*(1-Math.exp(-t/tau))
+        : vLevel*Math.exp(-t/tau);
+
+      d+=(i?' L ':'M ')+X(t).toFixed(2)+' '+Y(v).toFixed(2);
+    }
+
+    svg.appendChild(svgNode('path',{
+      d,
+      fill:'none',
+      stroke:'#2d6cdf',
+      'stroke-width':4.5,
+      'stroke-linecap':'round'
+    }));
+
+    const chargingOffsets={1:62,2:72,3:82,4:145,5:88};
+    const dischargingOffsets={1:-62,2:-72,3:-82,4:-145,5:-88};
+    const offsets=mode==='charge'?chargingOffsets:dischargingOffsets;
+
+    [1,2,3,4,5].forEach(n=>{
+      const frac=mode==='charge'
+        ? 1-Math.exp(-n)
+        : Math.exp(-n);
+
+      const voltage=frac*vLevel;
+      const cx=X(n*tau);
+      const cy=Y(voltage);
+
+      svg.appendChild(svgNode('circle',{
+        cx,cy,r:7,
+        fill:'#2f8f6b',
+        stroke:'#ffffff',
+        'stroke-width':2
+      }));
+
+      const anchor=n===5?'end':'start';
+      const labelX=n===5?cx-12:cx+12;
+      const labelY=cy+offsets[n];
+
+      // A short leader line keeps each staggered label tied to its point.
+      const leaderEndY=labelY+(offsets[n]>0?-29:29);
+      svg.appendChild(svgNode('line',{
+        x1:cx,
+        y1:cy+(offsets[n]>0?9:-9),
+        x2:cx,
+        y2:leaderEndY,
+        stroke:'#9aabbd',
+        'stroke-width':1.5
+      }));
+
+      addLabelBox(
+        svg,
+        labelX,
+        labelY,
+        (frac*100).toFixed(1)+'%',
+        voltage.toFixed(2)+' V',
+        anchor
+      );
+    });
+
+    const obs=Math.min(Math.max(0,observeTime),tMax);
+    const obsFrac=mode==='charge'
+      ? 1-Math.exp(-obs/tau)
+      : Math.exp(-obs/tau);
+    const obsVoltage=obsFrac*vLevel;
+    const ox=X(obs);
+    const oy=Y(obsVoltage);
+
+    svg.appendChild(svgNode('line',{
+      x1:ox,y1:top,x2:ox,y2:H-bottom,
+      stroke:'#b18a3b',
+      'stroke-width':3,
+      'stroke-dasharray':'9 7'
+    }));
+
+    svg.appendChild(svgNode('circle',{
+      cx:ox,cy:oy,r:12,
+      fill:'#b18a3b',
+      stroke:'#ffffff',
+      'stroke-width':3
+    }));
+
+    // Observation data stays in a fixed strip above the plot so dragging the
+    // cursor can never cause it to collide with 1τ–5τ labels.
+    addLabelBox(
+      svg,
+      left,
+      52,
+      'Observed: '+(obs/tau).toFixed(2)+'τ',
+      formatAxisTime(obs)+' · '+obsVoltage.toFixed(2)+' V',
+      'start'
+    );
+
+    svg.appendChild(svgNode('text',{
+      x:W-right,
+      y:57,
+      fill:'#b18a3b',
+      'font-size':18,
+      'font-weight':700,
+      'text-anchor':'end'
+    },'Drag the gold cursor from 0τ to 7τ'));
+
+    svg.appendChild(svgNode('text',{
+      x:W/2,y:H-2,
+      fill:'#172033',
+      'font-size':26,
+      'font-weight':700,
+      'text-anchor':'middle'
+    },'Time'));
+
+    const yt=svgNode('text',{
+      x:25,y:(top+H-bottom)/2,
+      fill:'#172033',
+      'font-size':24,
+      'font-weight':700,
+      'text-anchor':'middle'
+    },'Normalized capacitor voltage');
+
+    yt.setAttribute(
+      'transform',
+      'rotate(-90 25 '+((top+H-bottom)/2)+')'
+    );
+    svg.appendChild(yt);
+  }
+
+  function drawFrequencyChart(fc){
+    const svg=$('freqChart');
+    clear(svg);
+
+    const W=920,H=480,left=112,right=45,top=48,bottom=92;
+    const fMin=fc/100;
+    const fMax=fc*100;
+    const X=f=>left+
+      (Math.log10(f)-Math.log10(fMin))/
+      (Math.log10(fMax)-Math.log10(fMin))*
+      (W-left-right);
+    const Y=db=>H-bottom-((db+40)/40)*(H-top-bottom);
+
+    svg.appendChild(svgNode('rect',{
+      x:0,y:0,width:W,height:H,rx:14,fill:'#ffffff'
+    }));
+
+    for(let i=0;i<=4;i++){
+      const x=left+i*(W-left-right)/4;
+      const f=fMin*Math.pow(fMax/fMin,i/4);
+      svg.appendChild(svgNode('line',{
+        x1:x,y1:top,x2:x,y2:H-bottom,stroke:'#d9e0ea','stroke-width':1.2
+      }));
+      svg.appendChild(svgNode('text',{
+        x,y:H-38,fill:'#667085','font-size':22,'text-anchor':'middle'
+      },f>=1e6?(f/1e6).toFixed(2)+' MHz':
+         f>=1e3?(f/1e3).toFixed(2)+' kHz':
+         f.toFixed(2)+' Hz'));
+    }
+
+    [0,-10,-20,-30,-40].forEach(db=>{
+      const y=Y(db);
+      svg.appendChild(svgNode('line',{
+        x1:left,y1:y,x2:W-right,y2:y,stroke:'#d9e0ea','stroke-width':1.2
+      }));
+      svg.appendChild(svgNode('text',{
+        x:left-16,y:y+7,fill:'#667085','font-size':22,'text-anchor':'end'
+      },db+' dB'));
+    });
+
+    let d='';
+    for(let i=0;i<=500;i++){
+      const f=fMin*Math.pow(fMax/fMin,i/500);
+      const mag=1/Math.sqrt(1+Math.pow(f/fc,2));
+      const db=20*Math.log10(mag);
+      d+=(i?' L ':'M ')+X(f).toFixed(2)+' '+Y(Math.max(-40,db)).toFixed(2);
+    }
+
+    svg.appendChild(svgNode('path',{
+      d,fill:'none',stroke:'#7b4db3','stroke-width':4.5,'stroke-linecap':'round'
+    }));
+
+    const y3=Y(-3.0103);
+    svg.appendChild(svgNode('line',{
+      x1:left,y1:y3,x2:W-right,y2:y3,
+      stroke:'#ba4040','stroke-width':3,'stroke-dasharray':'9 7'
+    }));
+
+    const xfc=X(fc);
+    svg.appendChild(svgNode('line',{
+      x1:xfc,y1:top,x2:xfc,y2:H-bottom,
+      stroke:'#2f8f6b','stroke-width':3,'stroke-dasharray':'9 7'
+    }));
+    svg.appendChild(svgNode('circle',{
+      cx:xfc,cy:y3,r:11,fill:'#2f8f6b',stroke:'#ffffff','stroke-width':3
+    }));
+
+    addLabelBox(
+      svg,
+      xfc+18,
+      y3+62,
+      'fc = '+fmtFreq(fc),
+      '−3.01 dB · |H| = 0.707',
+      'start'
+    );
+
+    svg.appendChild(svgNode('text',{
+      x:W/2,y:H-5,fill:'#172033','font-size':26,'font-weight':700,'text-anchor':'middle'
+    },'Frequency (log scale)'));
+
+    const yt=svgNode('text',{
+      x:27,y:H/2,fill:'#172033','font-size':24,'font-weight':700,'text-anchor':'middle'
+    },'Magnitude (dB)');
+    yt.setAttribute('transform','rotate(-90 27 '+H/2+')');
+    svg.appendChild(yt);
+  }
+
+  function fillTauTable(){
+    const body=$('tauTable');
+    body.innerHTML='';
+
+    const interpretations={
+      1:'Fast initial response',
+      2:'Most of the transition is complete',
+      3:'Beginning of practical settling range',
+      4:'Close to final value',
+      5:'Common practical settling point'
+    };
+
+    [1,2,3,4,5].forEach(n=>{
+      const charge=(1-Math.exp(-n))*100;
+      const remain=Math.exp(-n)*100;
+      const tr=document.createElement('tr');
+      tr.innerHTML=
+        '<td>'+n+'τ</td>'+
+        '<td class="'+(n>=3?'highlight':'')+'">'+charge.toFixed(1)+'%</td>'+
+        '<td class="'+(n>=3?'highlight':'')+'">'+remain.toFixed(1)+'%</td>'+
+        '<td>'+interpretations[n]+'</td>';
+      body.appendChild(tr);
+    });
+  }
+
+  function calculate(){
+    const mode=$('mode').value;
+    const rScale={m:1e-3,k:1e3,M:1e6};
+    const cScale={f:1e-15,p:1e-12,n:1e-9,u:1e-6};
+    const R=value('r',10)*rScale[$('rUnit').value];
+    const C=value('c',1)*cScale[$('cUnit').value];
+    const level=value('vfinal',5);
+
+    const tau=R*C;
+    const fc=1/(2*Math.PI*tau);
+    const maxObserve=7*tau;
+    let observe=value('observe',10,true)*1e-3;
+
+    if(observe>maxObserve){
+      observe=maxObserve;
+      $('observe').value=Number((observe*1e3).toPrecision(8));
+    }
+    $('observe').max=Number((maxObserve*1e3).toPrecision(8));
+
+    const ratio=observe/tau;
+
+    const fraction=mode==='charge'
+      ? 1-Math.exp(-ratio)
+      : Math.exp(-ratio);
+    const voltage=level*fraction;
+
+    $('tauOut').textContent=fmtTime(tau);
+    $('fcOut').textContent=fmtFreq(fc);
+    $('vobsOut').textContent=voltage.toFixed(3)+' V · '+(fraction*100).toFixed(1)+'%';
+
+    $('formula').innerHTML=mode==='charge'
+      ? 'τ = RC<br>VC(t) = VFINAL × (1 − e^(−t/τ))<br>fc = 1 / (2πRC)'
+      : 'τ = RC<br>VC(t) = VINITIAL × e^(−t/τ)<br>fc = 1 / (2πRC)';
+drawCircuit(mode);
+    drawTimeChart(mode,tau,level,observe);
+    drawFrequencyChart(fc);
+  }
+
+
+  function updateObservationFromPointer(event){
+    if(!timeChartState)return;
+
+    const svg=$('timeChart');
+    const matrix=svg.getScreenCTM();
+    if(!matrix)return;
+
+    const point=svg.createSVGPoint();
+    point.x=event.clientX;
+    point.y=event.clientY;
+    const local=point.matrixTransform(matrix.inverse());
+
+    const plotWidth=timeChartState.W-timeChartState.left-timeChartState.right;
+    const normalized=Math.min(
+      1,
+      Math.max(0,(local.x-timeChartState.left)/plotWidth)
+    );
+    const observationTime=normalized*timeChartState.tMax;
+
+    $('observe').value=Number((observationTime*1e3).toPrecision(8));
+    calculate();
+  }
+
+  $('timeChart').addEventListener('pointerdown',event=>{
+    draggingObservation=true;
+    $('timeChart').classList.add('dragging');
+    $('timeChart').setPointerCapture(event.pointerId);
+    updateObservationFromPointer(event);
+  });
+
+  $('timeChart').addEventListener('pointermove',event=>{
+    if(draggingObservation)updateObservationFromPointer(event);
+  });
+
+  function stopObservationDrag(event){
+    draggingObservation=false;
+    $('timeChart').classList.remove('dragging');
+    if(event && $('timeChart').hasPointerCapture(event.pointerId)){
+      $('timeChart').releasePointerCapture(event.pointerId);
+    }
+  }
+
+  $('timeChart').addEventListener('pointerup',stopObservationDrag);
+  $('timeChart').addEventListener('pointercancel',stopObservationDrag);
+
+  $('calculate').addEventListener('click',calculate);
+  $('mode').addEventListener('change',calculate);
+  $('rUnit').addEventListener('change',calculate);
+  $('cUnit').addEventListener('change',calculate);
+  ['r','c','vfinal','observe'].forEach(id=>{
+    $(id).addEventListener('keydown',e=>{
+      if(e.key==='Enter')calculate();
+    });
+  });
+
+  fillTauTable();
+  calculate();
+})();
+</script>
+</body>
+</html>
