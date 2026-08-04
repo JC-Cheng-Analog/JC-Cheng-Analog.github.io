@@ -44,7 +44,8 @@
     }
 
     button,
-    input {
+    input,
+    select {
       font: inherit;
     }
 
@@ -143,8 +144,8 @@
 
     .app-layout {
       display: grid;
-      grid-template-columns: minmax(250px, 310px) minmax(0, 1fr);
-      gap: 22px;
+      grid-template-columns: 1fr;
+      gap: 18px;
       align-items: start;
     }
 
@@ -161,47 +162,95 @@
     }
 
     .controls-panel {
-      position: sticky;
-      top: 18px;
-      padding: 20px;
+      position: static;
+      padding: 16px 18px 18px;
       box-shadow: var(--shadow);
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel-title {
+      margin: 0;
+      color: var(--accent);
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .parameter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .control-group {
-      margin-bottom: 18px;
-    }
-
-    .control-group:last-of-type {
       margin-bottom: 0;
     }
 
     .control-label {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-      font-size: 0.93rem;
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.92rem;
+      font-weight: 700;
     }
 
-    .control-label strong {
+    .input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .numeric-input {
+      width: 100%;
+      height: 42px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      background: var(--panel);
+      outline: none;
+    }
+
+    .numeric-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(23, 52, 92, 0.11);
+    }
+
+    .unit-tag {
+      min-width: 48px;
       color: var(--accent);
+      font-weight: 700;
+      text-align: right;
       white-space: nowrap;
     }
 
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
+    .unit-select {
+      width: 74px;
+      height: 42px;
+      padding: 7px 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--accent);
+      background: var(--panel);
+      font-weight: 700;
+      outline: none;
+    }
+
+    .unit-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(23, 52, 92, 0.11);
     }
 
     .divider {
       height: 1px;
-      margin: 20px 0;
+      margin: 4px 0;
       background: var(--border);
     }
 
     .switch-list {
       display: grid;
-      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px 14px;
     }
 
     .switch-row {
@@ -237,8 +286,13 @@
 
     .content {
       display: grid;
-      gap: 20px;
+      gap: 16px;
       min-width: 0;
+    }
+
+    .section-panel {
+      padding: 14px 16px 16px;
+      box-shadow: var(--shadow);
     }
 
     .metrics-grid,
@@ -246,7 +300,7 @@
     .equation-grid,
     .sensitivity-grid {
       display: grid;
-      gap: 14px;
+      gap: 12px;
     }
 
     .metrics-grid {
@@ -263,19 +317,19 @@
     .result-card,
     .equation-card,
     .sensitivity-card {
-      padding: 16px;
+      padding: 14px;
     }
 
     .metric-label,
     .section-note,
     .muted {
       color: var(--muted);
-      font-size: 0.88rem;
+      font-size: 0.84rem;
     }
 
     .metric-value {
-      margin-top: 4px;
-      font-size: 1.35rem;
+      margin-top: 3px;
+      font-size: 1.16rem;
       font-weight: 750;
       letter-spacing: -0.02em;
     }
@@ -283,6 +337,18 @@
     .section-block {
       display: grid;
       gap: 10px;
+      min-width: 0;
+    }
+
+    .secondary-charts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    .secondary-charts.single-chart {
+      grid-template-columns: 1fr;
     }
 
     .section-heading {
@@ -305,7 +371,7 @@
 
     .chart-wrap {
       overflow: hidden;
-      padding: 4px;
+      padding: 6px;
       background: var(--panel);
     }
 
@@ -315,16 +381,19 @@
       touch-action: none;
     }
 
-    #mainPlot {
-      height: 410px;
-    }
-
-    #zoomPlot {
-      height: 330px;
-    }
-
+    #mainPlot,
+    #zoomPlot,
     #internalPlot {
-      height: 250px;
+      cursor: crosshair;
+    }
+
+    #mainPlot {
+      height: 560px;
+    }
+
+    #zoomPlot,
+    #internalPlot {
+      height: 390px;
     }
 
     .legend {
@@ -378,6 +447,42 @@
       font-weight: 750;
     }
 
+    .result-card {
+      transition:
+        border-color 0.16s ease,
+        box-shadow 0.16s ease,
+        transform 0.16s ease,
+        background 0.16s ease;
+    }
+
+    .result-card.is-hovered {
+      transform: translateY(-2px);
+    }
+
+    .result-card[data-curve="simple"].is-hovered {
+      border-color: var(--simple);
+      background: rgba(45, 108, 223, 0.055);
+      box-shadow:
+        0 0 0 2px rgba(45, 108, 223, 0.18),
+        0 0 24px rgba(45, 108, 223, 0.25);
+    }
+
+    .result-card[data-curve="cascode"].is-hovered {
+      border-color: var(--cascode);
+      background: rgba(194, 139, 44, 0.06);
+      box-shadow:
+        0 0 0 2px rgba(194, 139, 44, 0.18),
+        0 0 24px rgba(194, 139, 44, 0.25);
+    }
+
+    .result-card[data-curve="gain"].is-hovered {
+      border-color: var(--gain);
+      background: rgba(123, 77, 179, 0.055);
+      box-shadow:
+        0 0 0 2px rgba(123, 77, 179, 0.18),
+        0 0 24px rgba(123, 77, 179, 0.25);
+    }
+
     .equation-main {
       margin: 8px 0;
       font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -427,13 +532,19 @@
       text-align: center;
     }
 
-    @media (max-width: 1050px) {
-      .app-layout {
+    @media (max-width: 1100px) {
+      .secondary-charts {
         grid-template-columns: 1fr;
       }
+    }
 
-      .controls-panel {
-        position: static;
+    @media (max-width: 1050px) {
+      .parameter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .switch-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .metrics-grid {
@@ -461,6 +572,8 @@
         width: 100%;
       }
 
+      .parameter-grid,
+      .switch-list,
       .results-grid,
       .equation-grid,
       .sensitivity-grid {
@@ -468,10 +581,14 @@
       }
 
       #mainPlot {
-        height: 350px;
+        height: 420px;
       }
 
       #zoomPlot {
+        height: 340px;
+      }
+
+      #internalPlot {
         height: 300px;
       }
     }
@@ -490,7 +607,7 @@
       }
 
       #mainPlot {
-        height: 320px;
+        height: 380px;
       }
     }
   </style>
@@ -515,70 +632,80 @@
 
     <div class="app-layout">
       <aside class="panel controls-panel" aria-label="Current mirror controls">
-        <div class="control-group">
-          <label class="control-label" for="iref">
-            <span>Reference current IREF</span>
-            <strong id="irefOut">100 μA</strong>
-          </label>
-          <input id="iref" type="range" min="10" max="500" step="5" value="100" />
-        </div>
+        <h2 class="panel-title">1. Parameter Setting</h2>
 
-        <div class="control-group">
-          <label class="control-label" for="ratio">
-            <span>Mirror ratio K</span>
-            <strong id="ratioOut">1.00×</strong>
-          </label>
-          <input id="ratio" type="range" min="0.25" max="4" step="0.05" value="1" />
-        </div>
+        <div class="parameter-grid">
+          <div class="control-group">
+            <label class="control-label" for="iref">Reference current IREF</label>
+            <div class="input-row">
+              <input id="iref" class="numeric-input" type="number" min="0.001" max="500" step="0.1" value="100" />
+              <select id="irefUnit" class="unit-select" aria-label="Reference-current unit">
+                <option value="nA">nA</option>
+                <option value="uA" selected>μA</option>
+              </select>
+            </div>
+          </div>
 
-        <div class="control-group">
-          <label class="control-label" for="vout">
-            <span>Cursor VOUT</span>
-            <strong id="voutOut">1.20 V</strong>
-          </label>
-          <input id="vout" type="range" min="0" max="3" step="0.01" value="1.20" />
-        </div>
+          <div class="control-group">
+            <label class="control-label" for="ratio">Mirror ratio K</label>
+            <div class="input-row">
+              <input id="ratio" class="numeric-input" type="number" min="0.25" max="4" step="0.1" value="1" />
+              <span class="unit-tag">×</span>
+            </div>
+          </div>
 
-        <div class="control-group">
-          <label class="control-label" for="vov">
-            <span>Overdrive VOV</span>
-            <strong id="vovOut">0.20 V</strong>
-          </label>
-          <input id="vov" type="range" min="0.08" max="0.50" step="0.01" value="0.20" />
-        </div>
+          <div class="control-group">
+            <label class="control-label" for="vout">Cursor VOUT</label>
+            <div class="input-row">
+              <input id="vout" class="numeric-input" type="number" min="0" max="3" step="0.1" value="1.2" />
+              <span class="unit-tag">V</span>
+            </div>
+          </div>
 
-        <div class="control-group">
-          <label class="control-label" for="lambda">
-            <span>Channel modulation λ</span>
-            <strong id="lambdaOut">0.050 V⁻¹</strong>
-          </label>
-          <input id="lambda" type="range" min="0.005" max="0.20" step="0.005" value="0.05" />
-        </div>
+          <div class="control-group">
+            <label class="control-label" for="vov">Overdrive VOV</label>
+            <div class="input-row">
+              <input id="vov" class="numeric-input" type="number" min="0.08" max="0.5" step="0.1" value="0.2" />
+              <span class="unit-tag">V</span>
+            </div>
+          </div>
 
-        <div class="control-group">
-          <label class="control-label" for="gmro">
-            <span>Intrinsic gain gm·ro</span>
-            <strong id="gmroOut">20</strong>
-          </label>
-          <input id="gmro" type="range" min="5" max="100" step="1" value="20" />
-        </div>
+          <div class="control-group">
+            <label class="control-label" for="lambda">Channel modulation λ</label>
+            <div class="input-row">
+              <input id="lambda" class="numeric-input" type="number" min="0.005" max="0.2" step="0.1" value="0.05" />
+              <span class="unit-tag">V⁻¹</span>
+            </div>
+          </div>
 
-        <div class="control-group">
-          <label class="control-label" for="gain">
-            <span>Gain-boost amplifier A</span>
-            <strong id="gainOut">20 V/V</strong>
-          </label>
-          <input id="gain" type="range" min="0" max="100" step="1" value="20" />
-        </div>
+          <div class="control-group">
+            <label class="control-label" for="gmro">Intrinsic gain gm·ro</label>
+            <div class="input-row">
+              <input id="gmro" class="numeric-input" type="number" min="5" max="100" step="0.1" value="20" />
+              <span class="unit-tag"></span>
+            </div>
+          </div>
 
-        <div class="divider"></div>
+          <div class="control-group">
+            <label class="control-label" for="gain">Gain-boost amplifier A</label>
+            <div class="input-row">
+              <input id="gain" class="numeric-input" type="number" min="0" max="100" step="0.1" value="20" />
+              <span class="unit-tag">V/V</span>
+            </div>
+          </div>
 
-        <div class="control-group">
-          <label class="control-label" for="zoomPercent">
-            <span>Target-current zoom</span>
-            <strong id="zoomPercentOut">±5%</strong>
-          </label>
-          <input id="zoomPercent" type="range" min="1" max="10" step="1" value="5" />
+          <div class="control-group">
+            <label class="control-label" for="zoomPercent">Target-current zoom</label>
+            <div class="input-row">
+              <input id="zoomPercent" class="numeric-input" type="number" min="1" max="10" step="0.1" value="5" />
+              <span class="unit-tag">%</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="reset">Reset parameters</label>
+            <button id="reset" class="reset-button" type="button">Reset</button>
+          </div>
         </div>
 
         <div class="divider"></div>
@@ -599,32 +726,36 @@
             <span>Show sensitivity</span>
           </label>
         </div>
-
-        <button id="reset" class="reset-button" type="button">Reset parameters</button>
       </aside>
 
       <section class="content">
-        <div class="metrics-grid" aria-live="polite">
-          <article class="metric-card">
-            <div class="metric-label">Target current</div>
-            <div id="targetCurrent" class="metric-value">100 μA</div>
-          </article>
+        <section class="panel section-panel">
+          <div class="section-heading">
+            <h2>2. Circuit Information</h2>
+          </div>
 
-          <article class="metric-card">
-            <div class="metric-label">Simple VOUT,min<br><span class="muted">(Compliance)</span></div>
-            <div id="simpleCompliance" class="metric-value">0.20 V</div>
-          </article>
+          <div class="metrics-grid" aria-live="polite">
+            <article class="metric-card">
+              <div class="metric-label">Target current</div>
+              <div id="targetCurrent" class="metric-value">100 μA</div>
+            </article>
 
-          <article class="metric-card">
-            <div class="metric-label">Cascode VOUT,min<br><span class="muted">(Compliance)</span></div>
-            <div id="cascodeCompliance" class="metric-value">0.40 V</div>
-          </article>
+            <article class="metric-card">
+              <div class="metric-label">Simple VOUT,min<br><span class="muted">(Compliance)</span></div>
+              <div id="simpleCompliance" class="metric-value">0.20 V</div>
+            </article>
 
-          <article class="metric-card">
-            <div class="metric-label">Gain-boost Rout gain</div>
-            <div id="routGain" class="metric-value">420×</div>
-          </article>
-        </div>
+            <article class="metric-card">
+              <div class="metric-label">Cascode VOUT,min<br><span class="muted">(Compliance)</span></div>
+              <div id="cascodeCompliance" class="metric-value">0.40 V</div>
+            </article>
+
+            <article class="metric-card">
+              <div class="metric-label">Gain-boost Rout gain</div>
+              <div id="routGain" class="metric-value">420×</div>
+            </article>
+          </div>
+        </section>
 
         <section class="section-block">
           <div class="section-heading">
@@ -633,7 +764,7 @@
           </div>
 
           <div class="chart-wrap">
-            <canvas id="mainPlot" aria-label="Full current mirror comparison plot"></canvas>
+            <canvas id="mainPlot" aria-label="Full current mirror comparison plot. Drag to move the shared VOUT cursor."></canvas>
           </div>
         </section>
 
@@ -645,25 +776,26 @@
         </div>
 
         <div class="results-grid" aria-live="polite">
-          <article class="result-card">
+          <article id="simpleResultCard" class="result-card" data-curve="simple">
             <div class="result-title">Simple @ cursor</div>
             <div id="simpleCurrent" class="result-current">104.8 μA</div>
             <div id="simpleInfo" class="muted"></div>
           </article>
 
-          <article class="result-card">
+          <article id="cascodeResultCard" class="result-card" data-curve="cascode">
             <div class="result-title">Cascode @ cursor</div>
             <div id="cascodeCurrent" class="result-current">100.2 μA</div>
             <div id="cascodeInfo" class="muted"></div>
           </article>
 
-          <article class="result-card">
+          <article id="gainResultCard" class="result-card" data-curve="gain">
             <div class="result-title">Gain boost @ cursor</div>
             <div id="gainCurrent" class="result-current">100.0 μA</div>
             <div id="gainInfo" class="muted"></div>
           </article>
         </div>
 
+        <div id="secondaryCharts" class="secondary-charts">
         <section class="section-block">
           <div class="section-heading">
             <h2>Target-current zoom</h2>
@@ -671,16 +803,17 @@
           </div>
 
           <div class="chart-wrap">
-            <canvas id="zoomPlot" aria-label="Zoomed current comparison around target current"></canvas>
+            <canvas id="zoomPlot" aria-label="Zoomed current comparison around target current. Drag to move the shared VOUT cursor."></canvas>
           </div>
         </section>
 
         <section id="internalSection" class="section-block">
           <h2>Internal drain-node response</h2>
           <div class="chart-wrap">
-            <canvas id="internalPlot" aria-label="Internal drain-node response"></canvas>
+            <canvas id="internalPlot" aria-label="Internal drain-node response. Drag to move the shared VOUT cursor."></canvas>
           </div>
         </section>
+        </div>
 
         <section id="equationSection" class="equation-grid">
           <article class="equation-card">
@@ -740,6 +873,9 @@
       controlIds.map((id) => [id, document.getElementById(id)])
     );
 
+    const irefUnit = document.getElementById("irefUnit");
+    let previousIrefUnit = irefUnit.value;
+
     const showInternal = document.getElementById("showInternal");
     const showEquation = document.getElementById("showEquation");
     const showSensitivity = document.getElementById("showSensitivity");
@@ -752,11 +888,20 @@
     const zoomCtx = zoomPlot.getContext("2d");
     const internalCtx = internalPlot.getContext("2d");
 
+    const resultCards = {
+      simple: document.getElementById("simpleResultCard"),
+      cascode: document.getElementById("cascodeResultCard"),
+      gain: document.getElementById("gainResultCard")
+    };
+
+    const chartStates = new Map();
     const xMax = 3;
 
     function readParams() {
+      const irefScaleToMicroamp = irefUnit.value === "nA" ? 1e-3 : 1;
+
       return {
-        iref: Number(controls.iref.value),
+        iref: Number(controls.iref.value) * irefScaleToMicroamp,
         ratio: Number(controls.ratio.value),
         vout: Number(controls.vout.value),
         vov: Number(controls.vov.value),
@@ -765,6 +910,30 @@
         gain: Number(controls.gain.value),
         zoomPercent: Number(controls.zoomPercent.value)
       };
+    }
+
+    function currentDisplayInfo(valueMicroamp) {
+      if (Math.abs(valueMicroamp) < 1) {
+        return { scale: 1000, unit: "nA" };
+      }
+
+      return { scale: 1, unit: "μA" };
+    }
+
+    function formatCurrent(valueMicroamp, digits = 3) {
+      const display = currentDisplayInfo(valueMicroamp);
+      return `${(valueMicroamp * display.scale).toFixed(digits)} ${display.unit}`;
+    }
+
+    function formatCurrentRange(lowerMicroamp, upperMicroamp) {
+      const display = currentDisplayInfo(
+        Math.max(Math.abs(lowerMicroamp), Math.abs(upperMicroamp))
+      );
+
+      return (
+        `${(lowerMicroamp * display.scale).toFixed(1)}–` +
+        `${(upperMicroamp * display.scale).toFixed(1)} ${display.unit}`
+      );
     }
 
     function architecture(type, p) {
@@ -849,11 +1018,122 @@
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    function drawAxes(context, canvas, yMin, yMax, yTicks = 4, yDecimals = 0) {
+    function roundedRectPath(context, x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+
+      context.beginPath();
+      context.moveTo(x + r, y);
+      context.lineTo(x + width - r, y);
+      context.quadraticCurveTo(x + width, y, x + width, y + r);
+      context.lineTo(x + width, y + height - r);
+      context.quadraticCurveTo(
+        x + width,
+        y + height,
+        x + width - r,
+        y + height
+      );
+      context.lineTo(x + r, y + height);
+      context.quadraticCurveTo(x, y + height, x, y + height - r);
+      context.lineTo(x, y + r);
+      context.quadraticCurveTo(x, y, x + r, y);
+      context.closePath();
+    }
+
+    function drawCursorDataLabels(context, axes, items) {
+      if (!items.length) return;
+
+      const boxHeight = 36;
+      const gap = 42;
+      const minCenter = axes.margin.top + boxHeight / 2 + 4;
+      const maxCenter =
+        axes.margin.top + axes.plotHeight - boxHeight / 2 - 4;
+
+      const sorted = items
+        .slice()
+        .sort((a, b) => a.pointY - b.pointY);
+
+      const centers = sorted.map((item) =>
+        Math.max(minCenter, Math.min(maxCenter, item.pointY))
+      );
+
+      for (let index = 1; index < centers.length; index += 1) {
+        centers[index] = Math.max(centers[index], centers[index - 1] + gap);
+      }
+
+      if (centers.length && centers[centers.length - 1] > maxCenter) {
+        const shift = centers[centers.length - 1] - maxCenter;
+        for (let index = 0; index < centers.length; index += 1) {
+          centers[index] -= shift;
+        }
+      }
+
+      for (let index = centers.length - 2; index >= 0; index -= 1) {
+        centers[index] = Math.min(centers[index], centers[index + 1] - gap);
+      }
+
+      const pointX = items[0].pointX;
+      const placeLeft =
+        pointX > axes.margin.left + axes.plotWidth * 0.68;
+
+      sorted.forEach((item, index) => {
+        const centerY = centers[index];
+
+        context.save();
+        context.font = "700 17px Arial";
+        const textWidth = context.measureText(item.text).width;
+        const boxWidth = textWidth + 18;
+        const boxX = placeLeft
+          ? pointX - boxWidth - 14
+          : pointX + 14;
+        const boxY = centerY - boxHeight / 2;
+        const connectorX = placeLeft ? boxX + boxWidth : boxX;
+
+        context.strokeStyle = item.color;
+        context.lineWidth = 1.6;
+        context.beginPath();
+        context.moveTo(item.pointX, item.pointY);
+        context.lineTo(connectorX, centerY);
+        context.stroke();
+
+        roundedRectPath(context, boxX, boxY, boxWidth, boxHeight, 8);
+        context.fillStyle = "rgba(255,255,255,0.95)";
+        context.fill();
+        context.strokeStyle = item.color;
+        context.lineWidth = 1.5;
+        context.stroke();
+
+        context.fillStyle = item.color;
+        context.textAlign = "left";
+        context.textBaseline = "middle";
+        context.fillText(item.text, boxX + 9, centerY);
+        context.restore();
+      });
+    }
+
+    function setHoveredResult(type) {
+      Object.entries(resultCards).forEach(([name, card]) => {
+        card.classList.toggle("is-hovered", name === type);
+      });
+    }
+
+    function clearHoveredResult() {
+      setHoveredResult(null);
+    }
+
+    function drawAxes(
+      context,
+      canvas,
+      yMin,
+      yMax,
+      yTicks = 4,
+      yDecimals = 0,
+      currentScale = 1,
+      currentUnit = "μA"
+    ) {
       const c = palette();
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
-      const margin = { left: 66, right: 22, top: 25, bottom: 48 };
+      const margin = { left: 106, right: 34, top: 36, bottom: 86 };
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
 
@@ -864,7 +1144,7 @@
       context.strokeStyle = c.border;
       context.fillStyle = c.muted;
       context.lineWidth = 1;
-      context.font = "12px system-ui";
+      context.font = "24px system-ui";
 
       context.textAlign = "center";
 
@@ -889,7 +1169,11 @@
         context.lineTo(width - margin.right, Y(value));
         context.stroke();
 
-        context.fillText(value.toFixed(yDecimals), margin.left - 8, Y(value) + 4);
+        context.fillText(
+          (value * currentScale).toFixed(yDecimals),
+          margin.left - 10,
+          Y(value) + 7
+        );
       }
 
       context.strokeStyle = c.text;
@@ -905,9 +1189,9 @@
       context.fillText("VOUT (V)", margin.left + plotWidth / 2, height - 5);
 
       context.save();
-      context.translate(15, margin.top + plotHeight / 2);
+      context.translate(40, margin.top + plotHeight / 2);
       context.rotate(-Math.PI / 2);
-      context.fillText("IOUT (μA)", 0, 0);
+      context.fillText(`IOUT (${currentUnit})`, 0, 0);
       context.restore();
 
       return {
@@ -948,6 +1232,7 @@
 
     function drawCursor(context, axes, p, yMin, yMax) {
       const c = palette();
+      const display = currentDisplayInfo(p.iref * p.ratio);
 
       context.strokeStyle = c.text;
       context.setLineDash([4, 5]);
@@ -955,25 +1240,45 @@
 
       context.beginPath();
       context.moveTo(axes.X(p.vout), axes.margin.top);
-      context.lineTo(axes.X(p.vout), axes.margin.top + axes.plotHeight);
+      context.lineTo(
+        axes.X(p.vout),
+        axes.margin.top + axes.plotHeight
+      );
       context.stroke();
 
       context.setLineDash([]);
 
+      const labels = [];
+
       [
-        ["simple", c.simple],
-        ["cascode", c.cascode],
-        ["gain", c.gain]
-      ].forEach(([type, color]) => {
+        ["simple", "Simple", c.simple],
+        ["cascode", "Cascode", c.cascode],
+        ["gain", "Gain boost", c.gain]
+      ].forEach(([type, title, color]) => {
         const point = model(type, p.vout, p);
 
         if (point.current >= yMin && point.current <= yMax) {
+          const pointX = axes.X(p.vout);
+          const pointY = axes.Y(point.current);
+
           context.fillStyle = color;
           context.beginPath();
-          context.arc(axes.X(p.vout), axes.Y(point.current), 5.5, 0, Math.PI * 2);
+          context.arc(pointX, pointY, 7.5, 0, Math.PI * 2);
           context.fill();
+
+          labels.push({
+            pointX,
+            pointY,
+            color,
+            text:
+              `${title} ` +
+              `${(point.current * display.scale).toFixed(3)} ` +
+              `${display.unit}`
+          });
         }
       });
+
+      drawCursorDataLabels(context, axes, labels);
     }
 
     function drawMain() {
@@ -994,7 +1299,17 @@
 
       mainCtx.clearRect(0, 0, mainPlot.clientWidth, mainPlot.clientHeight);
 
-      const axes = drawAxes(mainCtx, mainPlot, 0, yMax, 4, 0);
+      const display = currentDisplayInfo(ideal);
+      const axes = drawAxes(
+        mainCtx,
+        mainPlot,
+        0,
+        yMax,
+        4,
+        display.scale === 1000 ? 0 : 0,
+        display.scale,
+        display.unit
+      );
 
       mainCtx.fillStyle = c.fill;
       mainCtx.fillRect(
@@ -1016,14 +1331,20 @@
       drawCurve(mainCtx, "cascode", p, axes.X, axes.Y, c.cascode);
       drawCurve(mainCtx, "gain", p, axes.X, axes.Y, c.gain);
       drawCursor(mainCtx, axes, p, 0, yMax);
+      chartStates.set(mainPlot, {
+        kind: "current",
+        axes,
+        p
+      });
 
       mainCtx.fillStyle = c.text;
+      mainCtx.font = "22px system-ui";
       mainCtx.textAlign = "left";
       mainCtx.fillText("Out of Compliance", axes.X(0.04), axes.margin.top + 16);
 
       mainCtx.textAlign = "center";
-      mainCtx.fillText("Simple VOUT,min", axes.X(p.vov), axes.margin.top + 34);
-      mainCtx.fillText("Cascode VOUT,min", axes.X(2 * p.vov), axes.margin.top + 50);
+      mainCtx.fillText("Simple VOUT,min", axes.X(p.vov), axes.margin.top + 42);
+      mainCtx.fillText("Cascode VOUT,min", axes.X(2 * p.vov), axes.margin.top + 70);
     }
 
     function drawZoom() {
@@ -1035,11 +1356,22 @@
       const fraction = p.zoomPercent / 100;
       const yMin = ideal * (1 - fraction);
       const yMax = ideal * (1 + fraction);
-      const decimals = ideal < 50 ? 1 : 0;
+      const display = currentDisplayInfo(ideal);
+      const displayedIdeal = ideal * display.scale;
+      const decimals = displayedIdeal < 50 ? 1 : 0;
 
       zoomCtx.clearRect(0, 0, zoomPlot.clientWidth, zoomPlot.clientHeight);
 
-      const axes = drawAxes(zoomCtx, zoomPlot, yMin, yMax, 4, decimals);
+      const axes = drawAxes(
+        zoomCtx,
+        zoomPlot,
+        yMin,
+        yMax,
+        4,
+        decimals,
+        display.scale,
+        display.unit
+      );
 
       zoomCtx.strokeStyle = c.text;
       zoomCtx.setLineDash([7, 5]);
@@ -1053,6 +1385,11 @@
       drawCurve(zoomCtx, "cascode", p, axes.X, axes.Y, c.cascode);
       drawCurve(zoomCtx, "gain", p, axes.X, axes.Y, c.gain);
       drawCursor(zoomCtx, axes, p, yMin, yMax);
+      chartStates.set(zoomPlot, {
+        kind: "current",
+        axes,
+        p
+      });
     }
 
     function drawInternal() {
@@ -1064,7 +1401,7 @@
       const c = palette();
       const width = internalPlot.clientWidth;
       const height = internalPlot.clientHeight;
-      const margin = { left: 60, right: 22, top: 22, bottom: 44 };
+      const margin = { left: 100, right: 34, top: 34, bottom: 84 };
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
 
@@ -1074,7 +1411,7 @@
       internalCtx.clearRect(0, 0, width, height);
       internalCtx.strokeStyle = c.border;
       internalCtx.fillStyle = c.muted;
-      internalCtx.font = "12px system-ui";
+      internalCtx.font = "24px system-ui";
       internalCtx.lineWidth = 1;
 
       internalCtx.textAlign = "center";
@@ -1114,16 +1451,36 @@
       internalCtx.fillText("VOUT (V)", margin.left + plotWidth / 2, height - 4);
 
       internalCtx.save();
-      internalCtx.translate(14, margin.top + plotHeight / 2);
+      internalCtx.translate(40, margin.top + plotHeight / 2);
       internalCtx.rotate(-Math.PI / 2);
       internalCtx.fillText("Internal node (V)", 0, 0);
       internalCtx.restore();
 
+      internalCtx.strokeStyle = c.text;
+      internalCtx.setLineDash([4, 5]);
+      internalCtx.lineWidth = 1.2;
+      internalCtx.beginPath();
+      internalCtx.moveTo(X(p.vout), margin.top);
+      internalCtx.lineTo(X(p.vout), margin.top + plotHeight);
+      internalCtx.stroke();
+      internalCtx.setLineDash([]);
+
+      const internalLabels = [];
+      const internalAxes = {
+        width,
+        height,
+        margin,
+        plotWidth,
+        plotHeight,
+        X,
+        Y
+      };
+
       [
-        ["simple", c.simple],
-        ["cascode", c.cascode],
-        ["gain", c.gain]
-      ].forEach(([type, color]) => {
+        ["simple", "Simple", c.simple],
+        ["cascode", "Cascode", c.cascode],
+        ["gain", "Gain boost", c.gain]
+      ].forEach(([type, title, color]) => {
         internalCtx.strokeStyle = color;
         internalCtx.lineWidth = 2.7;
         internalCtx.beginPath();
@@ -1141,16 +1498,29 @@
 
         internalCtx.stroke();
 
+        const nodeAtCursor = internalNode(type, p.vout, p);
+        const pointX = X(p.vout);
+        const pointY = Y(nodeAtCursor);
+
         internalCtx.fillStyle = color;
         internalCtx.beginPath();
-        internalCtx.arc(
-          X(p.vout),
-          Y(internalNode(type, p.vout, p)),
-          5,
-          0,
-          Math.PI * 2
-        );
+        internalCtx.arc(pointX, pointY, 7, 0, Math.PI * 2);
         internalCtx.fill();
+
+        internalLabels.push({
+          pointX,
+          pointY,
+          color,
+          text: `${title} ${nodeAtCursor.toFixed(3)} V`
+        });
+      });
+
+      drawCursorDataLabels(internalCtx, internalAxes, internalLabels);
+
+      chartStates.set(internalPlot, {
+        kind: "internal",
+        axes: internalAxes,
+        p
       });
     }
 
@@ -1201,39 +1571,118 @@
     }
 
     function setCursorFromPointer(event, canvas) {
-      const rect = canvas.getBoundingClientRect();
-      const marginLeft = 66;
-      const marginRight = 22;
-      const usableWidth = rect.width - marginLeft - marginRight;
+      const state = chartStates.get(canvas);
+      if (!state) return;
 
-      const localX = Math.max(
+      const rect = canvas.getBoundingClientRect();
+      const axes = state.axes;
+      const localX = event.clientX - rect.left;
+      const normalized = Math.max(
         0,
-        Math.min(usableWidth, event.clientX - rect.left - marginLeft)
+        Math.min(
+          1,
+          (localX - axes.margin.left) / axes.plotWidth
+        )
       );
 
-      controls.vout.value = ((localX / usableWidth) * xMax).toFixed(2);
+      controls.vout.value = (normalized * xMax).toFixed(2);
       update();
+    }
+
+    function detectHoveredCurve(event, canvas) {
+      const state = chartStates.get(canvas);
+      if (!state) {
+        clearHoveredResult();
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const localX = event.clientX - rect.left;
+      const localY = event.clientY - rect.top;
+      const axes = state.axes;
+
+      const insidePlot =
+        localX >= axes.margin.left &&
+        localX <= axes.margin.left + axes.plotWidth &&
+        localY >= axes.margin.top &&
+        localY <= axes.margin.top + axes.plotHeight;
+
+      if (!insidePlot) {
+        clearHoveredResult();
+        return;
+      }
+
+      const voltage =
+        ((localX - axes.margin.left) / axes.plotWidth) * xMax;
+
+      let nearestType = null;
+      let nearestDistance = Infinity;
+
+      // Reverse draw order so the visually top curve wins when curves overlap.
+      ["gain", "cascode", "simple"].forEach((type) => {
+        const value =
+          state.kind === "internal"
+            ? internalNode(type, voltage, state.p)
+            : model(type, voltage, state.p).current;
+
+        const curveY = axes.Y(value);
+        const distance = Math.abs(localY - curveY);
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestType = type;
+        }
+      });
+
+      if (nearestDistance <= 18) {
+        setHoveredResult(nearestType);
+      } else {
+        clearHoveredResult();
+      }
     }
 
     let dragging = false;
 
-    [mainPlot, zoomPlot].forEach((canvas) => {
+    [mainPlot, zoomPlot, internalPlot].forEach((canvas) => {
       canvas.addEventListener("pointerdown", (event) => {
+        const state = chartStates.get(canvas);
+        if (!state) return;
+
         dragging = true;
         canvas.setPointerCapture(event.pointerId);
         setCursorFromPointer(event, canvas);
       });
 
       canvas.addEventListener("pointermove", (event) => {
-        if (dragging) setCursorFromPointer(event, canvas);
+        if (dragging && canvas.hasPointerCapture(event.pointerId)) {
+          setCursorFromPointer(event, canvas);
+        } else {
+          detectHoveredCurve(event, canvas);
+        }
       });
 
-      canvas.addEventListener("pointerup", () => {
+      canvas.addEventListener("pointerup", (event) => {
         dragging = false;
+
+        if (canvas.hasPointerCapture(event.pointerId)) {
+          canvas.releasePointerCapture(event.pointerId);
+        }
+
+        detectHoveredCurve(event, canvas);
       });
 
-      canvas.addEventListener("pointercancel", () => {
+      canvas.addEventListener("pointercancel", (event) => {
         dragging = false;
+
+        if (canvas.hasPointerCapture(event.pointerId)) {
+          canvas.releasePointerCapture(event.pointerId);
+        }
+
+        clearHoveredResult();
+      });
+
+      canvas.addEventListener("pointerleave", () => {
+        if (!dragging) clearHoveredResult();
       });
     });
 
@@ -1248,17 +1697,8 @@
       const lower = ideal * (1 - p.zoomPercent / 100);
       const upper = ideal * (1 + p.zoomPercent / 100);
 
-      document.getElementById("irefOut").textContent = `${p.iref.toFixed(0)} μA`;
-      document.getElementById("ratioOut").textContent = `${p.ratio.toFixed(2)}×`;
-      document.getElementById("voutOut").textContent = `${p.vout.toFixed(2)} V`;
-      document.getElementById("vovOut").textContent = `${p.vov.toFixed(2)} V`;
-      document.getElementById("lambdaOut").textContent = `${p.lambda.toFixed(3)} V⁻¹`;
-      document.getElementById("gmroOut").textContent = p.gmro.toFixed(0);
-      document.getElementById("gainOut").textContent = `${p.gain.toFixed(0)} V/V`;
-      document.getElementById("zoomPercentOut").textContent =
-        `±${p.zoomPercent.toFixed(0)}%`;
-
-      document.getElementById("targetCurrent").textContent = `${ideal.toFixed(1)} μA`;
+      document.getElementById("targetCurrent").textContent =
+        formatCurrent(ideal, ideal < 1 ? 1 : 1);
       document.getElementById("simpleCompliance").textContent =
         `${p.vov.toFixed(2)} V`;
       document.getElementById("cascodeCompliance").textContent =
@@ -1266,7 +1706,7 @@
       document.getElementById("routGain").textContent =
         `${(p.gmro * (1 + p.gain)).toFixed(0)}×`;
       document.getElementById("zoomBadge").textContent =
-        `${lower.toFixed(1)}–${upper.toFixed(1)} μA`;
+        formatCurrentRange(lower, upper);
 
       [
         ["simple", simple],
@@ -1274,7 +1714,7 @@
         ["gain", gain]
       ].forEach(([name, result]) => {
         document.getElementById(`${name}Current`).textContent =
-          `${result.current.toFixed(3)} μA`;
+          formatCurrent(result.current, 3);
 
         document.getElementById(`${name}Info`).textContent =
           `Error ${result.error >= 0 ? "+" : ""}${result.error.toFixed(3)}% · ` +
@@ -1305,6 +1745,11 @@
 
       document.getElementById("internalSection").classList.toggle(
         "hidden",
+        !showInternal.checked
+      );
+
+      document.getElementById("secondaryCharts").classList.toggle(
+        "single-chart",
         !showInternal.checked
       );
 
@@ -1340,6 +1785,33 @@
       controls[id].addEventListener("input", update);
     });
 
+    function applyIrefUnitLimits() {
+      if (irefUnit.value === "nA") {
+        controls.iref.min = "0.1";
+        controls.iref.max = "500000";
+      } else {
+        controls.iref.min = "0.001";
+        controls.iref.max = "500";
+      }
+
+      controls.iref.step = "0.1";
+    }
+
+    irefUnit.addEventListener("change", () => {
+      const previousScale = previousIrefUnit === "nA" ? 1e-3 : 1;
+      const nextScale = irefUnit.value === "nA" ? 1e-3 : 1;
+      const physicalMicroamp =
+        Number(controls.iref.value) * previousScale;
+
+      controls.iref.value = Number(
+        (physicalMicroamp / nextScale).toPrecision(10)
+      );
+
+      previousIrefUnit = irefUnit.value;
+      applyIrefUnitLimits();
+      update();
+    });
+
     showInternal.addEventListener("change", update);
     showEquation.addEventListener("change", update);
     showSensitivity.addEventListener("change", update);
@@ -1362,13 +1834,19 @@
         controls[key].value = value;
       });
 
+      irefUnit.value = "uA";
+      previousIrefUnit = "uA";
+      applyIrefUnitLimits();
+
       showInternal.checked = true;
       showEquation.checked = true;
       showSensitivity.checked = true;
 
+      clearHoveredResult();
       update();
     });
 
+    applyIrefUnitLimits();
     update();
   </script>
 </body>
