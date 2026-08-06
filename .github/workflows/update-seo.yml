@@ -7,9 +7,8 @@ on:
       - main
     paths:
       - "**/*.html"
-      - "seo-tools/**"
-      - "sitemap.xml"
-      - "robots.txt"
+      - "seo-tools/seo-config.json"
+      - "seo-tools/update-seo.py"
       - ".github/workflows/update-seo.yml"
 
 permissions:
@@ -19,7 +18,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   update-and-deploy:
@@ -82,3 +81,5 @@ jobs:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 1200000
