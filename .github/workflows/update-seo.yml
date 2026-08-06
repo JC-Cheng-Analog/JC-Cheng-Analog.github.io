@@ -1,0 +1,84 @@
+name: Update SEO and Deploy Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "**/*.html"
+      - "seo-tools/**"
+      - "sitemap.xml"
+      - "robots.txt"
+      - ".github/workflows/update-seo.yml"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Update SEO files
+        run: >-
+          python seo-tools/update-seo.py
+          --root .
+          --config seo-tools/seo-config.json
+
+      - name: Validate generated changes
+        run: git diff --check
+
+      - name: Commit updated SEO files
+        shell: bash
+        run: |
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "SEO files are already synchronized."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add --all
+            git commit -m "chore: update SEO metadata"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          mkdir -p _site
+          rsync -av ./ _site/ \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='_site/' \
+            --exclude='seo-tools/' \
+            --exclude='README-SEO.md' \
+            --exclude='SEO-AUDIT-*.md'
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
