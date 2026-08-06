@@ -1,0 +1,131 @@
+{
+  "site": {
+    "name": "JC Cheng Analog",
+    "alternate_names": [
+      "JC Cheng Analog IC Notes",
+      "jc-cheng-analog.github.io"
+    ],
+    "base_url": "https://jc-cheng-analog.github.io/",
+    "default_language": "en",
+    "default_og_locale": "en_US",
+    "author_name": "JC Cheng",
+    "default_social_image": "https://jc-cheng-analog.github.io/logo.png",
+    "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+  },
+  "pages": [
+    {
+      "file": "index.html",
+      "path": "",
+      "title": "JC Cheng Analog | Analog IC Design Notes",
+      "description": "Practical analog IC design notes covering power management, small-signal analysis, compensation loops, LDOs, switching converters, bandgap references, and circuit debugging.",
+      "page_type": "website",
+      "language": "en",
+      "lastmod": "2026-08-06",
+      "manage_head": true,
+      "sitemap": true
+    },
+    {
+      "file": "small-signal-analysis.html",
+      "path": "small-signal-analysis.html",
+      "title": "Small-Signal Analysis: TL431 & CC/CV | JC Cheng Analog",
+      "description": "Practical small-signal analysis notes for analog IC design, including TL431 Type-II compensation, CC/CV feedback loops, optocouplers, poles, and zeros.",
+      "page_type": "article",
+      "language": "en",
+      "lastmod": "2026-07-27",
+      "image": "https://jc-cheng-analog.github.io/images/IMG000_TL431_CV_Loop_01.JPG",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "path": ""
+        },
+        {
+          "name": "Small-Signal Analysis",
+          "path": "small-signal-analysis.html"
+        }
+      ],
+      "manage_head": true,
+      "sitemap": true
+    },
+    {
+      "file": "current-mirrors.html",
+      "path": "current-mirrors.html",
+      "title": "Current Mirrors: Cascode & Gain Boosting | JC Cheng Analog",
+      "description": "Analog IC design notes on simple, cascode, regulated-cascode, and gain-boosted current mirrors, including output resistance and compliance tradeoffs.",
+      "page_type": "article",
+      "language": "en",
+      "lastmod": "2026-08-03",
+      "image": "https://jc-cheng-analog.github.io/images/current_mirror/IMG_0106.JPG",
+      "image_alt": "Small-signal comparison of simple and cascode current mirrors",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "path": ""
+        },
+        {
+          "name": "Current Mirrors",
+          "path": "current-mirrors.html"
+        }
+      ],
+      "manage_head": true,
+      "sitemap": true
+    },
+    {
+      "file": "current-mirror-explorer.html",
+      "path": "current-mirror-explorer.html",
+      "title": "Current Mirror Explorer | JC Cheng Analog",
+      "description": "Interactive analog IC design tool comparing simple, cascode, and gain-boosted current mirrors, including output current, compliance, and sensitivity.",
+      "page_type": "webapp",
+      "application_category": "EducationalApplication",
+      "language": "en",
+      "lastmod": "2026-08-06",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "path": ""
+        },
+        {
+          "name": "Current Mirrors",
+          "path": "current-mirrors.html"
+        },
+        {
+          "name": "Current Mirror Explorer",
+          "path": "current-mirror-explorer.html"
+        }
+      ],
+      "manage_head": true,
+      "sitemap": true
+    },
+    {
+      "file": "rc-explorer.html",
+      "path": "rc-explorer.html",
+      "title": "RC Charge & Discharge Explorer | JC Cheng Analog",
+      "description": "Interactive RC circuit calculator for charge and discharge waveforms, time constant, cutoff frequency, observation voltage, and practical settling time.",
+      "page_type": "webapp",
+      "application_category": "EducationalApplication",
+      "language": "en",
+      "lastmod": "2026-08-06",
+      "breadcrumbs": [
+        {
+          "name": "Home",
+          "path": ""
+        },
+        {
+          "name": "RC Charge & Discharge Explorer",
+          "path": "rc-explorer.html"
+        }
+      ],
+      "manage_head": true,
+      "sitemap": true
+    },
+    {
+      "file": "study-map.html",
+      "path": "study-map.html",
+      "title": "Analog IC Design Study Map | JC Cheng Analog",
+      "description": "A structured study map for analog IC design topics, including power management, basic analog circuits, feedback, compensation, and debugging.",
+      "page_type": "website",
+      "language": "en",
+      "manage_head": false,
+      "sitemap": true
+    }
+  ]
+}
