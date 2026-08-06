@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8VZV3YWSBB"></script>
+  <script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=e9sb5NSABMYMTBgAOLXtXKsQvF7CaW9YRNbmbgupD5HL5hFUscnwJNKDGic43DAuNXaiuwnhj5_R4uvlhGrP69vB1cIXjaxPlIRtnZ3MinD3ti8kEEQfgGISECqT-bOoT5gjr8VeyCbxYt0bHUxaWsV0Ytx8YAnLH-CKScf88Dr2HwFaqNRqKrLgTQz2xHZ4GcN0XRkGagRuZ5KlqDZ7p_tKjjjAONReWYM4vtCI1daxHCQRrBbTPVLciWEAKiv1HZB13Hf3Yscjx_Y_g4qQ_DkcqE4Vg1hUN_lCjMKkWZ4L3OPoJ-O5DXZrCXHtWO5uN6x4nCdhjYt1aoA4aZsP0Q" charset="UTF-8"></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-8VZV3YWSBB"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -293,6 +293,29 @@
       background: #e9ecef;
       border-radius: 4px;
       font-size: 14px;
+    }
+
+    .figure-grid-two {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 0 0 20px;
+    }
+
+    .figure-card {
+      min-width: 0;
+    }
+
+    .figure-card .image-frame {
+      min-height: 260px;
+      margin-bottom: 0;
+    }
+
+    .figure-caption {
+      margin: 8px 2px 0;
+      color: #5f6973;
+      font-size: 14px;
+      line-height: 1.6;
     }
 
     .description {
@@ -633,6 +656,10 @@
       .image-frame {
         min-height: 230px;
       }
+
+      .figure-grid-two {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -734,37 +761,86 @@
           Regulated Cascode Current Mirror
           <span class="method">Additional local gain further suppresses the internal-node variation</span>
         </h2>
-        <span class="updated-date">Last updated · 2026.08.03</span>
+        <span class="updated-date">Last updated · 2026.08.06</span>
       </div>
 
-      <div class="image-frame" id="figure-2">
+      <div class="figure-grid-two">
+        <div class="figure-card">
+          <div class="image-frame" id="figure-2">
+            <img
+              class="analysis-image"
+              src="./images/current_mirror/IMG_0112.JPG"
+              alt="Figure 2. Regulated cascode current mirror hand-drawn circuit overview"
+              onload="this.nextElementSibling.style.display='none'"
+              onerror="this.style.display='none'"
+            />
+            <div class="image-placeholder">
+              <strong>Image placeholder</strong>
+              Upload as <code>images/current_mirror/IMG_0112.JPG</code>
+            </div>
+          </div>
+          <p class="figure-caption">
+            <strong>Figure 2.</strong> Complete regulated-cascode current mirror: the reference
+            branch establishes the bias, while the output branch uses M5–M6 to isolate M2
+            from output-voltage variation.
+          </p>
+        </div>
+
+        <div class="figure-card">
+          <div class="image-frame" id="figure-3">
+            <img
+              class="analysis-image"
+              src="./images/current_mirror/IMG_0113.JPG"
+              alt="Figure 3. Local closed-loop intuition of the regulated cascode current mirror"
+              onload="this.nextElementSibling.style.display='none'"
+              onerror="this.style.display='none'"
+            />
+            <div class="image-placeholder">
+              <strong>Image placeholder</strong>
+              Upload as <code>images/current_mirror/IMG_0113.JPG</code>
+            </div>
+          </div>
+          <p class="figure-caption">
+            <strong>Figure 3.</strong> Local closed-loop intuition: when the internal node moves,
+            the M5–M6 feedback path generates a correction that suppresses the voltage
+            variation seen by M2.
+          </p>
+        </div>
+      </div>
+
+      <div class="image-frame" id="figure-4">
         <img
           class="analysis-image"
           src="./images/current_mirror/IMG_0107.JPG"
-          alt="Figure 2. Small-signal derivation of a regulated cascode current mirror"
+          alt="Figure 4. Small-signal derivation of a regulated cascode current mirror"
         />
       </div>
 
       <div class="description">
-        <h3>Small-signal interpretation</h3>
+        <h3>Core idea</h3>
         <p>
-          The regulating transistor introduces an additional intrinsic-gain factor.
-          A disturbance at the output is first attenuated by the cascode device and
-          then attenuated again by the local regulating action. As a result, the
-          drain voltage of the lower output transistor becomes substantially less
-          sensitive to <strong>V<sub>OUT</sub></strong>.
+          The regulated cascode can be viewed as a cascode mirror with an extra local
+          feedback path. The left branch establishes a reference bias, while the right
+          branch uses M5 and M6 to keep the drain voltage of M2 from moving too much.
+          Once the drain voltage of M2 is stabilized, the channel-length-modulation
+          error is strongly reduced and the mirrored output current becomes much flatter.
         </p>
+
         <p>
-          The exact expression contains the individual output resistances and the
-          transconductance terms. Under the usual condition
-          <strong>g<sub>m</sub>r<sub>o</sub> ≫ 1</strong>, the dominant product clearly
-          shows two gain-enhancement factors.
+          When <strong>V<sub>OUT</sub></strong> changes, M6 senses the internal-node shift
+          and adjusts M5, keeping the drain voltage of M2 nearly constant.
+        </p>
+
+        <p>
+          This local negative feedback reduces channel-length modulation and increases
+          the output resistance.
         </p>
 
         <ul class="key-point-list">
-          <li>The cascode device contributes approximately g<sub>m5</sub>r<sub>o5</sub>.</li>
-          <li>The regulating device contributes approximately g<sub>m6</sub>r<sub>o6</sub>.</li>
-          <li>The lower-device drain variation is reduced by the product of both factors.</li>
+          <li>M5 provides the basic cascode shielding against output-voltage variation.</li>
+          <li>M6 adds local gain, so the internal-node error is attenuated a second time.</li>
+          <li>The drain-voltage swing of M2 becomes much smaller than the output swing.</li>
+          <li>Smaller drain-voltage variation means smaller current error and larger <strong>R<sub>out</sub></strong>.</li>
         </ul>
 
         <div class="formula-highlight">
@@ -773,6 +849,15 @@
           <code>Rout ≈ gm5·ro5·ro2·gm6·ro6</code>
           <code>ΔVDS2 ≈ ΔVOUT / (gm5·ro5·gm6·ro6)</code>
         </div>
+
+        <h3>Link to gain boosting</h3>
+        <p>
+          Figure 5 in the next section shows the next step: instead of relying only on the
+          intrinsic gain of M6, a dedicated amplifier senses the node error and drives
+          the cascode gate.
+          The philosophy is the same—keep the drain voltage of M2 nearly constant—but the
+          correcting gain can be made much larger and more controllable.
+        </p>
       </div>
     </section>
 
@@ -782,18 +867,46 @@
           Gain-Boosted Cascode Current Mirror
           <span class="method">Amplifier-assisted regulation of the cascode gate</span>
         </h2>
-        <span class="updated-date">Last updated · 2026.08.03</span>
+        <span class="updated-date">Last updated · 2026.08.06</span>
       </div>
 
-      <div class="image-frame" id="figure-3">
+      <div class="image-frame" id="figure-5">
+        <img
+          class="analysis-image"
+          src="./images/current_mirror/IMG_0114.JPG"
+          alt="Figure 5. Gain-boosted cascode current mirror hand-drawn schematic"
+          onload="this.nextElementSibling.style.display='none'"
+          onerror="this.style.display='none'"
+        />
+        <div class="image-placeholder">
+          <strong>Image placeholder</strong>
+          Upload as <code>images/current_mirror/IMG_0114.JPG</code>
+        </div>
+      </div>
+
+      <p class="figure-caption">
+        <strong>Figure 5.</strong> An explicit amplifier senses the internal drain node and
+        drives the cascode gate, converting the same regulation idea into a higher-gain
+        gain-boosted loop.
+      </p>
+
+      <div class="image-frame" id="figure-6">
         <img
           class="analysis-image"
           src="./images/current_mirror/IMG_0110.JPG"
-          alt="Figure 3. Small-signal derivation of a gain-boosted cascode current mirror"
+          alt="Figure 6. Small-signal derivation of a gain-boosted cascode current mirror"
         />
       </div>
 
       <div class="description">
+        <h3>Circuit-level intuition</h3>
+        <p>
+          Figure 5 replaces the intrinsic regulating transistor with an explicit
+          amplifier. The amplifier compares the internal drain voltage with the
+          reference-side voltage and drives M4 so that the two nodes remain nearly
+          equal. This directly suppresses the drain-voltage variation of M2.
+        </p>
+
         <h3>Gain-boosting mechanism</h3>
         <p>
           The amplifier senses the internal drain voltage and adjusts the cascode-gate
@@ -811,7 +924,8 @@
 
         <ul class="key-point-list">
           <li>The amplifier actively regulates the lower-device drain voltage.</li>
-          <li>The output-resistance enhancement is approximately proportional to 1 + A.</li>
+          <li>The output-resistance enhancement is approximately proportional to <strong>1 + A</strong>.</li>
+          <li>Compared with the regulated cascode, the correction gain is set more explicitly by the amplifier.</li>
           <li>If A is comparable to an intrinsic-gain factor, the result approaches the regulated-cascode case.</li>
         </ul>
 
@@ -977,7 +1091,10 @@
         const figureNameMap = {
           'figure-1': 'Figure 1',
           'figure-2': 'Figure 2',
-          'figure-3': 'Figure 3'
+          'figure-3': 'Figure 3',
+          'figure-4': 'Figure 4',
+          'figure-5': 'Figure 5',
+          'figure-6': 'Figure 6'
         };
         const shortLabel =
           figureNameMap[currentFigure.id] || 'Figure';
