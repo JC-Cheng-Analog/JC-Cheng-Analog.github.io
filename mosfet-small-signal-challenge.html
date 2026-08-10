@@ -125,7 +125,7 @@ h1{margin:0;font-size:clamp(1.65rem,4vw,2.55rem)}
 .target{background:#f7fafc;border:1px solid var(--line);border-radius:10px;padding:9px 10px}
 .target .tname{font-size:.7rem;color:var(--muted);font-weight:800}
 .target .tval{font-size:1.02rem;color:var(--navy);font-weight:950;margin-top:2px}
-.workspace{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start}
+.workspace{display:grid;grid-template-columns:340px minmax(0,1fr);gap:14px;align-items:start}
 .controls{padding:14px;position:sticky;top:10px}
 .section-title{display:flex;gap:8px;align-items:center;font-size:1rem;font-weight:900;color:var(--navy);margin:0 0 10px}
 .section-title:before{content:"";width:4px;height:18px;border-radius:9px;background:var(--gold)}
@@ -134,13 +134,15 @@ h1{margin:0;font-size:clamp(1.65rem,4vw,2.55rem)}
   font-size:.74rem;line-height:1.55;color:var(--muted)
 }
 .fixed b{color:var(--text)}
-.field{display:grid;grid-template-columns:1fr 105px;align-items:center;gap:7px;margin:8px 0}
+.field{display:grid;grid-template-columns:minmax(0,1fr) 137px;align-items:center;gap:10px;margin:9px 0}
 .field label{font-size:.82rem;font-weight:800}
 input[type=number],select{
   width:100%;border:1px solid #bcccdc;background:#fbfdff;color:var(--text);
   border-radius:8px;padding:7px 8px;font-size:.86rem;min-height:35px
 }
-.unit{display:grid;grid-template-columns:1fr 62px;gap:5px}
+.unit select{width:100%;min-height:34px}
+
+.unit{display:grid;grid-template-columns:1fr;grid-template-rows:auto auto;gap:6px;width:100%}
 .buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
 button{
   border:0;border-radius:9px;padding:9px 10px;font-weight:850;cursor:pointer;
@@ -190,6 +192,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 footer{text-align:center;color:var(--muted);font-size:.75rem;margin-top:14px}
 @media(max-width:850px){
   .workspace{grid-template-columns:1fr}.controls{position:static}
+  .field{grid-template-columns:minmax(120px,1fr) minmax(137px,42%)}
   .status-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:540px){
@@ -346,12 +349,12 @@ const CASES=[
     start:{VGS:.60,RD:1000,A:.060},
     ranges:{VGS:[.50,.85],RD:[1000,1000],A:[.002,.100]},
     locks:{VGS:false,RD:true,A:false},
-    targetGain:-2.50,tol:.05,
+    targetGain:2.50,
     clearEn:"You found a bias that provides the requested gain and reduced vgs enough for the square-law curve to look locally linear.",
     clearZh:"你找到了符合增益的工作點，並把 vgs 縮小到讓 square-law 曲線在 Q-point 附近可以視為局部線性。",
     hints:[
       ["Gain is mainly set by the Q-point transconductance when RD,high is fixed.","當 RD,high 固定時，Gain 主要由 Q-point 的 transconductance 決定。"],
-      ["Move VGS,Q until the gain is close to the target before worrying about THD.","先調 VGS,Q，讓 Gain 接近目標，再處理 THD。"],
+      ["Move VGS,Q until the gain magnitude reaches at least the target before worrying about THD.","先調 VGS,Q，讓 Gain 幅度至少達到目標，再處理 THD。"],
       ["Once gain is correct, reduce vgs,peak. Small signal means the excursion must be small compared with VOV.","Gain 正確後縮小 vgs,peak；小訊號的關鍵是擺幅相對於 VOV 要夠小。"]
     ]
   },
@@ -363,13 +366,13 @@ const CASES=[
     start:{VGS:.70,RD:5000,A:.030},
     ranges:{VGS:[.52,.82],RD:[500,6000],A:[.002,.080]},
     locks:{VGS:false,RD:false,A:false},
-    targetGain:-4.00,tol:.05,
+    targetGain:4.00,
     clearEn:"You restored saturation over the whole cycle while preserving the required gain and low distortion. The drain now has enough voltage headroom.",
     clearZh:"你讓整個週期重新回到 saturation，同時保留目標 Gain 與低失真；Drain 現在有足夠的電壓 headroom。",
     hints:[
       ["Check the saturation percentage first. If it is below 100%, the drain does not have enough headroom.","先看 Saturation 百分比；低於 100% 就代表 Drain headroom 不足。"],
       ["A very large RD,high increases gain but also consumes DC drain voltage headroom.","RD,high 變大雖然能提高 Gain，但同時會吃掉 DC Drain 電壓 headroom。"],
-      ["Use VGS,Q and RD,high together to hit the gain target, then reduce vgs,peak until THD is below 1%.","用 VGS,Q 與 RD,high 一起把 Gain 調到目標，最後再縮小 vgs,peak，把 THD 壓到 1% 以下。"]
+      ["Use VGS,Q and RD,high together until the gain magnitude reaches at least the target, then reduce vgs,peak until THD is below 1%.","用 VGS,Q 與 RD,high 一起讓 Gain 幅度至少達標，最後再縮小 vgs,peak，把 THD 壓到 1% 以下。"]
     ]
   },
   {
@@ -380,7 +383,7 @@ const CASES=[
     start:{VGS:.65,RD:1000,A:.040},
     ranges:{VGS:[.55,.80],RD:[500,5000],A:[.002,.070]},
     locks:{VGS:false,RD:false,A:false},
-    targetGain:-6.00,tol:.05,
+    targetGain:6.00,
     clearEn:"You balanced gm, RD,high, finite ro, and drain headroom. Increasing RD alone was not enough; the bias point and signal amplitude also had to cooperate.",
     clearZh:"你成功平衡了 gm、RD,high、有限 ro 與 Drain headroom。只把 RD 一直加大並不足夠，bias point 與訊號振幅也必須一起配合。",
     hints:[
@@ -553,8 +556,7 @@ function render(){
   const C=CASES[state.caseIndex],P=getParams(),A=analyze(P);
   drawTransfer(P,A);drawId(A);drawGain(A);
 
-  const gainLo=C.targetGain*(1+C.tol),gainHi=C.targetGain*(1-C.tol);
-  const gainPass=A.gain>=Math.min(gainLo,gainHi)&&A.gain<=Math.max(gainLo,gainHi);
+  const gainPass=Number.isFinite(A.gain)&&Math.abs(A.gain)>=C.targetGain;
   const thdPass=Number.isFinite(A.thd)&&A.thd<1.0;
   const satPass=A.counts.Saturation>=99.5;
   const vov=P.VGS-P.Vth,ratio=vov>0?A.q.vds/vov:0;
@@ -563,7 +565,7 @@ function render(){
   $("thdVal").textContent=fmtPct(A.thd);
   $("satVal").textContent=A.counts.Saturation.toFixed(1)+"%";
   $("headroomVal").textContent=vov>0?ratio.toFixed(2)+"×":"N/A";
-  $("gainGoal").textContent=`Goal: ${C.targetGain.toFixed(2)} V/V ±${(C.tol*100).toFixed(0)}%`;
+  $("gainGoal").textContent=`Goal: |Av| ≥ ${C.targetGain.toFixed(2)} V/V`;
   setStatus($("gainStatus"),gainPass);setStatus($("thdStatus"),thdPass);setStatus($("satStatus"),satPass);
   setStatus($("headroomStatus"),A.q.region==="Saturation"&&ratio>=1);
 
@@ -580,7 +582,7 @@ function loadCase(i){
   const C=CASES[i];
   document.querySelectorAll(".case-tab").forEach((b,j)=>b.classList.toggle("active",i===j));
   $("caseKicker").textContent=`CASE 0${i+1}`;$("caseTitle").textContent=C.title;$("caseEn").textContent=C.en;$("caseZh").textContent=C.zh;
-  $("targetGain").textContent=`${C.targetGain.toFixed(2)} V/V ±${(C.tol*100).toFixed(0)}%`;
+  $("targetGain").textContent=`|Av| ≥ ${C.targetGain.toFixed(2)} V/V`;
   $("fixedBox").innerHTML=
     `<b>Fixed:</b> VDD ${C.fixed.VDD.toFixed(1)} V · Vth ${C.fixed.Vth.toFixed(2)} V · W/L ${(C.fixed.W/C.fixed.L).toFixed(1)} · μCox ${(C.fixed.muCox*1e6).toFixed(0)} µA/V² · CLM ${C.fixed.clm?`ON (λ=${C.fixed.lambda.toFixed(2)} 1/V)`:"OFF"}`;
 
