@@ -12,28 +12,27 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <!-- SEO:START (managed by update-seo.py) -->
-  <title>JC Cheng Analog | Analog IC Design Notes</title>
-  <meta name="description" content="Practical analog IC design notes covering power management, small-signal analysis, compensation loops, LDOs, switching converters, bandgap references, and circuit debugging." />
+  <title>JC Cheng Analog | Analog IC Design Notes &amp; Interactive Tools</title>
+  <meta name="description" content="Practical analog IC design notes and interactive tools covering MOSFET small-signal behavior, current mirrors, RC circuits, compensation loops, LDOs, switching converters, and circuit debugging." />
   <meta name="author" content="JC Cheng" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://jc-cheng-analog.github.io/" />
-  
+
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="JC Cheng Analog" />
-  <meta property="og:title" content="JC Cheng Analog | Analog IC Design Notes" />
-  <meta property="og:description" content="Practical analog IC design notes covering power management, small-signal analysis, compensation loops, LDOs, switching converters, bandgap references, and circuit debugging." />
+  <meta property="og:title" content="JC Cheng Analog | Analog IC Design Notes &amp; Interactive Tools" />
+  <meta property="og:description" content="Practical analog IC design notes and interactive tools covering MOSFET small-signal behavior, current mirrors, RC circuits, compensation loops, LDOs, switching converters, and circuit debugging." />
   <meta property="og:url" content="https://jc-cheng-analog.github.io/" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:image" content="https://jc-cheng-analog.github.io/logo.png" />
-  <meta property="og:image:alt" content="JC Cheng Analog | Analog IC Design Notes" />
-  
+  <meta property="og:image:alt" content="JC Cheng Analog | Analog IC Design Notes &amp; Interactive Tools" />
+
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="JC Cheng Analog | Analog IC Design Notes" />
-  <meta name="twitter:description" content="Practical analog IC design notes covering power management, small-signal analysis, compensation loops, LDOs, switching converters, bandgap references, and circuit debugging." />
+  <meta name="twitter:title" content="JC Cheng Analog | Analog IC Design Notes &amp; Interactive Tools" />
+  <meta name="twitter:description" content="Practical analog IC design notes and interactive tools covering MOSFET small-signal behavior, current mirrors, RC circuits, compensation loops, LDOs, switching converters, and circuit debugging." />
   <meta name="twitter:image" content="https://jc-cheng-analog.github.io/logo.png" />
-  
+
   <script id="seo-structured-data" type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -43,15 +42,22 @@
       "@id": "https://jc-cheng-analog.github.io/#website",
       "url": "https://jc-cheng-analog.github.io/",
       "name": "JC Cheng Analog",
+      "description": "Practical analog IC design notes and interactive tools covering MOSFET small-signal behavior, current mirrors, RC circuits, compensation loops, LDOs, switching converters, and circuit debugging.",
       "inLanguage": "en",
       "alternateName": [
         "JC Cheng Analog IC Notes",
         "jc-cheng-analog.github.io"
       ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://jc-cheng-analog.github.io/#jccheng",
+      "name": "JC Cheng",
+      "url": "https://jc-cheng-analog.github.io/"
     }
   ]
 }
-</script>
+  </script>
   <!-- SEO:END (managed by update-seo.py) -->
 <style>
     html {
@@ -375,6 +381,12 @@
     }
 
     .study-map-tree details > ul {
+      margin-left: 17px;
+      padding-left: 17px;
+      border-left: 1px solid #d8dde3;
+    }
+
+    .study-map-tree .study-map-subtree {
       margin-left: 17px;
       padding-left: 17px;
       border-left: 1px solid #d8dde3;
@@ -1374,8 +1386,15 @@
                       </li>
                       <li>
                         <a class="study-map-item" href="mosfet-vgs-id-small-signal-explorer.html">
-                          <span class="map-status available"></span>MOSFET Small-Signal Explorer
+                          <span class="map-status available"></span>MOSFET VGS → ID Small-Signal Explorer
                         </a>
+                        <ul class="study-map-subtree">
+                          <li>
+                            <a class="study-map-item" href="mosfet-small-signal-challenge.html">
+                              <span class="map-status available"></span>MOSFET Small-Signal Challenge
+                            </a>
+                          </li>
+                        </ul>
                       </li>
                     </ul>
                   </details>

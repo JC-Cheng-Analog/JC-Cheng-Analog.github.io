@@ -3,8 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Three interactive MOSFET small-signal amplifier case studies. Tune bias, drain load, and input swing to meet gain, THD, and saturation targets.">
-<title>MOSFET Small-Signal Challenge</title>
+
+  <!-- SEO:START (managed by update-seo.py) -->
+  <title>MOSFET Small-Signal Challenge | JC Cheng Analog</title>
+  <meta name="description" content="Interactive MOSFET amplifier exercises for tuning bias and input swing to meet gain, THD, saturation, and headroom targets while learning small-signal design tradeoffs." />
+  <meta name="author" content="JC Cheng" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="https://jc-cheng-analog.github.io/mosfet-small-signal-challenge.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="JC Cheng Analog" />
+  <meta property="og:title" content="MOSFET Small-Signal Challenge | JC Cheng Analog" />
+  <meta property="og:description" content="Interactive MOSFET amplifier exercises for tuning bias and input swing to meet gain, THD, saturation, and headroom targets while learning small-signal design tradeoffs." />
+  <meta property="og:url" content="https://jc-cheng-analog.github.io/mosfet-small-signal-challenge.html" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_TW" />
+  <meta property="og:image" content="https://jc-cheng-analog.github.io/logo.png" />
+  <meta property="og:image:alt" content="MOSFET Small-Signal Challenge | JC Cheng Analog" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="MOSFET Small-Signal Challenge | JC Cheng Analog" />
+  <meta name="twitter:description" content="Interactive MOSFET amplifier exercises for tuning bias and input swing to meet gain, THD, saturation, and headroom targets while learning small-signal design tradeoffs." />
+  <meta name="twitter:image" content="https://jc-cheng-analog.github.io/logo.png" />
+
+  <script id="seo-structured-data" type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://jc-cheng-analog.github.io/mosfet-small-signal-challenge.html#webapp",
+      "name": "MOSFET Small-Signal Challenge",
+      "description": "Interactive MOSFET amplifier exercises for tuning bias and input swing to meet gain, THD, saturation, and headroom targets while learning small-signal design tradeoffs.",
+      "url": "https://jc-cheng-analog.github.io/mosfet-small-signal-challenge.html",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "inLanguage": [
+        "en",
+        "zh-Hant"
+      ],
+      "isAccessibleForFree": true,
+      "author": {
+        "@type": "Person",
+        "name": "JC Cheng"
+      },
+      "image": "https://jc-cheng-analog.github.io/logo.png"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://jc-cheng-analog.github.io/mosfet-small-signal-challenge.html#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://jc-cheng-analog.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "MOSFET VGS–ID Small-Signal Explorer",
+          "item": "https://jc-cheng-analog.github.io/mosfet-vgs-id-small-signal-explorer.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "MOSFET Small-Signal Challenge",
+          "item": "https://jc-cheng-analog.github.io/mosfet-small-signal-challenge.html"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+  <!-- SEO:END (managed by update-seo.py) -->
 <style>
 :root{
   --navy:#102a43;--navy2:#173f5f;--gold:#d8a63c;--goldsoft:#fff5d8;
