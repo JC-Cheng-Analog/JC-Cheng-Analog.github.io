@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Three interactive MOSFET small-signal amplifier case studies. Tune bias, drain load, and input swing to meet gain, THD, and saturation targets.">
+<title>MOSFET Small-Signal Challenge</title>
+<style>
+:root{
+  --navy:#102a43;--navy2:#173f5f;--gold:#d8a63c;--goldsoft:#fff5d8;
+  --bg:#f4f7fa;--card:#fff;--text:#243b53;--muted:#66788a;--line:#d9e2ec;
+  --green:#26836a;--greenbg:#eaf7f2;--purple:#7451b8;--red:#d64545;--redbg:#fff0f0;
+  --orange:#e07a32;--shadow:0 10px 28px rgba(16,42,67,.09);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",Arial,sans-serif;
+  color:var(--text);
+  background:
+    linear-gradient(rgba(16,42,67,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(16,42,67,.035) 1px,transparent 1px),var(--bg);
+  background-size:24px 24px;
+}
+header{
+  background:linear-gradient(135deg,var(--navy),var(--navy2));border-bottom:5px solid var(--gold);
+  color:white;padding:27px 17px 25px
+}
+.header-inner,.page{max-width:1180px;margin:auto}
+.header-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+h1{margin:0;font-size:clamp(1.65rem,4vw,2.55rem)}
+.subtitle{margin:8px 0 0;color:#dbe9f4;line-height:1.62;max-width:840px}
+.back{
+  flex:0 0 auto;text-decoration:none;color:#f6dd9d;border:1px solid rgba(255,255,255,.28);
+  border-radius:999px;padding:8px 12px;font-size:.82rem;font-weight:800;background:rgba(255,255,255,.06)
+}
+.page{padding:17px 12px 55px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+.case-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;margin-bottom:14px}
+.case-tab{
+  border:1px solid var(--line);background:#f8fafc;border-radius:11px;padding:10px 11px;text-align:left;
+  cursor:pointer;color:var(--text)
+}
+.case-tab .num{font-size:.7rem;letter-spacing:.1em;color:var(--muted);font-weight:850;text-transform:uppercase}
+.case-tab .title{font-size:.91rem;font-weight:900;color:var(--navy);margin-top:3px}
+.case-tab.active{border-color:#d8a63c;background:var(--goldsoft);box-shadow:inset 0 0 0 1px #d8a63c}
+.case-tab.cleared .title:after{content:"  ✓";color:var(--green)}
+.hero{padding:16px 17px;margin-bottom:14px}
+.case-kicker{font-size:.75rem;font-weight:900;color:var(--gold);letter-spacing:.12em;text-transform:uppercase}
+.case-title{font-size:1.35rem;font-weight:950;color:var(--navy);margin:4px 0}
+.case-copy{display:grid;grid-template-columns:1fr;gap:3px;color:var(--muted);line-height:1.55;font-size:.88rem}
+.target-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.target{background:#f7fafc;border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.target .tname{font-size:.7rem;color:var(--muted);font-weight:800}
+.target .tval{font-size:1.02rem;color:var(--navy);font-weight:950;margin-top:2px}
+.workspace{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start}
+.controls{padding:14px;position:sticky;top:10px}
+.section-title{display:flex;gap:8px;align-items:center;font-size:1rem;font-weight:900;color:var(--navy);margin:0 0 10px}
+.section-title:before{content:"";width:4px;height:18px;border-radius:9px;background:var(--gold)}
+.fixed{
+  border:1px solid var(--line);background:#f8fafc;border-radius:10px;padding:9px 10px;margin-bottom:10px;
+  font-size:.74rem;line-height:1.55;color:var(--muted)
+}
+.fixed b{color:var(--text)}
+.field{display:grid;grid-template-columns:1fr 105px;align-items:center;gap:7px;margin:8px 0}
+.field label{font-size:.82rem;font-weight:800}
+input[type=number],select{
+  width:100%;border:1px solid #bcccdc;background:#fbfdff;color:var(--text);
+  border-radius:8px;padding:7px 8px;font-size:.86rem;min-height:35px
+}
+.unit{display:grid;grid-template-columns:1fr 62px;gap:5px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
+button{
+  border:0;border-radius:9px;padding:9px 10px;font-weight:850;cursor:pointer;
+  font-family:inherit
+}
+.primary{background:var(--navy);color:white}
+.secondary{background:var(--goldsoft);color:#76540b;border:1px solid #ead18a}
+.hint-box{
+  margin-top:9px;border-radius:10px;border:1px dashed #bcccdc;background:#f8fafc;
+  padding:9px 10px;font-size:.76rem;line-height:1.55;color:var(--muted);display:none
+}
+.status-card{padding:12px;margin-bottom:14px}
+.status-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.status{
+  border:1px solid var(--line);border-radius:10px;background:#fbfdff;padding:9px 10px;min-height:66px
+}
+.status .name{font-size:.68rem;color:var(--muted);font-weight:800}
+.status .value{font-size:1.08rem;color:var(--navy);font-weight:950;margin-top:3px}
+.status .goal{font-size:.65rem;color:var(--muted);margin-top:2px}
+.status.pass{border-color:#9cd4bf;background:var(--greenbg)}
+.status.pass .value{color:var(--green)}
+.status.fail{border-color:#efb1b1;background:var(--redbg)}
+.status.fail .value{color:var(--red)}
+.clear-panel{
+  margin-top:9px;border-radius:11px;padding:12px 14px;border:1px solid #9cd4bf;background:var(--greenbg);
+  display:none
+}
+.clear-panel.show{display:block}
+.clear-title{font-size:1.35rem;color:var(--green);font-weight:1000;letter-spacing:.04em}
+.clear-en{margin-top:5px;font-size:.82rem;line-height:1.5}
+.clear-zh{margin-top:5px;font-size:.82rem;line-height:1.5;color:var(--muted)}
+.charts{display:grid;gap:14px}
+.chart-card{padding:11px 11px 14px}
+.chart-head{display:flex;justify-content:space-between;gap:10px;padding:3px 4px 8px;align-items:flex-start}
+.chart-title{font-size:.98rem;font-weight:900;color:var(--navy)}
+.chart-note{text-align:right;font-size:.72rem;color:var(--muted);line-height:1.4}
+.canvas-wrap{position:relative;height:305px;border:1px solid var(--line);border-radius:11px;background:#fff;overflow:hidden;touch-action:none}
+.wave-wrap{height:235px}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#transferCanvas{touch-action:none;cursor:ew-resize;-webkit-user-select:none;user-select:none}
+.drag-hint{
+  position:absolute;left:10px;top:9px;background:rgba(255,255,255,.92);
+  border:1px solid var(--line);border-radius:7px;padding:4px 7px;font-size:.7rem;color:var(--muted);pointer-events:none
+}
+.bottom-nav{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:18px}
+.bottom-nav a{padding:8px 13px;border-radius:999px;text-decoration:none;font-size:.8rem;font-weight:850;border:1px solid var(--line);color:var(--navy);background:#fff}
+footer{text-align:center;color:var(--muted);font-size:.75rem;margin-top:14px}
+@media(max-width:850px){
+  .workspace{grid-template-columns:1fr}.controls{position:static}
+  .status-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:540px){
+  .page{padding-left:8px;padding-right:8px}
+  .header-row{display:block}.back{display:inline-block;margin-top:12px}
+  .case-nav{grid-template-columns:1fr;gap:5px;padding:7px}
+  .case-tab{padding:7px 9px}
+  .case-tab .title{font-size:.83rem}.case-tab .num{font-size:.64rem}
+  .target-row{grid-template-columns:1fr 1fr 1fr;gap:5px}
+  .target{padding:7px}.target .tval{font-size:.88rem}.target .tname{font-size:.62rem}
+  .status-grid{grid-template-columns:1fr 1fr}.status{min-height:61px;padding:8px}
+  .status .value{font-size:.98rem}
+  .canvas-wrap{height:275px}.wave-wrap{height:220px}
+}
+</style>
+</head>
+<body id="top">
+<header>
+<div class="header-inner">
+  <div class="header-row">
+    <div>
+      <h1>MOSFET Small-Signal Challenge</h1>
+      <p class="subtitle">
+        Fix a deliberately bad amplifier. Meet the gain target, reduce THD below 1%, and keep the MOSFET in saturation.<br>
+        修好一個故意設壞的放大器：達到目標 Gain、把 THD 壓到 1% 以下，並維持 MOSFET 在 saturation。
+      </p>
+    </div>
+    <a class="back" href="mosfet-vgs-id-small-signal-explorer.html">← Explorer</a>
+  </div>
+</div>
+</header>
+
+<div class="page">
+  <section class="card case-nav">
+    <button class="case-tab active" data-case="0"><div class="num">CASE 01</div><div class="title">Large-Signal Distortion</div></button>
+    <button class="case-tab" data-case="1"><div class="num">CASE 02</div><div class="title">Triode Compression</div></button>
+    <button class="case-tab" data-case="2"><div class="num">CASE 03</div><div class="title">Finite ro / Gain Limit</div></button>
+  </section>
+
+  <section class="card hero">
+    <div id="caseKicker" class="case-kicker">CASE 01</div>
+    <div id="caseTitle" class="case-title">Large-Signal Distortion</div>
+    <div class="case-copy">
+      <div id="caseEn"></div>
+      <div id="caseZh"></div>
+    </div>
+    <div class="target-row">
+      <div class="target"><div class="tname">GAIN TARGET</div><div id="targetGain" class="tval">—</div></div>
+      <div class="target"><div class="tname">THD TARGET</div><div class="tval">&lt; 1.00%</div></div>
+      <div class="target"><div class="tname">REGION TARGET</div><div class="tval">100% SAT</div></div>
+    </div>
+  </section>
+
+  <div class="workspace">
+    <aside class="card controls">
+      <h2 class="section-title">Tune Parameters</h2>
+      <div id="fixedBox" class="fixed"></div>
+
+      <div id="vgsField" class="field">
+        <label for="vgs">VGS,Q (V)</label>
+        <input id="vgs" type="number" step="0.001">
+      </div>
+
+      <div id="rdField" class="field">
+        <label for="rd">R<sub>D,high</sub></label>
+        <div class="unit">
+          <input id="rd" type="number" step="0.1">
+          <select id="rdUnit">
+            <option value="1">Ω</option><option value="1000" selected>kΩ</option><option value="1000000">MΩ</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="swingField" class="field">
+        <label for="swing">vgs peak (mV)</label>
+        <input id="swing" type="number" min="1" max="120" step="1">
+      </div>
+
+      <div class="buttons">
+        <button id="hintBtn" class="primary">Hint 1</button>
+        <button id="resetBtn" class="secondary">Reset Case</button>
+      </div>
+      <div id="hintBox" class="hint-box"></div>
+    </aside>
+
+    <main>
+      <section class="card status-card">
+        <div class="status-grid">
+          <div id="gainStatus" class="status"><div class="name">ACTUAL GAIN</div><div id="gainVal" class="value">—</div><div id="gainGoal" class="goal"></div></div>
+          <div id="thdStatus" class="status"><div class="name">THD</div><div id="thdVal" class="value">—</div><div class="goal">Goal: &lt; 1.00%</div></div>
+          <div id="satStatus" class="status"><div class="name">SATURATION</div><div id="satVal" class="value">—</div><div class="goal">Goal: 100%</div></div>
+          <div id="headroomStatus" class="status"><div class="name">VDS,Q / VOV</div><div id="headroomVal" class="value">—</div><div class="goal">Headroom check</div></div>
+        </div>
+        <div id="clearPanel" class="clear-panel">
+          <div class="clear-title">✓ CLEAR</div>
+          <div id="clearEn" class="clear-en"></div>
+          <div id="clearZh" class="clear-zh"></div>
+        </div>
+      </section>
+
+      <div class="charts">
+        <section class="card chart-card">
+          <div class="chart-head">
+            <div>
+              <div class="chart-title">1. Loaded Transfer Curve — VGS → ID</div>
+              <div class="chart-note" style="text-align:left;margin-top:2px">Drag horizontally anywhere inside the plot to move VGS,Q.<br>在圖內按住左右拖曳即可改變 VGS,Q。</div>
+            </div>
+            <div class="chart-note">Gold = input range<br>Green dashed = local tangent</div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="transferCanvas"></canvas>
+            <div class="drag-hint">↔ Drag Q-point</div>
+          </div>
+        </section>
+
+        <section class="card chart-card">
+          <div class="chart-head">
+            <div class="chart-title">2. ID Distortion View</div>
+            <div class="chart-note">Actual ID vs DC + fundamental</div>
+          </div>
+          <div class="canvas-wrap wave-wrap"><canvas id="idCanvas"></canvas></div>
+        </section>
+
+        <section class="card chart-card">
+          <div class="chart-head">
+            <div class="chart-title">3. Voltage Gain View — ΔVGS vs ΔVDS</div>
+            <div class="chart-note">Orange dashed = input<br>Purple = output</div>
+          </div>
+          <div class="canvas-wrap wave-wrap"><canvas id="gainCanvas"></canvas></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="mosfet-vgs-id-small-signal-explorer.html">← Back to Explorer</a>
+    <a href="#top">↑ Top / 回到最上方</a>
+  </div>
+  <footer>JC Cheng Analog · MOSFET Small-Signal Challenge</footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $=id=>document.getElementById(id);
+const state={caseIndex:0,hintIndex:0,drag:false,map:null,cleared:[false,false,false]};
+
+const CASES=[
+  {
+    title:"Large-Signal Distortion",
+    en:"The MOSFET stays in saturation, but the input signal is too large for the local small-signal approximation. Find a bias point that meets the gain target, then shrink the input until the waveform becomes locally linear.",
+    zh:"MOSFET 雖然維持在 saturation，但輸入訊號太大，已經超出局部小訊號近似。先找到符合增益的 bias，再把輸入縮小到足夠線性。",
+    fixed:{M:1,muCox:200e-6,W:10,L:.18,Vth:.45,VDD:1.8,clm:false,lambda:0},
+    start:{VGS:.60,RD:1000,A:.060},
+    ranges:{VGS:[.50,.85],RD:[1000,1000],A:[.002,.100]},
+    locks:{VGS:false,RD:true,A:false},
+    targetGain:-2.50,tol:.05,
+    clearEn:"You found a bias that provides the requested gain and reduced vgs enough for the square-law curve to look locally linear.",
+    clearZh:"你找到了符合增益的工作點，並把 vgs 縮小到讓 square-law 曲線在 Q-point 附近可以視為局部線性。",
+    hints:[
+      ["Gain is mainly set by the Q-point transconductance when RD,high is fixed.","當 RD,high 固定時，Gain 主要由 Q-point 的 transconductance 決定。"],
+      ["Move VGS,Q until the gain is close to the target before worrying about THD.","先調 VGS,Q，讓 Gain 接近目標，再處理 THD。"],
+      ["Once gain is correct, reduce vgs,peak. Small signal means the excursion must be small compared with VOV.","Gain 正確後縮小 vgs,peak；小訊號的關鍵是擺幅相對於 VOV 要夠小。"]
+    ]
+  },
+  {
+    title:"Triode Compression",
+    en:"The drain resistor and bias are pulling the drain too low, so part of the waveform enters triode and becomes strongly compressed. Recover saturation headroom without losing the requested gain.",
+    zh:"目前 Drain 負載與 bias 把 Drain 電壓拉得太低，部分週期掉進 triode，造成嚴重壓縮。請在保住目標 Gain 的同時恢復 saturation headroom。",
+    fixed:{M:1,muCox:200e-6,W:10,L:.18,Vth:.45,VDD:1.8,clm:false,lambda:0},
+    start:{VGS:.70,RD:5000,A:.030},
+    ranges:{VGS:[.52,.82],RD:[500,6000],A:[.002,.080]},
+    locks:{VGS:false,RD:false,A:false},
+    targetGain:-4.00,tol:.05,
+    clearEn:"You restored saturation over the whole cycle while preserving the required gain and low distortion. The drain now has enough voltage headroom.",
+    clearZh:"你讓整個週期重新回到 saturation，同時保留目標 Gain 與低失真；Drain 現在有足夠的電壓 headroom。",
+    hints:[
+      ["Check the saturation percentage first. If it is below 100%, the drain does not have enough headroom.","先看 Saturation 百分比；低於 100% 就代表 Drain headroom 不足。"],
+      ["A very large RD,high increases gain but also consumes DC drain voltage headroom.","RD,high 變大雖然能提高 Gain，但同時會吃掉 DC Drain 電壓 headroom。"],
+      ["Use VGS,Q and RD,high together to hit the gain target, then reduce vgs,peak until THD is below 1%.","用 VGS,Q 與 RD,high 一起把 Gain 調到目標，最後再縮小 vgs,peak，把 THD 壓到 1% 以下。"]
+    ]
+  },
+  {
+    title:"Finite ro / Gain Limit",
+    en:"Channel-length modulation is enabled. The MOSFET now has finite output resistance, so the effective load is RD,high in parallel with ro. Reach the target without pushing the device out of saturation.",
+    zh:"這關開啟 Channel-length modulation，因此 MOSFET 具有有限的輸出阻抗；有效負載會受到 RD,high 與 ro 並聯限制。請在不掉出 saturation 的前提下達成目標。",
+    fixed:{M:1,muCox:200e-6,W:10,L:.18,Vth:.45,VDD:1.8,clm:true,lambda:.40},
+    start:{VGS:.65,RD:1000,A:.040},
+    ranges:{VGS:[.55,.80],RD:[500,5000],A:[.002,.070]},
+    locks:{VGS:false,RD:false,A:false},
+    targetGain:-6.00,tol:.05,
+    clearEn:"You balanced gm, RD,high, finite ro, and drain headroom. Increasing RD alone was not enough; the bias point and signal amplitude also had to cooperate.",
+    clearZh:"你成功平衡了 gm、RD,high、有限 ro 與 Drain headroom。只把 RD 一直加大並不足夠，bias point 與訊號振幅也必須一起配合。",
+    hints:[
+      ["Finite ro reduces the effective load seen by gm. Watch the gain while changing RD,high.","有限 ro 會降低 gm 所看到的有效負載；改變 RD,high 時注意 Gain 的變化。"],
+      ["A larger RD,high does not give unlimited gain, and it also lowers VDS,Q.","RD,high 變大不會讓 Gain 無限上升，而且還會降低 VDS,Q。"],
+      ["A solution exists near a moderate RD,high with a higher gm bias. After gain is met, reduce vgs,peak to clean up THD.","答案會落在中等大小的 RD,high 搭配較高 gm 的 bias；Gain 達標後，再縮小 vgs,peak 清掉 THD。"]
+    ]
+  }
+];
+
+const controls={vgs:$("vgs"),rd:$("rd"),rdUnit:$("rdUnit"),swing:$("swing")};
+const canvases={transfer:$("transferCanvas"),id:$("idCanvas"),gain:$("gainCanvas")};
+
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function fmtI(a){
+  const x=Math.abs(a);
+  if(x>=1e-3)return (a*1e3).toFixed(3)+" mA";
+  if(x>=1e-6)return (a*1e6).toFixed(2)+" µA";
+  return (a*1e9).toFixed(2)+" nA";
+}
+function fmtPct(x){return Number.isFinite(x)?x.toFixed(2)+"%":"N/A"}
+function beta(P){return P.M*P.muCox*(P.W/P.L)}
+
+function getParams(){
+  const C=CASES[state.caseIndex], F=C.fixed;
+  const unit=Number(controls.rdUnit.value)||1;
+  return {
+    ...F,
+    RD:Math.max(0,Number(controls.rd.value)||0)*unit,
+    VGS:Number(controls.vgs.value)||0,
+    A:Math.max(0,Number(controls.swing.value)||0)/1000
+  };
+}
+function mosId(P,VGS,VDS){
+  const vov=VGS-P.Vth,v=Math.max(0,VDS),b=beta(P);
+  if(vov<=0)return{id:0,region:"Cutoff",vov};
+  if(v<vov)return{id:Math.max(0,b*(vov*v-.5*v*v)),region:"Triode",vov};
+  let id=.5*b*vov*vov;
+  if(P.clm)id*=1+P.lambda*Math.max(0,v-vov);
+  return{id:Math.max(0,id),region:"Saturation",vov};
+}
+function solveLoaded(P,VGS){
+  if(VGS<=P.Vth)return{id:0,vds:P.VDD,region:"Cutoff",vov:VGS-P.Vth};
+  if(P.RD<=1e-15){
+    const m=mosId(P,VGS,P.VDD);return{id:m.id,vds:P.VDD,region:m.region,vov:m.vov};
+  }
+  let lo=0,hi=P.VDD;
+  for(let k=0;k<65;k++){
+    const mid=(lo+hi)/2;
+    const f=mosId(P,VGS,mid).id-(P.VDD-mid)/P.RD;
+    if(f>0)hi=mid;else lo=mid;
+  }
+  const vds=(lo+hi)/2,m=mosId(P,VGS,vds);
+  return{id:Math.max(0,(P.VDD-vds)/P.RD),vds,region:m.region,vov:m.vov};
+}
+function derivVgs(P,V){
+  const h=1e-5;
+  const a=solveLoaded(P,V-h).id,b=solveLoaded(P,V+h).id;
+  return(b-a)/(2*h);
+}
+function analyze(P){
+  const N=1024,theta=[],vgs=[],ids=[],vds=[],regions=[];
+  for(let i=0;i<N;i++){
+    const th=4*Math.PI*i/(N-1),vg=P.VGS+P.A*Math.sin(th),s=solveLoaded(P,vg);
+    theta.push(th);vgs.push(vg);ids.push(s.id);vds.push(s.vds);regions.push(s.region);
+  }
+  function spec(y){
+    const H=512,data=y.slice(0,H),dc=data.reduce((a,b)=>a+b,0)/H;
+    const amps=[],sins=[],phase=[];
+    for(let n=1;n<=10;n++){
+      let c=0,s=0;
+      for(let i=0;i<H;i++){
+        const th=2*Math.PI*i/H,ac=data[i]-dc;
+        c+=ac*Math.cos(n*th);s+=ac*Math.sin(n*th);
+      }
+      c*=2/H;s*=2/H;amps[n]=Math.hypot(c,s);sins[n]=s;phase[n]=Math.atan2(c,s);
+    }
+    const a1=amps[1]||0;
+    const thd=a1>1e-15?Math.sqrt(amps.slice(2).reduce((z,a)=>z+a*a,0))/a1*100:NaN;
+    return{dc,a1,thd,sins,phase};
+  }
+  const is=spec(ids),vs=spec(vds);
+  const fit=ids.map((_,i)=>is.dc+is.a1*Math.sin(theta[i]+is.phase[1]));
+  const gain=P.A>1e-15?vs.sins[1]/P.A:NaN;
+  const counts={Cutoff:0,Triode:0,Saturation:0};regions.forEach(r=>counts[r]++);
+  Object.keys(counts).forEach(k=>counts[k]=100*counts[k]/N);
+  const q=solveLoaded(P,P.VGS);
+  return{
+    theta,vgs,ids,vds,fit,gain,thd:is.thd,counts,q,
+    vgsAC:vgs.map(v=>v-P.VGS),vdsAC:vds.map(v=>v-vs.dc),
+    gm:derivVgs(P,P.VGS)
+  };
+}
+
+function setupCanvas(c){
+  const r=c.getBoundingClientRect(),dpr=Math.max(1,window.devicePixelRatio||1);
+  const w=Math.max(10,r.width),h=Math.max(10,r.height);
+  c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);
+  const x=c.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);return{x,w,h};
+}
+function nice(x){
+  if(!Number.isFinite(x)||x<=0)return 1;
+  const e=Math.floor(Math.log10(x)),f=x/10**e,n=f<=1?1:f<=2?2:f<=5?5:10;return n*10**e;
+}
+function axes(x,b,xt,yt,xlab,ylab,xf,yf){
+  x.save();x.strokeStyle="#d9e2ec";x.lineWidth=1;x.fillStyle="#66788a";x.font="11px sans-serif";
+  x.textAlign="center";x.textBaseline="top";
+  for(let i=0;i<=xt;i++){const xx=b.l+(b.r-b.l)*i/xt;x.beginPath();x.moveTo(xx,b.t);x.lineTo(xx,b.b);x.stroke();x.fillText(xf(i/xt),xx,b.b+6)}
+  x.textAlign="right";x.textBaseline="middle";
+  for(let i=0;i<=yt;i++){const yy=b.b-(b.b-b.t)*i/yt;x.beginPath();x.moveTo(b.l,yy);x.lineTo(b.r,yy);x.stroke();x.fillText(yf(i/yt),b.l-7,yy)}
+  x.strokeStyle="#829ab1";x.lineWidth=1.1;x.beginPath();x.moveTo(b.l,b.t);x.lineTo(b.l,b.b);x.lineTo(b.r,b.b);x.stroke();
+  x.fillStyle="#334e68";x.textAlign="center";x.textBaseline="top";x.fillText(xlab,(b.l+b.r)/2,b.b+27);
+  x.save();x.translate(13,(b.t+b.b)/2);x.rotate(-Math.PI/2);x.textBaseline="top";x.fillText(ylab,0,0);x.restore();x.restore();
+}
+function line(x,pts,color,w=2,dash=[]){
+  if(!pts.length)return;x.save();x.strokeStyle=color;x.lineWidth=w;x.setLineDash(dash);
+  x.beginPath();x.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)x.lineTo(pts[i][0],pts[i][1]);x.stroke();x.restore();
+}
+function drawTransfer(P,A){
+  const {x,w,h}=setupCanvas(canvases.transfer),b={l:61,t:21,r:w-16,b:h-49};
+  x.clearRect(0,0,w,h);
+  const C=CASES[state.caseIndex],xr=C.ranges.VGS;
+  const xmin=xr[0],xmax=xr[1],N=450,pts=[];let ymax=0;
+  for(let i=0;i<=N;i++){const vg=xmin+(xmax-xmin)*i/N,s=solveLoaded(P,vg);pts.push([vg,s.id,s.region]);ymax=Math.max(ymax,s.id)}
+  ymax=nice(ymax*1.12||1e-6);
+  const X=v=>b.l+(b.r-b.l)*(v-xmin)/(xmax-xmin),Y=i=>b.b-(b.b-b.t)*i/ymax;
+  axes(x,b,5,5,"VGS (V)","ID",f=>(xmin+f*(xmax-xmin)).toFixed(3),f=>ymax>=1e-3?(f*ymax*1e3).toFixed(2)+"m":(f*ymax*1e6).toFixed(0)+"µ");
+
+  const lo=clamp(P.VGS-P.A,xmin,xmax),hi=clamp(P.VGS+P.A,xmin,xmax);
+  x.save();x.fillStyle="rgba(216,166,60,.16)";x.fillRect(X(lo),b.t,X(hi)-X(lo),b.b-b.t);x.restore();
+
+  const colors={Cutoff:"#a8b7c5",Triode:"#e07a32",Saturation:"#7451b8"};
+  let seg=[],last=pts[0][2];
+  for(let i=0;i<pts.length;i++){
+    if(pts[i][2]!==last&&seg.length){line(x,seg.map(v=>[X(v[0]),Y(v[1])]),colors[last],2.7);seg=[pts[i-1]];last=pts[i][2]}
+    seg.push(pts[i]);
+  }
+  if(seg.length)line(x,seg.map(v=>[X(v[0]),Y(v[1])]),colors[last],2.7);
+
+  const q=A.q,qx=X(P.VGS),qy=Y(q.id);
+  const span=Math.min(.05,(xmax-xmin)*.18),v1=clamp(P.VGS-span,xmin,xmax),v2=clamp(P.VGS+span,xmin,xmax);
+  line(x,[[X(v1),Y(q.id+A.gm*(v1-P.VGS))],[X(v2),Y(q.id+A.gm*(v2-P.VGS))]],"#26836a",1.7,[5,4]);
+
+  x.save();x.beginPath();x.arc(qx,qy,7.5,0,Math.PI*2);x.fillStyle="#d8a63c";x.fill();x.strokeStyle="#76540b";x.lineWidth=2;x.stroke();
+  x.fillStyle="#102a43";x.font="bold 11px sans-serif";x.textAlign=qx>b.r-120?"right":"left";
+  x.fillText(`Q ${P.VGS.toFixed(3)} V`,qx+(qx>b.r-120?-10:10),Math.max(b.t+10,qy-10));x.restore();
+
+  state.map={box:b,Xinv:px=>clamp(xmin+(px-b.l)/(b.r-b.l)*(xmax-xmin),xmin,xmax)};
+}
+function drawId(A){
+  const {x,w,h}=setupCanvas(canvases.id),b={l:60,t:18,r:w-15,b:h-45};x.clearRect(0,0,w,h);
+  let mn=Math.min(...A.ids,...A.fit),mx=Math.max(...A.ids,...A.fit);let d=mx-mn;if(d<1e-15)d=1e-6;mn-=d*.12;mx+=d*.12;
+  const X=v=>b.l+(b.r-b.l)*v/(4*Math.PI),Y=v=>b.b-(b.b-b.t)*(v-mn)/(mx-mn);
+  axes(x,b,4,4,"θ","ID",f=>["0","π","2π","3π","4π"][Math.round(f*4)],f=>{
+    const v=mn+f*(mx-mn);return Math.abs(mx)>=1e-3?(v*1e3).toFixed(2)+"m":(v*1e6).toFixed(0)+"µ";
+  });
+  line(x,A.theta.map((v,i)=>[X(v),Y(A.fit[i])]),"#d8a63c",1.6,[5,4]);
+  line(x,A.theta.map((v,i)=>[X(v),Y(A.ids[i])]),"#26836a",2.4);
+}
+function drawGain(A){
+  const {x,w,h}=setupCanvas(canvases.gain),b={l:60,t:18,r:w-15,b:h-45};x.clearRect(0,0,w,h);
+  let lim=Math.max(...A.vgsAC.map(Math.abs),...A.vdsAC.map(Math.abs));if(lim<1e-9)lim=.01;lim*=1.15;
+  const X=v=>b.l+(b.r-b.l)*v/(4*Math.PI),Y=v=>b.b-(b.b-b.t)*(v+lim)/(2*lim);
+  axes(x,b,4,4,"θ","AC V",f=>["0","π","2π","3π","4π"][Math.round(f*4)],f=>(-lim+2*lim*f).toFixed(3));
+  line(x,A.theta.map((v,i)=>[X(v),Y(A.vgsAC[i])]),"#e07a32",2.0,[6,3]);
+  line(x,A.theta.map((v,i)=>[X(v),Y(A.vdsAC[i])]),"#7451b8",2.8);
+}
+function setStatus(node,pass){node.classList.toggle("pass",pass);node.classList.toggle("fail",!pass)}
+function render(){
+  const C=CASES[state.caseIndex],P=getParams(),A=analyze(P);
+  drawTransfer(P,A);drawId(A);drawGain(A);
+
+  const gainLo=C.targetGain*(1+C.tol),gainHi=C.targetGain*(1-C.tol);
+  const gainPass=A.gain>=Math.min(gainLo,gainHi)&&A.gain<=Math.max(gainLo,gainHi);
+  const thdPass=Number.isFinite(A.thd)&&A.thd<1.0;
+  const satPass=A.counts.Saturation>=99.5;
+  const vov=P.VGS-P.Vth,ratio=vov>0?A.q.vds/vov:0;
+
+  $("gainVal").textContent=Number.isFinite(A.gain)?A.gain.toFixed(3)+" V/V":"N/A";
+  $("thdVal").textContent=fmtPct(A.thd);
+  $("satVal").textContent=A.counts.Saturation.toFixed(1)+"%";
+  $("headroomVal").textContent=vov>0?ratio.toFixed(2)+"×":"N/A";
+  $("gainGoal").textContent=`Goal: ${C.targetGain.toFixed(2)} V/V ±${(C.tol*100).toFixed(0)}%`;
+  setStatus($("gainStatus"),gainPass);setStatus($("thdStatus"),thdPass);setStatus($("satStatus"),satPass);
+  setStatus($("headroomStatus"),A.q.region==="Saturation"&&ratio>=1);
+
+  const clear=gainPass&&thdPass&&satPass;
+  $("clearPanel").classList.toggle("show",clear);
+  if(clear){
+    $("clearEn").textContent=C.clearEn;$("clearZh").textContent=C.clearZh;
+    state.cleared[state.caseIndex]=true;
+    document.querySelector(`.case-tab[data-case="${state.caseIndex}"]`).classList.add("cleared");
+  }
+}
+function loadCase(i){
+  state.caseIndex=i;state.hintIndex=0;state.drag=false;
+  const C=CASES[i];
+  document.querySelectorAll(".case-tab").forEach((b,j)=>b.classList.toggle("active",i===j));
+  $("caseKicker").textContent=`CASE 0${i+1}`;$("caseTitle").textContent=C.title;$("caseEn").textContent=C.en;$("caseZh").textContent=C.zh;
+  $("targetGain").textContent=`${C.targetGain.toFixed(2)} V/V ±${(C.tol*100).toFixed(0)}%`;
+  $("fixedBox").innerHTML=
+    `<b>Fixed:</b> VDD ${C.fixed.VDD.toFixed(1)} V · Vth ${C.fixed.Vth.toFixed(2)} V · W/L ${(C.fixed.W/C.fixed.L).toFixed(1)} · μCox ${(C.fixed.muCox*1e6).toFixed(0)} µA/V² · CLM ${C.fixed.clm?`ON (λ=${C.fixed.lambda.toFixed(2)} 1/V)`:"OFF"}`;
+
+  controls.vgs.value=C.start.VGS.toFixed(3);
+  controls.vgs.min=C.ranges.VGS[0];controls.vgs.max=C.ranges.VGS[1];
+  controls.rdUnit.value="1000";controls.rd.value=(C.start.RD/1000).toFixed(2);
+  controls.swing.value=(C.start.A*1000).toFixed(0);
+
+  controls.vgs.disabled=C.locks.VGS;
+  controls.rd.disabled=C.locks.RD;controls.rdUnit.disabled=C.locks.RD;
+  controls.swing.disabled=C.locks.A;
+  $("vgsField").style.opacity=C.locks.VGS?.55:1;
+  $("rdField").style.opacity=C.locks.RD?.55:1;
+  $("swingField").style.opacity=C.locks.A?.55:1;
+
+  $("hintBox").style.display="none";$("hintBox").innerHTML="";
+  $("hintBtn").textContent="Hint 1";
+  $("clearPanel").classList.remove("show");
+  render();
+}
+function showHint(){
+  const C=CASES[state.caseIndex],h=C.hints[state.hintIndex];
+  $("hintBox").innerHTML=`<b>Hint ${state.hintIndex+1}</b><br>${h[0]}<br><span style="color:#7b8c9d">${h[1]}</span>`;
+  $("hintBox").style.display="block";
+  state.hintIndex=Math.min(state.hintIndex+1,C.hints.length-1);
+  $("hintBtn").textContent=`Hint ${Math.min(state.hintIndex+1,C.hints.length)}`;
+}
+Object.values(controls).forEach(e=>{e.addEventListener("input",render);e.addEventListener("change",render)});
+document.querySelectorAll(".case-tab").forEach(b=>b.addEventListener("click",()=>loadCase(Number(b.dataset.case))));
+$("resetBtn").addEventListener("click",()=>loadCase(state.caseIndex));
+$("hintBtn").addEventListener("click",showHint);
+
+function point(clientX,clientY){
+  const r=canvases.transfer.getBoundingClientRect();return{x:clientX-r.left,y:clientY-r.top};
+}
+function dragTo(clientX){
+  if(!state.map||controls.vgs.disabled)return;
+  const r=canvases.transfer.getBoundingClientRect(),x=clientX-r.left,b=state.map.box;
+  controls.vgs.value=state.map.Xinv(clamp(x,b.l,b.r)).toFixed(3);render();
+}
+canvases.transfer.addEventListener("pointerdown",e=>{
+  if(!state.map||controls.vgs.disabled)return;
+  const p=point(e.clientX,e.clientY),b=state.map.box;
+  if(p.x<b.l||p.x>b.r||p.y<b.t||p.y>b.b)return;
+  e.preventDefault();state.drag=true;try{canvases.transfer.setPointerCapture(e.pointerId)}catch(_){}
+  dragTo(e.clientX);
+});
+canvases.transfer.addEventListener("pointermove",e=>{if(state.drag){e.preventDefault();dragTo(e.clientX)}});
+canvases.transfer.addEventListener("pointerup",()=>state.drag=false);
+canvases.transfer.addEventListener("pointercancel",()=>state.drag=false);
+
+let rt;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,120)});
+loadCase(0);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive MOSFET VGS-to-ID small-signal and distortion explorer with drain resistor load.">
+<title>MOSFET VGS → ID Small-Signal Explorer</title>
+<style>
+:root{
+  --navy:#102a43; --navy2:#173f5f; --gold:#d8a63c; --goldsoft:#fff5d8;
+  --bg:#f4f7fa; --card:#fff; --text:#243b53; --muted:#66788a; --line:#d9e2ec;
+  --green:#26836a; --purple:#7451b8; --red:#d64545; --orange:#e07a32;
+  --shadow:0 10px 28px rgba(16,42,67,.09);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",Arial,sans-serif;
+  color:var(--text);
+  background:
+    linear-gradient(rgba(16,42,67,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(16,42,67,.035) 1px,transparent 1px),var(--bg);
+  background-size:24px 24px;
+}
+header{background:linear-gradient(135deg,var(--navy),var(--navy2));border-bottom:5px solid var(--gold);color:white;padding:32px 18px 28px}
+.header-inner,.page{max-width:1240px;margin:auto}
+.header-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.header-copy{min-width:0}
+.home-link{
+  flex:0 0 auto;text-decoration:none;color:#f6dd9d;border:1px solid rgba(255,255,255,.28);
+  border-radius:999px;padding:8px 12px;font-size:.82rem;font-weight:850;background:rgba(255,255,255,.06);
+  transition:background-color .18s ease,transform .18s ease,border-color .18s ease
+}
+.home-link:hover,.home-link:focus-visible{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.48);transform:translateY(-1px);outline:none}
+h1{margin:0;font-size:clamp(1.7rem,4.5vw,2.75rem)}
+.subtitle{margin:10px 0 0;color:#dbe9f4;line-height:1.7;max-width:960px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.badge{font-size:.82rem;color:#f6dd9d;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.07);padding:5px 10px;border-radius:999px}
+.page{padding:20px 14px 55px}
+.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:17px}
+.controls{position:sticky;top:12px}
+.section-title{display:flex;gap:9px;align-items:center;font-size:1.05rem;font-weight:850;color:var(--navy);margin:0 0 13px}
+.section-title:before{content:"";width:5px;height:20px;border-radius:9px;background:var(--gold)}
+.group{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.group:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.group-label{font-size:.76rem;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field{margin-bottom:8px}
+.field-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px}
+label{font-size:.86rem;font-weight:720}
+.value-pill{min-width:70px;text-align:center;padding:2px 6px;background:#eef3f7;color:var(--navy);border-radius:7px;font-size:.78rem;font-variant-numeric:tabular-nums}
+input[type="range"]{width:100%;accent-color:var(--gold)}
+input[type="number"],select{
+  width:100%;border:1px solid #bcccdc;background:#fbfdff;border-radius:8px;
+  padding:7px 9px;font-size:.88rem;color:var(--text);min-height:36px
+}
+.compact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.compact-field{display:grid;grid-template-columns:minmax(72px,.8fr) minmax(92px,1.2fr);gap:7px;align-items:center}
+.compact-field label{margin:0}
+.unit-input{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:6px}
+.helper{font-size:.71rem;color:var(--muted);line-height:1.35;margin-top:2px}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;background:#f6f8fa;padding:10px 11px}
+.switch{position:relative;width:44px;height:24px;flex:0 0 auto}.switch input{display:none}
+.slider{position:absolute;inset:0;border-radius:99px;background:#bcccdc;transition:.2s}
+.slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:white;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:.2s}
+.switch input:checked+.slider{background:var(--gold)}.switch input:checked+.slider:before{transform:translateX(20px)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+button{border:0;border-radius:10px;padding:10px 11px;font-weight:830;cursor:pointer}
+.primary{background:var(--navy);color:white}.secondary{background:var(--goldsoft);color:#76540b;border:1px solid #ebd18a}
+.main{display:grid;gap:18px}
+.chart-card{padding:13px 13px 16px}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:4px 5px 10px}
+.chart-title{font-weight:850;color:var(--navy);font-size:1.05rem}
+.chart-note{font-size:.81rem;color:var(--muted);line-height:1.45;text-align:right}
+.canvas-wrap{position:relative;width:100%;height:365px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:white;touch-action:none}
+.wave-wrap{height:255px}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#transferCanvas{touch-action:none;cursor:ew-resize;-webkit-user-select:none;user-select:none}
+.drag-hint{position:absolute;left:12px;top:11px;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:.77rem;color:var(--muted);pointer-events:none}
+.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.metric{border:1px solid var(--line);border-radius:10px;background:#fbfdff;padding:9px 10px;min-height:68px}
+.metric .name{font-size:.72rem;color:var(--muted);font-weight:760;line-height:1.25}
+.metric .val{font-size:1.08rem;color:var(--navy);font-weight:900;margin-top:3px;font-variant-numeric:tabular-nums}
+.metric .small{font-size:.67rem;color:var(--muted);margin-top:2px;line-height:1.3}
+.summary-subhead{
+  grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:4px 0 -1px;
+  color:var(--navy);font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.09em
+}
+.summary-subhead:after{content:"";height:1px;background:var(--line);flex:1}
+
+.good{color:var(--green)!important}.warn{color:var(--orange)!important}.bad{color:var(--red)!important}
+.region-bar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:#e8eef3;margin-top:12px}
+.cutoff{background:#a8b7c5}.triode{background:var(--orange)}.saturation{background:var(--purple)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:.77rem;color:var(--muted)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+.advice{margin-top:13px;border-left:5px solid var(--gold);background:var(--goldsoft);padding:12px 14px;border-radius:10px;line-height:1.65}
+.advice strong{color:#6f4e00}
+.formula{background:#f7fafc;border:1px solid var(--line);border-radius:12px;padding:14px 15px;line-height:1.78;font-family:Georgia,"Times New Roman",serif;overflow:auto}
+.formula code{font-family:inherit;color:var(--navy);font-size:1rem}
+.note{font-size:.86rem;color:var(--muted);line-height:1.65;margin-top:11px}
+.topology{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;background:#f8fafc;border:1px dashed #bcccdc;border-radius:12px;padding:11px;margin-bottom:12px;color:var(--navy);font-weight:750}
+.topology .arrow{color:var(--gold);font-size:1.25rem}
+footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:14px}
+.intro{
+  border-left:5px solid var(--gold);background:linear-gradient(135deg,#fffdf7,#f8fbfd);
+}
+.intro h2{margin:0 0 10px;color:var(--navy);font-size:1.06rem}
+.intro p{margin:7px 0;line-height:1.7}
+.intro .en{color:#334e68;font-weight:620}
+.intro .zh{color:var(--muted)}
+.top-link{
+  display:block;width:max-content;margin:24px auto 0;padding:9px 16px;border-radius:999px;
+  background:#eef3f7;border:1px solid var(--line);color:var(--navy);font-weight:800;
+  text-decoration:none;box-shadow:0 4px 12px rgba(16,42,67,.06)
+}
+.top-link:hover{background:var(--goldsoft);border-color:#ebd18a}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}.controls{position:static}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .compact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .canvas-wrap{height:330px}.wave-wrap{height:245px}
+}
+@media(max-width:520px){
+  .header-row{display:block}.home-link{display:inline-block;margin-top:12px}
+  .page{padding-left:9px;padding-right:9px}.card{padding:13px;border-radius:13px}.chart-head{display:block}.chart-note{text-align:left;margin-top:5px}
+  .summary-grid{grid-template-columns:1fr 1fr}.metric{padding:8px;min-height:64px}.metric .val{font-size:.98rem}
+  .compact-grid{grid-template-columns:1fr 1fr}.compact-field{grid-template-columns:1fr}.unit-input{grid-template-columns:minmax(0,1fr) 64px}
+  .canvas-wrap{height:300px}.wave-wrap{height:220px}
+}
+
+.case-study-link{
+  position:fixed;right:16px;bottom:18px;z-index:50;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:10px 14px;border-radius:999px;
+  background:#d8a63c;color:#102a43;text-decoration:none;font-weight:900;
+  box-shadow:0 8px 24px rgba(16,42,67,.22);
+  border:1px solid rgba(16,42,67,.12);
+}
+.case-study-link:hover{transform:translateY(-1px)}
+@media(max-width:520px){
+  .case-study-link{right:10px;bottom:10px;padding:9px 12px;font-size:.84rem}
+}
+</style>
+</head>
+<body id="top">
+<header>
+<div class="header-inner">
+  <div class="header-row">
+    <div class="header-copy">
+      <h1>MOSFET VGS → ID Small-Signal Explorer</h1>
+      <p class="subtitle">
+        A common-source NMOS is loaded by <b>R<sub>D,high</sub></b> between VDD and the drain.
+        Move <b>V<sub>GS,Q</sub></b>, apply a small sinusoidal <b>v<sub>gs</sub></b>, and observe how
+        <b>g<sub>m</sub>v<sub>gs</sub></b> becomes drain-current variation and an inverted drain-voltage signal.
+      </p>
+      <p class="subtitle" style="margin-top:5px">
+        以 Common-Source + <b>R<sub>D,high</sub></b> 為核心：拖曳 <b>V<sub>GS,Q</sub></b>，
+        再疊加小幅正弦 <b>v<sub>gs</sub></b>，觀察實際 <b>I<sub>D</sub></b>、
+        <b>V<sub>DS</sub></b>、電壓增益、工作區域與非線性失真。
+      </p>
+      <div class="badges">
+        <span class="badge">gm · vgs</span><span class="badge">Drain resistor load</span>
+        <span class="badge">Region crossing</span><span class="badge">THD</span><span class="badge">Channel-length modulation</span>
+      </div>
+    </div>
+    <a class="home-link" href="index.html">← Home</a>
+  </div>
+</div>
+</header>
+
+<div class="page">
+<div class="layout">
+<aside class="card controls">
+  <h2 class="section-title">Parameter Setup</h2>
+
+  <div class="group">
+    <div class="group-label">MOSFET / Process</div>
+    <div class="compact-grid">
+      <div class="compact-field"><label for="m">M</label><input id="m" type="number" min="1" max="1000" step="1" value="1"></div>
+      <div class="compact-field"><label for="muCox">μCox (µA/V²)</label><input id="muCox" type="number" min="1" max="5000" step="1" value="200"></div>
+      <div class="compact-field"><label for="w">W (µm)</label><input id="w" type="number" min="0.01" max="10000" step="0.01" value="10"></div>
+      <div class="compact-field"><label for="l">L (µm)</label><input id="l" type="number" min="0.01" max="100" step="0.01" value="0.18"></div>
+      <div class="compact-field"><label for="vth">Vth (V)</label><input id="vth" type="number" min="0.05" max="2" step="0.01" value="0.45"></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-label">Bias / Load</div>
+    <div class="compact-grid">
+      <div class="compact-field"><label for="vdd">VDD (V)</label><input id="vdd" type="number" min="0.1" max="20" step="0.05" value="1.8"></div>
+
+      <div class="compact-field">
+        <label for="rd">R<sub>D,high</sub></label>
+        <div class="unit-input">
+          <input id="rd" type="number" min="0" max="1000000000" step="0.1" value="1">
+          <select id="rdUnit" aria-label="RD high unit">
+            <option value="1">Ω</option>
+            <option value="1000" selected>kΩ</option>
+            <option value="1000000">MΩ</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="compact-field"><label for="vgs">VGS,Q (V)</label><input id="vgs" type="number" min="0" max="20" step="0.001" value="0.62"></div>
+      <div class="compact-field"><label for="swing">vgs peak (mV)</label><input id="swing" type="number" min="0" max="200" step="1" value="20"></div>
+    </div>
+    <div class="helper">
+      R<sub>D,high</sub> is between VDD and drain. vgs is limited to 0–200 mVpeak.<br>
+      R<sub>D,high</sub> 位於 VDD 與 Drain 之間；vgs 限制在 0–200 mVpeak。
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-label">Non-ideal Effect</div>
+    <div class="compact-grid">
+      <div class="toggle-row" style="grid-column:1/-1;padding:8px 10px">
+        <div>
+          <label>Channel-length modulation</label>
+          <div class="helper">finite r<sub>o</sub> in saturation</div>
+        </div>
+        <label class="switch"><input id="clm" type="checkbox"><span class="slider"></span></label>
+      </div>
+      <div class="compact-field"><label for="lambda">λ (1/V)</label><input id="lambda" type="number" min="0" max="1" step="0.005" value="0.08"></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button id="smallBtn" class="primary">10 mV 小訊號</button>
+    <button id="resetBtn" class="secondary">Reset</button>
+  </div>
+</aside>
+
+<main class="main">
+
+<section class="card intro">
+  <h2>How this explorer works / 這個工具在看什麼</h2>
+  <p class="en">
+    The gate signal changes drain current through transconductance. The drain current then creates a voltage drop
+    across R<sub>D,high</sub>, so the drain voltage moves in the opposite direction.
+    In small signal, the local voltage gain is approximately A<sub>v</sub> = −g<sub>m,loaded</sub>R<sub>D,high</sub>.
+  </p>
+  <p class="zh">
+    Gate 的小訊號先透過 g<sub>m</sub> 造成 I<sub>D</sub> 變化，再由 R<sub>D,high</sub>
+    把電流變化轉成反相的 Drain 電壓。最後一張圖會把 VGS 與 VDS 的 AC component 疊在同一個電壓刻度，
+    可以直接比較增益與反相關係。
+  </p>
+</section>
+
+<section class="card chart-card">
+  <div class="topology">
+    <span>VDD</span><span class="arrow">→</span><span>R<sub>D,high</sub></span>
+    <span class="arrow">→</span><span>Drain / VDS</span><span class="arrow">→</span><span>NMOS → GND</span>
+    <span style="margin-left:10px;color:var(--muted);font-weight:650">Gate: VGS,Q + vgs(t)</span>
+  </div>
+  <div class="chart-head">
+    <div>
+      <div class="chart-title">1. Loaded Transfer Curve — VGS → ID</div>
+      <div class="note" style="margin-top:3px">
+        Gold area = VGS,Q ± vgs swing; touch and drag horizontally anywhere inside the plot, or edit VGS,Q directly.<br>
+        金色區域為 VGS,Q ± vgs swing；在圖內任意位置按住左右拖曳即可移動 Q-point，也可直接修改 VGS,Q。
+      </div>
+    </div>
+    <div class="chart-note">Q-point + local tangent<br>loaded transfer curve</div>
+  </div>
+  <div id="transferWrap" class="canvas-wrap">
+    <canvas id="transferCanvas"></canvas>
+    <div class="drag-hint">↔ Touch & drag anywhere in plot</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2 class="section-title">Operating-Point Summary</h2>
+  <div class="summary-grid">
+    <div class="summary-subhead">Operating Point</div>
+    <div class="metric"><div class="name">Q-point region</div><div id="regionMetric" class="val">—</div><div id="regionDetail" class="small"></div></div>
+    <div class="metric"><div class="name">ID,Q</div><div id="idqMetric" class="val">—</div><div class="small">DC drain current</div></div>
+    <div class="metric"><div class="name">VDS,Q</div><div id="vdsqMetric" class="val">—</div><div class="small">VDD − ID·R<sub>D,high</sub></div></div>
+    <div class="metric"><div class="name">gm,loaded</div><div id="gmMetric" class="val">—</div><div class="small">dID / dVGS at Q</div></div>
+    <div class="metric"><div class="name">r<sub>o</sub></div><div id="roMetric" class="val">—</div><div class="small">1 / g<sub>ds</sub> at Q</div></div>
+    <div class="metric"><div class="name">r<sub>o</sub> || R<sub>D,high</sub></div><div id="roRdMetric" class="val">—</div><div class="small">parallel resistance</div></div>
+
+    <div class="summary-subhead">Performance</div>
+    <div class="metric"><div class="name">Predicted ΔID</div><div id="predMetric" class="val">—</div><div class="small">gm,Q · vgs,peak</div></div>
+    <div class="metric"><div class="name">Actual fundamental</div><div id="fundMetric" class="val">—</div><div class="small">ID sine component, peak</div></div>
+    <div class="metric"><div class="name">THD (2nd–10th)</div><div id="thdMetric" class="val">—</div><div class="small">harmonics / fundamental</div></div>
+    <div class="metric"><div class="name">gm variation</div><div id="gmVarMetric" class="val">—</div><div class="small">over input swing</div></div>
+
+    <div class="metric"><div class="name">Local voltage gain A<sub>v,Q</sub></div><div id="gainMetric" class="val">—</div><div class="small">−gm,loaded · R<sub>D,high</sub></div></div>
+    <div class="metric"><div class="name">Actual fundamental gain</div><div id="fundGainMetric" class="val">—</div><div class="small">ΔVDS,1 / ΔVGS,1</div></div>
+  </div>
+
+  <div class="region-bar">
+    <div id="cutoffBar" class="cutoff"></div><div id="triodeBar" class="triode"></div><div id="satBar" class="saturation"></div>
+  </div>
+  <div class="legend">
+    <span><i class="dot cutoff"></i>Cutoff <b id="cutoffPct">0%</b></span>
+    <span><i class="dot triode"></i>Triode <b id="triodePct">0%</b></span>
+    <span><i class="dot saturation"></i>Saturation <b id="satPct">0%</b></span>
+  </div>
+
+  <div id="advice" class="advice"><strong>Suggestion：</strong>—</div>
+</section>
+
+<section class="card chart-card">
+  <div class="chart-head">
+    <div class="chart-title">2. Input VGS Waveform — 2 Cycles</div>
+    <div class="chart-note">VGS(t) = VGS,Q + A·sinθ<br>0 ≤ θ ≤ 4π</div>
+  </div>
+  <div class="canvas-wrap wave-wrap"><canvas id="vgsCanvas"></canvas></div>
+</section>
+
+<section class="card chart-card">
+  <div class="chart-head">
+    <div class="chart-title">3. Resulting ID Waveform</div>
+    <div class="chart-note">實線：actual ID<br>虛線：DC + fundamental</div>
+  </div>
+  <div class="canvas-wrap wave-wrap"><canvas id="idCanvas"></canvas></div>
+</section>
+
+<section class="card chart-card">
+  <div class="chart-head">
+    <div>
+      <div class="chart-title">4. Voltage Gain View — ΔVGS vs ΔVDS</div>
+      <div class="note" style="margin-top:3px">
+        AC components are DC-centered and plotted on the same voltage scale, so amplitude ratio directly shows gain.<br>
+        將 VGS 與 VDS 扣除 DC 後放在同一個 V scale；振幅比就是 gain，也可直接看出 180° 反相。
+      </div>
+    </div>
+    <div class="chart-note">ΔVDS = −ΔID·R<sub>D,high</sub><br>same Y-axis unit: V</div>
+  </div>
+  <div class="canvas-wrap wave-wrap"><canvas id="vdsCanvas"></canvas></div>
+</section>
+
+<section class="card">
+  <h2 class="section-title">Small-Signal Meaning</h2>
+  <div class="formula">
+    <div><code>β = M · μCox · (W/L)</code></div>
+    <div><code>i<sub>d</sub> ≈ g<sub>m</sub>v<sub>gs</sub> + g<sub>ds</sub>v<sub>ds</sub></code></div>
+    <div><code>v<sub>ds</sub> = −i<sub>d</sub>R<sub>D,high</sub></code> &nbsp;(AC, VDD is AC ground)</div>
+    <div><code>⇒ i<sub>d</sub> ≈ [g<sub>m</sub> / (1 + g<sub>ds</sub>R<sub>D,high</sub>)] · v<sub>gs</sub></code></div>
+    <div><code>A<sub>v,Q</sub> = dVDS/dVGS ≈ −g<sub>m,loaded</sub>R<sub>D,high</sub></code></div>
+    <div><code>VGS(θ) = VGS,Q + A·sin(θ), 0 ≤ θ ≤ 4π</code></div>
+    <div><code>THD = √(I₂² + … + I₁₀²) / I₁</code></div>
+  </div>
+  <p class="note">
+    這版的核心不是讓 VDS 去「推動」ID，而是讓 <b>vgs 透過 gm 產生 id</b>。
+    R<sub>D,high</sub> 再把電流變化轉成 drain voltage 變化。當 swing 太大時，
+    square-law 的 gm 本身會隨 VGS 改變；若 VDS 又被拉低到 VOV 以下，還會進一步跨入 triode，
+    因此輸出電流不再是理想正弦。
+  </p>
+</section>
+
+</main>
+</div>
+<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:24px">
+  <a class="top-link" style="margin:0" href="index.html">← Home</a>
+  <a class="top-link" style="margin:0" href="#top">↑ Top / 回到最上方</a>
+</div>
+<a class="case-study-link" href="mosfet-small-signal-challenge.html">Case Study →</a>
+<footer>JC Cheng Analog · MOSFET VGS → ID Small-Signal Explorer</footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $=id=>document.getElementById(id);
+const el={
+  m:$("m"),muCox:$("muCox"),w:$("w"),l:$("l"),vth:$("vth"),
+  vdd:$("vdd"),rd:$("rd"),vgs:$("vgs"),swing:$("swing"),clm:$("clm"),lambda:$("lambda")
+};
+const cvs={transfer:$("transferCanvas"),vgs:$("vgsCanvas"),id:$("idCanvas"),vds:$("vdsCanvas")};
+const state={map:null,last:null,drag:false};
+
+function n(x,f=0){const v=Number(x.value);return Number.isFinite(v)?v:f}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function p(){
+  const VDD=Math.max(.05,n(el.vdd,1.8));
+  const unit=Number($("rdUnit").value)||1;
+  const rdValue=Math.max(0,n(el.rd,1))*unit;
+  const swingMv=clamp(n(el.swing,20),0,200);
+  return {
+    M:Math.max(1,n(el.m,1)), muCox:Math.max(0,n(el.muCox,200))*1e-6,
+    W:Math.max(1e-6,n(el.w,10)), L:Math.max(1e-6,n(el.l,.18)),
+    Vth:n(el.vth,.45), VDD, RD:rdValue,
+    VGS:clamp(n(el.vgs,.62),0,VDD), A:swingMv/1000,
+    clm:el.clm.checked, lambda:Math.max(0,n(el.lambda,.08))
+  };
+}
+function beta(P){return P.M*P.muCox*(P.W/P.L)}
+
+function mosId(P,VGS,VDS){
+  const vov=VGS-P.Vth, v=Math.max(0,VDS), b=beta(P);
+  if(vov<=0)return {id:0,region:"Cutoff",vov};
+  if(v<vov){
+    return {id:Math.max(0,b*(vov*v-.5*v*v)),region:"Triode",vov};
+  }
+  let id=.5*b*vov*vov;
+  // Continuous teaching approximation at triode/saturation boundary.
+  if(P.clm) id*=1+P.lambda*Math.max(0,v-vov);
+  return {id:Math.max(0,id),region:"Saturation",vov};
+}
+
+function solveLoaded(P,VGS){
+  if(VGS<=P.Vth)return {id:0,vds:P.VDD,region:"Cutoff",vov:VGS-P.Vth};
+  if(P.RD<=1e-12){
+    const m=mosId(P,VGS,P.VDD);
+    return {id:m.id,vds:P.VDD,region:m.region,vov:m.vov};
+  }
+  let lo=0,hi=P.VDD;
+  // f(VDS)=IMOS-(VDD-VDS)/RD
+  for(let k=0;k<70;k++){
+    const mid=(lo+hi)/2;
+    const f=mosId(P,VGS,mid).id-(P.VDD-mid)/P.RD;
+    if(f>0)hi=mid;else lo=mid;
+  }
+  const vds=(lo+hi)/2;
+  const m=mosId(P,VGS,vds);
+  const id=Math.max(0,(P.VDD-vds)/P.RD);
+  return {id,vds,region:m.region,vov:m.vov};
+}
+
+
+function derivativeVds(P,VGS,VDS){
+  const h=Math.max(1e-8,P.VDD/200000);
+  const v1=Math.max(0,VDS-h), v2=Math.min(P.VDD,VDS+h);
+  const a=mosId(P,VGS,v1).id;
+  const b=mosId(P,VGS,v2).id;
+  const dv=v2-v1;
+  return dv>0?(b-a)/dv:0;
+}
+
+function derivative(P,V){
+  const h=Math.max(1e-6,P.VDD/200000);
+  const a=solveLoaded(P,clamp(V-h,0,P.VDD)).id;
+  const b=solveLoaded(P,clamp(V+h,0,P.VDD)).id;
+  const dv=clamp(V+h,0,P.VDD)-clamp(V-h,0,P.VDD);
+  return dv>0?(b-a)/dv:0;
+}
+function fmtI(a){
+  const x=Math.abs(a);
+  if(x>=1)return a.toFixed(3)+" A";
+  if(x>=1e-3)return (a*1e3).toFixed(3)+" mA";
+  if(x>=1e-6)return (a*1e6).toFixed(2)+" µA";
+  return (a*1e9).toFixed(2)+" nA";
+}
+function fmtG(a){
+  const x=Math.abs(a);
+  if(x>=1)return a.toFixed(3)+" S";
+  if(x>=1e-3)return (a*1e3).toFixed(3)+" mS";
+  if(x>=1e-6)return (a*1e6).toFixed(2)+" µS";
+  return (a*1e9).toFixed(2)+" nS";
+}
+
+function fmtR(r){
+  if(!Number.isFinite(r) || r>1e15) return "∞";
+  const x=Math.abs(r);
+  if(x>=1e9) return (r/1e9).toFixed(3)+" GΩ";
+  if(x>=1e6) return (r/1e6).toFixed(3)+" MΩ";
+  if(x>=1e3) return (r/1e3).toFixed(3)+" kΩ";
+  return r.toFixed(2)+" Ω";
+}
+function parallel(a,b){
+  if(!Number.isFinite(a) && !Number.isFinite(b)) return Infinity;
+  if(!Number.isFinite(a)) return b;
+  if(!Number.isFinite(b)) return a;
+  if(a<=0 || b<=0) return 0;
+  return 1/(1/a+1/b);
+}
+function fmtPct(a){
+  if(!Number.isFinite(a))return "N/A";
+  if(a>=100)return a.toFixed(1)+"%";
+  return a.toFixed(2)+"%";
+}
+function analyze(P){
+  const N=1024,theta=[],vgs=[],ids=[],vds=[],regions=[];
+  for(let i=0;i<N;i++){
+    const th=4*Math.PI*i/(N-1), vg=P.VGS+P.A*Math.sin(th), s=solveLoaded(P,vg);
+    theta.push(th);vgs.push(vg);ids.push(s.id);vds.push(s.vds);regions.push(s.region);
+  }
+
+  function spectrum(y){
+    const H=512, data=y.slice(0,H), dc=data.reduce((a,b)=>a+b,0)/H;
+    const amps=[],phase=[],sinCoeff=[],cosCoeff=[];
+    for(let k=1;k<=10;k++){
+      let c=0,s=0;
+      for(let i=0;i<H;i++){
+        const th=2*Math.PI*i/H, ac=data[i]-dc;
+        c+=ac*Math.cos(k*th);
+        s+=ac*Math.sin(k*th);
+      }
+      c*=2/H;s*=2/H;
+      cosCoeff[k]=c;sinCoeff[k]=s;
+      amps[k]=Math.hypot(c,s);
+      phase[k]=Math.atan2(c,s);
+    }
+    const a1=amps[1]||0;
+    const thd=a1>1e-15?Math.sqrt(amps.slice(2).reduce((z,a)=>z+a*a,0))/a1*100:NaN;
+    return {dc,amps,phase,sinCoeff,cosCoeff,a1,thd};
+  }
+
+  const iSpec=spectrum(ids);
+  const vSpec=spectrum(vds);
+  const fit=ids.map((_,i)=>iSpec.dc+iSpec.a1*Math.sin(theta[i]+iSpec.phase[1]));
+
+  const counts={Cutoff:0,Triode:0,Saturation:0};
+  regions.forEach(r=>counts[r]++);
+  Object.keys(counts).forEach(k=>counts[k]=100*counts[k]/N);
+
+  const lo=clamp(P.VGS-P.A,0,P.VDD),hi=clamp(P.VGS+P.A,0,P.VDD);
+  const gmLo=derivative(P,lo),gmHi=derivative(P,hi),gmQ=derivative(P,P.VGS);
+  const gmVar=gmQ>1e-18?(Math.max(gmLo,gmHi,gmQ)-Math.min(gmLo,gmHi,gmQ))/gmQ*100:NaN;
+
+  const q=solveLoaded(P,P.VGS);
+  const gdsQ=derivativeVds(P,P.VGS,q.vds);
+  const roQ=gdsQ>1e-18?1/gdsQ:Infinity;
+  const roPar=parallel(roQ,P.RD);
+
+  const localGain=-P.RD*gmQ;
+  const fundGain=P.A>1e-15 ? vSpec.sinCoeff[1]/P.A : NaN;
+  const gainError=Math.abs(localGain)>1e-12 && Number.isFinite(fundGain)
+    ? Math.abs((fundGain-localGain)/localGain)*100 : NaN;
+
+  const vgsAC=vgs.map(v=>v-P.VGS);
+  const vdsAC=vds.map(v=>v-vSpec.dc);
+
+  return {
+    theta,vgs,ids,vds,vgsAC,vdsAC,fit,
+    dc:iSpec.dc,a1:iSpec.a1,thd:iSpec.thd,
+    counts,gmLo,gmHi,gmQ,gmVar,
+    vdsDC:vSpec.dc,vdsFund:vSpec.a1,
+    localGain,fundGain,gainError,q,
+    gdsQ,roQ,roPar
+  };
+}
+
+function canvas(c){
+  const r=c.getBoundingClientRect(),dpr=Math.max(1,window.devicePixelRatio||1);
+  const w=Math.max(10,r.width),h=Math.max(10,r.height),rw=Math.round(w*dpr),rh=Math.round(h*dpr);
+  if(c.width!==rw||c.height!==rh){c.width=rw;c.height=rh}
+  const x=c.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);return {x,w,h};
+}
+function nice(x){
+  if(!Number.isFinite(x)||x<=0)return 1;
+  const e=Math.floor(Math.log10(x)),f=x/10**e,n=f<=1?1:f<=2?2:f<=5?5:10;return n*10**e;
+}
+function axes(x,b,xt,yt,xlab,ylab,xf,yf){
+  x.save();x.strokeStyle="#d9e2ec";x.lineWidth=1;x.fillStyle="#64788c";x.font="12px sans-serif";
+  x.textAlign="center";x.textBaseline="top";
+  for(let i=0;i<=xt;i++){const xx=b.l+(b.r-b.l)*i/xt;x.beginPath();x.moveTo(xx,b.t);x.lineTo(xx,b.b);x.stroke();x.fillText(xf(i/xt),xx,b.b+7)}
+  x.textAlign="right";x.textBaseline="middle";
+  for(let i=0;i<=yt;i++){const yy=b.b-(b.b-b.t)*i/yt;x.beginPath();x.moveTo(b.l,yy);x.lineTo(b.r,yy);x.stroke();x.fillText(yf(i/yt),b.l-8,yy)}
+  x.strokeStyle="#829ab1";x.lineWidth=1.2;x.beginPath();x.moveTo(b.l,b.t);x.lineTo(b.l,b.b);x.lineTo(b.r,b.b);x.stroke();
+  x.fillStyle="#334e68";x.textAlign="center";x.textBaseline="top";x.fillText(xlab,(b.l+b.r)/2,b.b+29);
+  x.save();x.translate(14,(b.t+b.b)/2);x.rotate(-Math.PI/2);x.textBaseline="top";x.fillText(ylab,0,0);x.restore();x.restore();
+}
+function line(x,pts,color,w=2,dash=[]){
+  if(!pts.length)return;x.save();x.strokeStyle=color;x.lineWidth=w;x.setLineDash(dash);
+  x.beginPath();x.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)x.lineTo(pts[i][0],pts[i][1]);x.stroke();x.restore();
+}
+function transfer(P,A){
+  const {x,w,h}=canvas(cvs.transfer);x.clearRect(0,0,w,h);
+  const b={l:66,t:24,r:w-18,b:h-54},N=600,pts=[],regs=[];let ymax=0;
+  for(let i=0;i<=N;i++){const vg=P.VDD*i/N,s=solveLoaded(P,vg);pts.push([vg,s.id]);regs.push(s.region);ymax=Math.max(ymax,s.id)}
+  ymax=nice(ymax*1.12||1e-6);
+  const X=v=>b.l+(b.r-b.l)*v/P.VDD,Y=i=>b.b-(b.b-b.t)*i/ymax;
+  axes(x,b,5,5,"VGS (V)","ID",f=>(f*P.VDD).toFixed(2),f=>{
+    const v=f*ymax;return ymax>=1e-3?(v*1e3).toFixed(2)+"m":(v*1e6).toFixed(1)+"µ";
+  });
+
+  const lo=clamp(P.VGS-P.A,0,P.VDD),hi=clamp(P.VGS+P.A,0,P.VDD);
+  x.save();x.fillStyle="rgba(216,166,60,.16)";x.fillRect(X(lo),b.t,X(hi)-X(lo),b.b-b.t);
+  x.strokeStyle="#d8a63c";x.setLineDash([4,4]);[lo,hi].forEach(v=>{x.beginPath();x.moveTo(X(v),b.t);x.lineTo(X(v),b.b);x.stroke()});x.restore();
+
+  // Split curve by operating region so region changes are visually obvious.
+  const colors={Cutoff:"#a8b7c5",Triode:"#e07a32",Saturation:"#7451b8"};
+  let seg=[],last=regs[0];
+  for(let i=0;i<pts.length;i++){
+    if(regs[i]!==last && seg.length){line(x,seg.map(([vg,id])=>[X(vg),Y(id)]),colors[last],3);seg=[pts[i-1]];last=regs[i]}
+    seg.push(pts[i]);
+  }
+  if(seg.length)line(x,seg.map(([vg,id])=>[X(vg),Y(id)]),colors[last],3);
+
+  const q=solveLoaded(P,P.VGS),qx=X(P.VGS),qy=Y(q.id);
+  x.save();x.beginPath();x.arc(qx,qy,8,0,Math.PI*2);x.fillStyle="#d8a63c";x.fill();x.strokeStyle="#76540b";x.lineWidth=2;x.stroke();
+  x.fillStyle="#102a43";x.font="bold 12px sans-serif";x.textAlign=qx>b.r-135?"right":"left";
+  x.fillText(`Q: ${P.VGS.toFixed(3)} V, ${fmtI(q.id)}`,qx+(qx>b.r-135?-12:12),Math.max(b.t+12,qy-12));x.restore();
+
+  // Tangent line at Q to visualize small-signal linearization.
+  const gm=A.gmQ,span=Math.max(.03,Math.min(.15,P.A*2.5||.08));
+  const tv1=clamp(P.VGS-span,0,P.VDD),tv2=clamp(P.VGS+span,0,P.VDD);
+  const ti1=q.id+gm*(tv1-P.VGS),ti2=q.id+gm*(tv2-P.VGS);
+  line(x,[[X(tv1),Y(ti1)],[X(tv2),Y(ti2)]],"#26836a",1.8,[6,5]);
+
+  // Save coordinate mapping for interactive Q-point dragging.
+  state.map={
+    box:b,
+    Xinv:px=>clamp((px-b.l)/(b.r-b.l)*P.VDD,0,P.VDD),
+    qx,qy
+  };
+}
+function wave(c,xx,yy,opt){
+  const {x,w,h}=canvas(c);x.clearRect(0,0,w,h);const b={l:62,t:21,r:w-17,b:h-50};
+  let mn=Math.min(...yy),mx=Math.max(...yy);
+  if(opt.extra){mn=Math.min(mn,...opt.extra);mx=Math.max(mx,...opt.extra)}
+  if(Math.abs(mx-mn)<1e-15){const d=Math.max(Math.abs(mx)*.1,1e-6);mn-=d;mx+=d}
+  const pad=(mx-mn)*.12;mn-=pad;mx+=pad;
+  const X=v=>b.l+(b.r-b.l)*v/(4*Math.PI),Y=v=>b.b-(b.b-b.t)*(v-mn)/(mx-mn);
+  axes(x,b,4,4,"θ",opt.ylabel,f=>["0","π","2π","3π","4π"][Math.round(f*4)],f=>opt.yfmt(mn+f*(mx-mn)));
+  if(opt.extra)line(x,xx.map((v,i)=>[X(v),Y(opt.extra[i])]),opt.extraColor||"#d8a63c",1.7,[6,5]);
+  line(x,xx.map((v,i)=>[X(v),Y(yy[i])]),opt.color||"#173f5f",2.5);
+  if(opt.threshold!==undefined && opt.threshold>=mn && opt.threshold<=mx){
+    x.save();x.strokeStyle="#d64545";x.setLineDash([5,5]);x.beginPath();x.moveTo(b.l,Y(opt.threshold));x.lineTo(b.r,Y(opt.threshold));x.stroke();
+    x.fillStyle="#d64545";x.font="11px sans-serif";x.textAlign="right";x.fillText("Vth",b.r-3,Y(opt.threshold)-5);x.restore();
+  }
+}
+
+function compareVoltageWave(c,xx,inputAC,outputAC){
+  const {x,w,h}=canvas(c);x.clearRect(0,0,w,h);
+  const b={l:62,t:21,r:w-17,b:h-50};
+  let lim=Math.max(...inputAC.map(Math.abs),...outputAC.map(Math.abs));
+  if(!Number.isFinite(lim)||lim<1e-9)lim=.01;
+  lim*=1.15;
+  const X=v=>b.l+(b.r-b.l)*v/(4*Math.PI);
+  const Y=v=>b.b-(b.b-b.t)*(v+lim)/(2*lim);
+
+  axes(x,b,4,4,"θ","AC voltage (V)",
+    f=>["0","π","2π","3π","4π"][Math.round(f*4)],
+    f=>(-lim+2*lim*f).toFixed(3)
+  );
+
+  x.save();
+  x.strokeStyle="#9fb3c8";x.setLineDash([4,4]);
+  x.beginPath();x.moveTo(b.l,Y(0));x.lineTo(b.r,Y(0));x.stroke();
+  x.restore();
+
+  // ΔVGS: orange, dense dashed
+  x.save();
+  x.strokeStyle="#e07a32";
+  x.lineWidth=2.2;
+  x.setLineDash([6,3]);
+  x.beginPath();
+  x.moveTo(X(xx[0]),Y(inputAC[0]));
+  for(let i=1;i<xx.length;i++)x.lineTo(X(xx[i]),Y(inputAC[i]));
+  x.stroke();
+  x.restore();
+
+  // ΔVDS: purple, 10% thicker
+  line(x,xx.map((v,i)=>[X(v),Y(outputAC[i])]),"#7451b8",2.86);
+
+  x.save();
+  x.font="12px sans-serif";x.textBaseline="middle";
+  const lx=b.l+10,ly=b.t+12;
+  x.strokeStyle="#e07a32";x.lineWidth=2.2;x.setLineDash([6,3]);
+  x.beginPath();x.moveTo(lx,ly);x.lineTo(lx+24,ly);x.stroke();
+  x.setLineDash([]);
+  x.fillStyle="#52667a";x.fillText("ΔVGS input / 輸入",lx+31,ly);
+  x.strokeStyle="#7451b8";x.lineWidth=2.86;x.beginPath();x.moveTo(lx,ly+19);x.lineTo(lx+24,ly+19);x.stroke();
+  x.fillStyle="#52667a";x.fillText("ΔVDS output / 輸出",lx+31,ly+19);
+  x.restore();
+}
+function cls(node,c){node.classList.remove("good","warn","bad");if(c)node.classList.add(c)}
+function metrics(P,A){
+  const q=A.q;
+  $("regionMetric").textContent=q.region;
+  $("regionDetail").textContent=`Vov = ${(P.VGS-P.Vth).toFixed(3)} V`;
+  cls($("regionMetric"),q.region==="Saturation"?"good":q.region==="Triode"?"warn":"bad");
+
+  $("idqMetric").textContent=fmtI(q.id);
+  $("vdsqMetric").textContent=q.vds.toFixed(3)+" V";
+  $("gmMetric").textContent=fmtG(A.gmQ);
+  $("roMetric").textContent=fmtR(A.roQ);
+  $("roRdMetric").textContent=fmtR(A.roPar);
+  $("predMetric").textContent=fmtI(A.gmQ*P.A);
+  $("fundMetric").textContent=fmtI(A.a1);
+  $("thdMetric").textContent=fmtPct(A.thd);
+  $("gmVarMetric").textContent=fmtPct(A.gmVar);
+
+  $("gainMetric").textContent=Number.isFinite(A.localGain)?A.localGain.toFixed(3)+" V/V":"N/A";
+  $("fundGainMetric").textContent=Number.isFinite(A.fundGain)?A.fundGain.toFixed(3)+" V/V":"N/A";
+
+  const quality=!Number.isFinite(A.thd)?"bad":A.thd<1?"good":A.thd<5?"warn":"bad";
+  cls($("thdMetric"),quality);
+  cls($("gmVarMetric"),!Number.isFinite(A.gmVar)?"bad":A.gmVar<10?"good":A.gmVar<30?"warn":"bad");
+  cls($("gainMetric"),q.region==="Saturation"?"good":q.region==="Triode"?"warn":"bad");
+  cls($("fundGainMetric"),
+      !Number.isFinite(A.gainError)?"bad":A.gainError<5?"good":A.gainError<15?"warn":"bad");
+
+  const ids={Cutoff:["cutoffBar","cutoffPct"],Triode:["triodeBar","triodePct"],Saturation:["satBar","satPct"]};
+  Object.entries(ids).forEach(([name,[bar,pct]])=>{
+    $(bar).style.width=A.counts[name]+"%";
+    $(pct).textContent=A.counts[name].toFixed(1)+"%";
+  });
+
+  const en=[],zh=[];
+  const lo=P.VGS-P.A,hi=P.VGS+P.A;
+
+  if(hi<=P.Vth){
+    en.push("The entire input swing is below Vth, so transconductance is nearly zero. Increase VGS,Q.");
+    zh.push("整個輸入 swing 都低於 Vth，因此跨導幾乎為零；請提高 VGS,Q。");
+  }else{
+    if(lo<P.Vth){
+      en.push("The input swing crosses Vth and approaches cutoff. Increase VGS,Q or reduce the vgs swing.");
+      zh.push("輸入 swing 穿越 Vth 並接近 cutoff；請提高 VGS,Q 或縮小 vgs swing。");
+    }
+
+    if(A.counts.Triode>0.5){
+      en.push("Part of the cycle enters triode because RD,high pulls the drain voltage too low. Reduce VGS,Q or RD,high, increase VDD, or reduce the input swing.");
+      zh.push("部分週期進入 triode，代表 RD,high 將 Drain 電壓拉得太低。可降低 VGS,Q 或 RD,high、提高 VDD，或縮小輸入 swing。");
+    }
+
+    if(A.counts.Saturation>99.5){
+      if(P.A<=.01){
+        en.push("The device remains in saturation with a small vgs, so the result is close to the local gm·vgs small-signal model.");
+        zh.push("整個週期維持 saturation 且 vgs 很小，因此結果很接近局部 gm·vgs 小訊號模型。");
+      }else{
+        en.push("The device remains in saturation, but the square-law relation still makes gm vary with VGS.");
+        zh.push("雖然整個週期維持 saturation，但 square-law 關係仍會使 gm 隨 VGS 改變。");
+      }
+    }
+
+    const ratio=P.A/Math.max(P.VGS-P.Vth,1e-12);
+    if(ratio>.2){
+      en.push(`vgs,peak / Vov is about ${(ratio*100).toFixed(1)}%, which is relatively large for small-signal analysis. Try 5–10% of Vov first.`);
+      zh.push(`目前 vgs,peak / Vov 約 ${(ratio*100).toFixed(1)}%，對小訊號分析而言偏大；建議先壓到 Vov 的 5–10% 左右。`);
+    }
+
+    if(Number.isFinite(A.gainError) && A.gainError>10){
+      en.push(`The fundamental gain differs from the local Q-point gain by about ${A.gainError.toFixed(1)}%, indicating noticeable large-signal nonlinearity.`);
+      zh.push(`實際基頻增益與 Q-point 局部增益相差約 ${A.gainError.toFixed(1)}%，表示 large-signal nonlinearity 已經明顯。`);
+    }
+
+    if(Number.isFinite(A.thd)&&A.thd<1){
+      en.push("THD is below 1%, so the local linear approximation is very good.");
+      zh.push("THD 低於 1%，目前局部線性近似相當良好。");
+    }else if(Number.isFinite(A.thd)&&A.thd>5){
+      en.push(`THD is about ${fmtPct(A.thd)}. Reduce the vgs swing first, then adjust the Q-point.`);
+      zh.push(`目前 THD 約 ${fmtPct(A.thd)}。建議先縮小 vgs swing，再調整 Q-point。`);
+    }
+  }
+
+  $("advice").innerHTML =
+    `<strong>Suggestion</strong><div style="margin-top:5px">${en.join(" ")}</div>` +
+    `<div style="border-top:1px solid rgba(111,78,0,.18);margin:9px 0 7px"></div>` +
+    `<strong>建議</strong><div style="margin-top:5px">${zh.join(" ")}</div>`;
+}
+function labels(P){
+  el.lambda.disabled=!P.clm;
+  el.lambda.style.opacity=P.clm?1:.45;
+}
+function render(){
+  const P=p(),A=analyze(P);state.last={P,A};labels(P);transfer(P,A);metrics(P,A);
+
+  wave(cvs.vgs,A.theta,A.vgs,{
+    ylabel:"VGS (V)",yfmt:v=>v.toFixed(3),color:"#173f5f",threshold:P.Vth
+  });
+
+  wave(cvs.id,A.theta,A.ids,{
+    ylabel:"ID",yfmt:v=>{
+      const s=Math.max(...A.ids.map(Math.abs));
+      return s>=1e-3?(v*1e3).toFixed(2)+"m":(v*1e6).toFixed(1)+"µ";
+    },
+    color:"#26836a",extra:A.fit,extraColor:"#d8a63c"
+  });
+
+  compareVoltageWave(cvs.vds,A.theta,A.vgsAC,A.vdsAC);
+}
+Object.values(el).forEach(e=>{e.addEventListener("input",render);e.addEventListener("change",render)});
+$("rdUnit").addEventListener("change",render);
+$("smallBtn").addEventListener("click",()=>{el.swing.value=10;render()});
+$("resetBtn").addEventListener("click",()=>{
+  const d={m:1,muCox:200,w:10,l:.18,vth:.45,vdd:1.8,rd:1,vgs:.62,swing:20,lambda:.08};
+  Object.entries(d).forEach(([k,v])=>el[k].value=v);
+  $("rdUnit").value="1000";
+  el.clm.checked=false;
+  render();
+});
+function localPoint(clientX,clientY,c){
+  const r=c.getBoundingClientRect();
+  return {x:clientX-r.left,y:clientY-r.top};
+}
+function setQFromClientX(clientX){
+  if(!state.map)return;
+  const r=cvs.transfer.getBoundingClientRect();
+  const x=clientX-r.left;
+  const b=state.map.box;
+
+  // Only respond inside the actual plot area horizontally.
+  const clampedX=clamp(x,b.l,b.r);
+  const v=state.map.Xinv(clampedX);
+  el.vgs.value=v.toFixed(3);
+  render();
+}
+function beginQDrag(clientX,clientY){
+  if(!state.map)return false;
+  const pt=localPoint(clientX,clientY,cvs.transfer);
+  const b=state.map.box;
+
+  // Allow dragging anywhere inside the plotting rectangle.
+  if(pt.x<b.l || pt.x>b.r || pt.y<b.t || pt.y>b.b)return false;
+
+  state.drag=true;
+  setQFromClientX(clientX);
+  return true;
+}
+
+// Pointer Events: desktop + modern iPad/iPhone Safari.
+cvs.transfer.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  if(beginQDrag(e.clientX,e.clientY)){
+    try{cvs.transfer.setPointerCapture(e.pointerId)}catch(_){}
+  }
+});
+cvs.transfer.addEventListener("pointermove",e=>{
+  if(!state.drag)return;
+  e.preventDefault();
+  setQFromClientX(e.clientX);
+});
+cvs.transfer.addEventListener("pointerup",e=>{
+  state.drag=false;
+  try{cvs.transfer.releasePointerCapture(e.pointerId)}catch(_){}
+});
+cvs.transfer.addEventListener("pointercancel",()=>state.drag=false);
+
+// Touch fallback for browsers/webviews with incomplete PointerEvent dragging.
+if(!window.PointerEvent){
+  cvs.transfer.addEventListener("touchstart",e=>{
+    if(!e.touches.length)return;
+    const t=e.touches[0];
+    if(beginQDrag(t.clientX,t.clientY))e.preventDefault();
+  },{passive:false});
+
+  cvs.transfer.addEventListener("touchmove",e=>{
+    if(!state.drag || !e.touches.length)return;
+    e.preventDefault();
+    setQFromClientX(e.touches[0].clientX);
+  },{passive:false});
+
+  cvs.transfer.addEventListener("touchend",()=>state.drag=false,{passive:true});
+  cvs.transfer.addEventListener("touchcancel",()=>state.drag=false,{passive:true});
+}
+
+cvs.transfer.addEventListener("dblclick",e=>{
+  e.preventDefault();
+  setQFromClientX(e.clientX);
+});
+
+let rt;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,120)});
+render();
+})();
+</script>
+</body>
+</html>
