@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8VZV3YWSBB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-8VZV3YWSBB');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO:START (managed by update-seo.py) -->
+  <title>Basic Analog Concepts: MOSFET &amp; Small-Signal Basics | JC Cheng Analog</title>
+  <meta name="description" content="Beginner-friendly analog IC notes covering MOSFET operating regions, channel-length modulation, lambda, Early voltage (Va), output resistance (ro), Thevenin/Norton equivalents, and MOSFET small-signal modeling." />
+  <meta name="author" content="JC Cheng" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="https://jc-cheng-analog.github.io/basic-analog-concepts.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="JC Cheng Analog" />
+  <meta property="og:title" content="Basic Analog Concepts: MOSFET &amp; Small-Signal Basics | JC Cheng Analog" />
+  <meta property="og:description" content="Beginner-friendly analog IC notes covering MOSFET operating regions, channel-length modulation, lambda, Early voltage (Va), output resistance (ro), Thevenin/Norton equivalents, and MOSFET small-signal modeling." />
+  <meta property="og:url" content="https://jc-cheng-analog.github.io/basic-analog-concepts.html" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image" content="https://jc-cheng-analog.github.io/images/basic_analog_concepts/01-mosfet-operating-regions.jpg" />
+  <meta property="og:image:alt" content="Handwritten note explaining MOSFET operating regions and drain-current equations" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Basic Analog Concepts: MOSFET &amp; Small-Signal Basics | JC Cheng Analog" />
+  <meta name="twitter:description" content="Beginner-friendly analog IC notes covering MOSFET operating regions, channel-length modulation, lambda, Early voltage (Va), output resistance (ro), Thevenin/Norton equivalents, and MOSFET small-signal modeling." />
+  <meta name="twitter:image" content="https://jc-cheng-analog.github.io/images/basic_analog_concepts/01-mosfet-operating-regions.jpg" />
+
+  <script id="seo-structured-data" type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://jc-cheng-analog.github.io/basic-analog-concepts.html#article",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://jc-cheng-analog.github.io/basic-analog-concepts.html"
+      },
+      "headline": "Basic Analog Concepts: MOSFET & Small-Signal Basics",
+      "description": "Beginner-friendly analog IC notes covering MOSFET operating regions, channel-length modulation, lambda, Early voltage (Va), output resistance (ro), Thevenin/Norton equivalents, and MOSFET small-signal modeling.",
+      "url": "https://jc-cheng-analog.github.io/basic-analog-concepts.html",
+      "inLanguage": "en",
+      "author": {
+        "@type": "Person",
+        "name": "JC Cheng"
+      },
+      "dateModified": "2026-08-19",
+      "image": "https://jc-cheng-analog.github.io/images/basic_analog_concepts/01-mosfet-operating-regions.jpg",
+      "about": [
+        "MOSFET operating regions",
+        "Channel-length modulation",
+        "Early voltage (Va)",
+        "MOSFET output resistance (ro)",
+        "Thevenin equivalent circuit",
+        "Norton equivalent circuit",
+        "MOSFET small-signal model"
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://jc-cheng-analog.github.io/basic-analog-concepts.html#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://jc-cheng-analog.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Basic Analog Concepts",
+          "item": "https://jc-cheng-analog.github.io/basic-analog-concepts.html"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+  <!-- SEO:END (managed by update-seo.py) -->
+<style>
+    :root {
+      --navy: #0b2e59;
+      --gold: #c99700;
+      --text: #222222;
+      --muted: #666666;
+      --background: #fafafa;
+      --card: #ffffff;
+      --border: #dddddd;
+      --link: #005fcc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px;
+      color: var(--text);
+      background: var(--background);
+      font-family: Arial, "Noto Sans TC", sans-serif;
+      line-height: 1.7;
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 8px;
+    }
+
+    .site-title {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.1;
+    }
+
+    .name {
+      color: var(--navy);
+    }
+
+    .analog {
+      color: var(--gold);
+    }
+
+    .site-logo {
+      display: block;
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .breadcrumb {
+      margin: 18px 0 28px;
+      font-size: 15px;
+    }
+
+    .breadcrumb a,
+    .back-link {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover,
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .page-heading {
+      margin: 0;
+      padding-bottom: 10px;
+      color: var(--navy);
+      font-size: 34px;
+      line-height: 1.25;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .page-intro {
+      margin: 12px 0 30px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .section-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0 0 28px;
+    }
+
+    .section-nav a {
+      padding: 7px 12px;
+      color: var(--navy);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .section-nav a:hover {
+      border-color: var(--gold);
+    }
+
+    .section-nav .gui-learning-button {
+      color: #ffffff;
+      background: var(--gold);
+      border-color: var(--gold);
+      font-weight: 700;
+      box-shadow: 0 3px 10px rgba(201, 151, 0, 0.18);
+    }
+
+    .section-nav .gui-learning-button:hover,
+    .section-nav .gui-learning-button:focus-visible {
+      color: #ffffff;
+      background: #b78900;
+      border-color: #b78900;
+      text-decoration: none;
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .note-card {
+      margin: 20px 0;
+      padding: 24px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      scroll-margin-top: 20px;
+    }
+
+    .note-card h2 {
+      margin: 0 0 18px;
+      color: var(--navy);
+      font-size: 25px;
+      line-height: 1.35;
+    }
+
+    .note-card-heading-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 0 18px;
+    }
+
+    .note-card-heading-row h2 {
+      margin: 0;
+    }
+
+    .updated-date {
+      flex: 0 0 auto;
+      margin-top: 5px;
+      color: #8a8f96;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    .method {
+      display: block;
+      margin-top: 4px;
+      color: var(--gold);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .image-frame {
+      position: relative;
+      display: grid;
+      min-height: 320px;
+      margin: 0 0 20px;
+      overflow: hidden;
+      place-items: center;
+      background: #f5f6f8;
+      border: 2px dashed #c8cdd3;
+      border-radius: 10px;
+    }
+
+    .analysis-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: none;
+      object-fit: contain;
+      background: #ffffff;
+    }
+
+    .image-placeholder {
+      padding: 32px;
+      color: #7a7f86;
+      text-align: center;
+    }
+
+    .image-placeholder strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #4c535b;
+      font-size: 18px;
+    }
+
+    .image-placeholder code {
+      padding: 3px 7px;
+      background: #e9ecef;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .figure-grid-two {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 0 0 20px;
+    }
+
+    .figure-card {
+      min-width: 0;
+    }
+
+    .figure-card .image-frame {
+      min-height: 260px;
+      margin-bottom: 0;
+    }
+
+    .figure-caption {
+      margin: 8px 2px 0;
+      color: #5f6973;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .description {
+      margin: 0;
+      color: #444444;
+    }
+
+    .description h3 {
+      margin: 28px 0 10px;
+      color: var(--navy);
+      font-size: 20px;
+      line-height: 1.35;
+    }
+
+    .description h3:first-child {
+      margin-top: 0;
+    }
+
+    .description pre {
+      margin: 12px 0 18px;
+      padding: 16px;
+      overflow-x: auto;
+      color: #1f2933;
+      background: #f5f6f8;
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      font-family: "Courier New", Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    .description code {
+      font-family: inherit;
+    }
+
+    .page-divider {
+      margin: 38px 0 30px;
+      border: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .subpage-title {
+      margin: 0 0 18px;
+      color: var(--navy);
+      font-size: 23px;
+      line-height: 1.35;
+    }
+
+    .back-to-top-float {
+      position: fixed;
+      /* Stack directly above the return-to-figure button. */
+      right: max(18px, calc((100vw - 860px) / 2 + 18px));
+      bottom: 88px;
+      z-index: 1001;
+      display: flex;
+      width: 52px;
+      height: 52px;
+      padding: 0 14px;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px;
+      overflow: hidden;
+      white-space: nowrap;
+      color: #ffffff;
+      background: var(--gold);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 26px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.20);
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition:
+        width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 180ms ease,
+        transform 180ms ease,
+        visibility 180ms ease,
+        background 180ms ease;
+    }
+
+    .back-to-top-float.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .back-to-top-float:hover,
+    .back-to-top-float:focus-visible {
+      width: 106px;
+      background: #b78900;
+    }
+
+    .back-to-top-float:focus-visible {
+      outline: 3px solid rgba(11, 46, 89, 0.28);
+      outline-offset: 3px;
+    }
+
+    .back-to-top-float svg {
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.9;
+    }
+
+    .back-to-top-float-label {
+      display: block;
+      min-width: 44px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateX(-5px);
+      transition:
+        opacity 150ms ease 45ms,
+        transform 180ms ease 45ms;
+    }
+
+    .back-to-top-float:hover .back-to-top-float-label,
+    .back-to-top-float:focus-visible .back-to-top-float-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .return-to-figure {
+      position: fixed;
+      /* Align the button with the right edge of the 860 px content area. */
+      right: max(18px, calc((100vw - 860px) / 2 + 18px));
+      bottom: 24px;
+      z-index: 1000;
+      display: flex;
+      width: 52px;
+      height: 52px;
+      padding: 0 14px;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px;
+      overflow: hidden;
+      white-space: nowrap;
+      color: #ffffff;
+      background: var(--navy);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 26px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition:
+        width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 180ms ease,
+        transform 180ms ease,
+        visibility 180ms ease,
+        background 180ms ease;
+    }
+
+    .return-to-figure.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .return-to-figure:hover,
+    .return-to-figure:focus-visible {
+      width: 138px;
+      background: #123f75;
+    }
+
+    .return-to-figure:focus-visible {
+      outline: 3px solid rgba(201, 151, 0, 0.45);
+      outline-offset: 3px;
+    }
+
+    .return-to-figure svg {
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.9;
+    }
+
+    .return-to-figure-label {
+      display: block;
+      min-width: 76px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateX(-5px);
+      transition:
+        opacity 150ms ease 45ms,
+        transform 180ms ease 45ms;
+    }
+
+    .return-to-figure:hover .return-to-figure-label,
+    .return-to-figure:focus-visible .return-to-figure-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+
+    .formula-highlight {
+      margin: 16px 0 0;
+      padding: 16px 18px;
+      color: #1f2933;
+      background: #f7f8fa;
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+    }
+
+    .formula-highlight strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--navy);
+      font-size: 15px;
+    }
+
+    .formula-highlight code {
+      display: block;
+      overflow-x: auto;
+      font-family: "Courier New", Consolas, monospace;
+      font-size: 15px;
+      line-height: 1.7;
+      white-space: nowrap;
+    }
+
+    .key-point-list {
+      margin: 12px 0 0;
+      padding-left: 22px;
+    }
+
+    .key-point-list li + li {
+      margin-top: 6px;
+    }
+
+    .open-explorer {
+      position: fixed;
+      right: max(18px, calc((100vw - 860px) / 2 + 18px));
+      bottom: 88px;
+      z-index: 1001;
+      display: flex;
+      width: 52px;
+      height: 52px;
+      padding: 0 14px;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px;
+      overflow: hidden;
+      white-space: nowrap;
+      color: #ffffff;
+      background: var(--gold);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 26px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+      text-decoration: none;
+      transition:
+        width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 180ms ease,
+        background 180ms ease;
+    }
+
+    .open-explorer:hover,
+    .open-explorer:focus-visible {
+      width: 238px;
+      background: #b78900;
+      transform: translateY(-1px);
+    }
+
+    .open-explorer:focus-visible {
+      outline: 3px solid rgba(11, 46, 89, 0.28);
+      outline-offset: 3px;
+    }
+
+    .open-explorer svg {
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.9;
+    }
+
+    .open-explorer-label {
+      display: block;
+      min-width: 178px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      opacity: 0;
+      transform: translateX(-5px);
+      transition:
+        opacity 150ms ease 45ms,
+        transform 180ms ease 45ms;
+    }
+
+    .open-explorer:hover .open-explorer-label,
+    .open-explorer:focus-visible .open-explorer-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    @media (max-width: 600px) {
+      .footer-navigation {
+        gap: 14px;
+      }
+
+      .back-to-top-float {
+        right: 16px;
+        bottom: 76px;
+        width: 48px;
+        height: 48px;
+        padding: 0 12px;
+        border-radius: 24px;
+      }
+
+      .back-to-top-float:hover,
+      .back-to-top-float:focus-visible {
+        width: 98px;
+      }
+
+      .return-to-figure {
+        right: 16px;
+        bottom: 16px;
+        width: 48px;
+        height: 48px;
+        padding: 0 12px;
+        border-radius: 24px;
+      }
+
+      .return-to-figure:hover,
+      .return-to-figure:focus-visible {
+        width: 126px;
+      }
+
+      .open-explorer {
+        right: 16px;
+        bottom: 76px;
+        width: 48px;
+        height: 48px;
+        padding: 0 12px;
+        border-radius: 24px;
+      }
+
+      .open-explorer:hover,
+      .open-explorer:focus-visible {
+        width: 226px;
+      }
+    }
+
+    .footer-navigation {
+      position: relative;
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: flex-start;
+      font-size: 110%;
+    }
+
+    .back-to-top-link {
+      position: absolute;
+      left: 50%;
+      padding: 0;
+      background: none;
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+      transform: translateX(-50%);
+    }
+
+    .back-to-top-link:hover {
+      transform: translate(-50%, -2px);
+      transition: transform 0.2s ease;
+    }
+
+    .page-footer {
+      margin-top: 38px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 32px 18px;
+      }
+
+      .site-header {
+        gap: 16px;
+      }
+
+      .site-title {
+        font-size: 34px;
+      }
+
+      .site-logo {
+        width: 68px;
+        height: 68px;
+      }
+
+      .page-heading {
+        font-size: 29px;
+      }
+
+      .note-card {
+        padding: 20px;
+      }
+
+      .note-card h2 {
+        font-size: 22px;
+      }
+
+      .note-card-heading-row {
+        gap: 12px;
+      }
+
+      .updated-date {
+        margin-top: 4px;
+        font-size: 12px;
+      }
+
+      .image-frame {
+        min-height: 230px;
+      }
+
+      .figure-grid-two {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+
+    .learning-sequence {
+      margin: -10px 0 28px;
+      padding: 14px 16px;
+      color: #4a5560;
+      background: #fffdf7;
+      border: 1px solid rgba(201, 151, 0, 0.28);
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .learning-sequence strong {
+      color: var(--navy);
+    }
+
+    .next-topic {
+      margin-top: 30px;
+      padding: 18px 20px;
+      background: #ffffff;
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    .next-topic a {
+      color: var(--navy);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .next-topic a:hover {
+      color: var(--gold);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-title" aria-label="JC Cheng Analog">
+      <span class="name">JC Cheng</span>
+      <span class="analog">Analog</span>
+    </div>
+
+    <!-- Keep logo.png in the same folder as this HTML file. -->
+    <img
+      class="site-logo"
+      src="logo.png"
+      alt="JC Cheng Analog logo"
+      onerror="this.style.display='none'"
+    />
+  </header>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="index.html">Home</a>
+    <span aria-hidden="true"> / </span>
+    <span>Analog Building Blocks</span>
+    <span aria-hidden="true"> / </span>
+    <span>Basic Analog Concepts</span>
+  </nav>
+
+  <main>
+    <h1 class="page-heading">Basic Analog Concepts</h1>
+    <p class="page-intro">
+      A beginner-oriented path from MOSFET large-signal behavior to channel-length modulation,
+      linear equivalent circuits, and the small-signal model used in analog IC analysis.
+    </p>
+
+    <nav class="section-nav" aria-label="Page sections">
+      <a href="#mosfet-regions">Operating Regions</a>
+      <a href="#channel-length-modulation">Channel-Length Modulation</a>
+      <a href="#lambda-va-ro">λ, Early Voltage(Va), and Output Resistance(ro)</a>
+      <a href="#thevenin">Thevenin Equivalent Circuit</a>
+      <a href="#norton">Norton Equivalent Circuit</a>
+      <a href="#small-signal-model">Small-Signal Model</a>
+    </nav>
+
+    <div class="learning-sequence">
+      <strong>Suggested learning order:</strong> MOSFET regions → channel-length modulation → λ / V<sub>A</sub> / r<sub>o</sub> → Thevenin → Norton → MOSFET small-signal model.
+    </div>
+
+    <section class="note-card" id="mosfet-regions">
+      <div class="note-card-heading-row">
+        <h2>
+          MOSFET Operating Regions
+          <span class="method">Start from the large-signal I–V picture before using small-signal models</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.19</span>
+      </div>
+
+      <div class="image-frame" id="figure-1">
+        <img
+          class="analysis-image"
+          src="./images/basic_analog_concepts/01-mosfet-operating-regions.jpg"
+          alt="Figure 1. Handwritten MOSFET drain-current equations for cutoff, triode, and saturation regions"
+          width="1448"
+          height="2048"
+          loading="eager" fetchpriority="high"
+        />
+      </div>
+      <p class="figure-caption"><strong>Figure 1.</strong> The three basic MOSFET operating regions and the boundary set by the overdrive voltage V<sub>OV</sub> = V<sub>GS</sub> − V<sub>TH</sub>.</p>
+
+      <div class="description">
+        <h3>Core idea</h3>
+        <p>
+          A MOSFET does not follow one single drain-current equation under every bias condition.
+          Its behavior depends mainly on <strong>V<sub>GS</sub></strong> and
+          <strong>V<sub>DS</sub></strong>, so the first step in almost every analog analysis is
+          to decide which operating region the device is in before choosing an equation or a model.
+        </p>
+        <p>
+          A useful quantity is the overdrive voltage,
+          <strong>V<sub>OV</sub> = V<sub>GS</sub> − V<sub>TH</sub></strong>. Once
+          V<sub>GS</sub> exceeds the threshold voltage, an inversion channel forms. The value of
+          V<sub>DS</sub> then determines whether that channel extends continuously from source to
+          drain or becomes pinched off near the drain end.
+        </p>
+
+        <h3>Region-by-region interpretation</h3>
+        <ul class="key-point-list">
+          <li>
+            <strong>Cutoff:</strong> V<sub>GS</sub> &lt; V<sub>TH</sub>. In the simple long-channel
+            model, no strong inversion channel is formed and I<sub>D</sub> is taken as approximately
+            zero. Subthreshold current is intentionally neglected at this introductory stage.
+          </li>
+          <li>
+            <strong>Triode / linear region:</strong> V<sub>GS</sub> &gt; V<sub>TH</sub> and
+            V<sub>DS</sub> &lt; V<sub>OV</sub>. A channel exists along the full source-to-drain path,
+            and I<sub>D</sub> depends strongly on V<sub>DS</sub>. For sufficiently small
+            V<sub>DS</sub>, the MOSFET can be approximated as a voltage-controlled resistance.
+          </li>
+          <li>
+            <strong>Saturation:</strong> V<sub>GS</sub> &gt; V<sub>TH</sub> and
+            V<sub>DS</sub> ≥ V<sub>OV</sub>. The channel is pinched off near the drain. In the ideal
+            long-channel model, the drain current is then determined primarily by V<sub>GS</sub>
+            rather than V<sub>DS</sub>. This is the region most often used for analog gain stages
+            and current sources.
+          </li>
+        </ul>
+
+        <h3>Why the boundary is V<sub>DS</sub> = V<sub>OV</sub></h3>
+        <p>
+          At the drain end of an NMOS channel, the local gate-to-channel voltage is approximately
+          V<sub>GD</sub>. Pinch-off begins when the drain-end inversion condition just reaches
+          threshold, or <strong>V<sub>GD</sub> = V<sub>TH</sub></strong>. Because
+          V<sub>GD</sub> = V<sub>GS</sub> − V<sub>DS</sub>, this condition becomes
+          <strong>V<sub>DS</sub> = V<sub>GS</sub> − V<sub>TH</sub> = V<sub>OV</sub></strong>.
+          This gives a simple physical meaning to the triode–saturation boundary.
+        </p>
+
+        <div class="formula-highlight">
+          <strong>Useful starting equations</strong>
+          <code>Cutoff: ID ≈ 0,  for VGS &lt; VTH</code>
+          <code>Triode: ID = μCox(W/L)[(VGS − VTH)VDS − VDS²/2]</code>
+          <code>Triode, if VDS ≪ VOV: ID ≈ μCox(W/L)(VGS − VTH)VDS</code>
+          <code>Saturation (ideal): ID = 1/2 · μCox(W/L)(VGS − VTH)²</code>
+          <code>Triode / saturation boundary: VDS = VOV = VGS − VTH</code>
+        </div>
+      </div>
+    </section>
+    <section class="note-card" id="channel-length-modulation">
+      <div class="note-card-heading-row">
+        <h2>
+          Channel-Length Modulation
+          <span class="method">Why saturation current is not perfectly constant in a real MOSFET</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.19</span>
+      </div>
+
+      <div class="image-frame" id="figure-2">
+        <img
+          class="analysis-image"
+          src="./images/basic_analog_concepts/02-channel-length-modulation.jpg"
+          alt="Figure 2. Handwritten explanation of MOSFET channel-length modulation and pinch-off movement"
+          width="1448"
+          height="2048"
+          loading="lazy"
+        />
+      </div>
+      <p class="figure-caption"><strong>Figure 2.</strong> As VDS increases beyond saturation, the pinch-off point moves toward the source and the effective channel length becomes slightly shorter.</p>
+
+      <div class="description">
+        <h3>From ideal saturation to a real MOSFET</h3>
+        <p>
+          In the ideal long-channel square-law model, once
+          <strong>V<sub>DS</sub> ≥ V<sub>OV</sub></strong>, the drain current is treated as independent
+          of V<sub>DS</sub>. On an ideal I<sub>D</sub>–V<sub>DS</sub> plot, the saturation curve would
+          therefore be perfectly horizontal.
+        </p>
+        <p>
+          A real MOSFET is different. Increasing V<sub>DS</sub> increases the reverse bias across
+          the drain-body junction. The drain-side depletion region expands into the channel and the
+          pinch-off point moves slightly toward the source. The electrically active channel is then
+          shorter than the drawn channel length.
+        </p>
+
+        <h3>Effective channel length</h3>
+        <p>
+          If the original channel length is <strong>L</strong> and the drain-side pinch-off region
+          extends by <strong>ΔL</strong>, the effective channel length can be viewed as
+          <strong>L′ = L − ΔL</strong>. Because the saturation current is proportional to W/L,
+          reducing the effective L increases I<sub>D</sub> slightly even though V<sub>GS</sub> has not
+          changed.
+        </p>
+        <p>
+          For a small change in channel length, the ratio can be approximated to first order:
+          <strong>L/(L − ΔL) ≈ 1 + ΔL/L</strong>. If ΔL/L grows approximately linearly with
+          V<sub>DS</sub>, that extra current can be represented compactly by the familiar
+          <strong>(1 + λV<sub>DS</sub>)</strong> factor.
+        </p>
+
+        <h3>What to remember physically</h3>
+        <ul class="key-point-list">
+          <li>Pinch-off does <strong>not</strong> mean that drain current stops flowing.</li>
+          <li>Increasing V<sub>DS</sub> beyond the saturation boundary moves the pinch-off point.</li>
+          <li>The effective channel becomes slightly shorter, so I<sub>D</sub> increases.</li>
+          <li>The result is a finite positive slope in the saturation-region I–V curve.</li>
+          <li>That slope is the origin of finite MOSFET output resistance.</li>
+        </ul>
+
+        <div class="formula-highlight">
+          <strong>First-order channel-length-modulation model</strong>
+          <code>ID,ideal = 1/2 · μCox(W/L)(VGS − VTH)²</code>
+          <code>L′ = L − ΔL</code>
+          <code>ID′ ∝ W/(L − ΔL) ≈ (W/L)(1 + ΔL/L)</code>
+          <code>Assume ΔL/L ∝ VDS  →  ID ≈ ID,ideal(1 + λVDS)</code>
+        </div>
+      </div>
+    </section>
+    <section class="note-card" id="lambda-va-ro">
+      <div class="note-card-heading-row">
+        <h2>
+          λ, Early Voltage(Va), and Output Resistance(ro)
+          <span class="method">Translate the sloped saturation curve into λ, Va, gds, and ro</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.19</span>
+      </div>
+
+      <div class="image-frame" id="figure-3">
+        <img
+          class="analysis-image"
+          src="./images/basic_analog_concepts/03-early-voltage-lambda-output-resistance.jpg"
+          alt="Figure 3. Handwritten MOSFET channel-length modulation graph with Early voltage Va, lambda, and output resistance ro"
+          width="1448"
+          height="2048"
+          loading="lazy"
+        />
+      </div>
+      <p class="figure-caption"><strong>Figure 3.</strong> The nonzero saturation-region slope can be expressed using λ, extrapolated to the Early-voltage intercept Va, and converted into the small-signal output resistance ro.</p>
+
+      <div class="description">
+        <h3>1. λ describes how strongly I<sub>D</sub> changes with V<sub>DS</sub></h3>
+        <p>
+          Channel-length modulation is commonly included by multiplying the ideal saturation current
+          by <strong>(1 + λV<sub>DS</sub>)</strong>. The parameter <strong>λ</strong> therefore describes
+          how sensitive the drain current is to drain-source voltage while the transistor is in
+          saturation. A larger λ means a steeper I<sub>D</sub>–V<sub>DS</sub> slope; a smaller λ means
+          a flatter current-source characteristic.
+        </p>
+        <p>
+          At a fixed V<sub>GS</sub>, the first-order model is approximately a straight line versus
+          V<sub>DS</sub>. This linearized picture is especially useful because the slope can be related
+          directly to small-signal output conductance.
+        </p>
+
+        <h3>2. Early Voltage(Va) is the extrapolated voltage-axis intercept</h3>
+        <p>
+          If the approximately straight saturation-region line is extended backward, it intersects
+          the V<sub>DS</sub> axis near <strong>−V<sub>a</sub></strong>. Setting the first-order current
+          expression to zero gives <strong>1 + λV<sub>DS</sub> = 0</strong>, so the intercept occurs at
+          V<sub>DS</sub> = −1/λ. The magnitude of that intercept is therefore
+          <strong>V<sub>a</sub> ≈ 1/λ</strong> in this first-order model.
+        </p>
+        <p>
+          This gives two equivalent ways to describe the same behavior: a small λ corresponds to a
+          large V<sub>a</sub>, while a large λ corresponds to a small V<sub>a</sub>. A larger
+          V<sub>a</sub> means the saturation curve is flatter and the MOSFET behaves more like an ideal
+          current source.
+        </p>
+
+        <h3>3. The slope becomes g<sub>ds</sub>, and its reciprocal becomes r<sub>o</sub></h3>
+        <p>
+          Around a chosen DC operating point, imagine changing V<sub>DS</sub> by only a small amount.
+          The resulting incremental drain-current change is
+          <strong>Δi<sub>d</sub> ≈ g<sub>ds</sub>Δv<sub>ds</sub></strong>, where
+          <strong>g<sub>ds</sub> = ∂I<sub>D</sub>/∂V<sub>DS</sub></strong>. For the simple CLM model,
+          this slope is approximately <strong>λI<sub>D</sub></strong>.
+        </p>
+        <p>
+          The corresponding small-signal resistance looking into the drain is
+          <strong>r<sub>o</sub> = 1/g<sub>ds</sub></strong>. Therefore, a device with weaker
+          channel-length modulation has a larger r<sub>o</sub>. This finite r<sub>o</sub> is one of the
+          most important non-idealities in analog design because it directly limits the gain of current
+          mirrors, common-source stages, cascodes, and operational amplifiers.
+        </p>
+
+        <h3>DC value versus small-signal change</h3>
+        <p>
+          It is useful to keep the notation separate. <strong>I<sub>D</sub></strong> is the DC bias
+          current at the operating point, while <strong>i<sub>d</sub></strong> or ΔI<sub>D</sub> denotes
+          the small incremental current around that point. The output resistance r<sub>o</sub> describes
+          only this local slope; it is not the same as the large-signal ratio V<sub>DS</sub>/I<sub>D</sub>.
+        </p>
+
+        <div class="formula-highlight">
+          <strong>Key relationships</strong>
+          <code>ID ≈ ID0(1 + λVDS)</code>
+          <code>Va ≈ 1/λ</code>
+          <code>gds = ∂ID/∂VDS ≈ λID</code>
+          <code>ro = 1/gds ≈ 1/(λID)</code>
+          <code>ro ≈ Va/ID</code>
+          <code>Δid ≈ gds·Δvds = Δvds/ro</code>
+        </div>
+      </div>
+    </section>
+    <section class="note-card" id="thevenin">
+      <div class="note-card-heading-row">
+        <h2>
+          Thevenin Equivalent Circuit
+          <span class="method">Reduce a linear two-terminal network to one voltage source and one resistance</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.19</span>
+      </div>
+
+      <div class="image-frame" id="figure-4">
+        <img
+          class="analysis-image"
+          src="./images/basic_analog_concepts/04-thevenin-equivalent-circuit.jpg"
+          alt="Figure 4. Handwritten Thevenin equivalent circuit derivation using open-circuit voltage and equivalent resistance"
+          width="1448"
+          height="2048"
+          loading="lazy"
+        />
+      </div>
+      <p class="figure-caption"><strong>Figure 4.</strong> Any linear two-terminal network can be represented at terminals A–B by an ideal voltage source VTH in series with an equivalent resistance RTH.</p>
+
+      <div class="description">
+        <h3>What Thevenin equivalence means</h3>
+        <p>
+          Imagine that everything inside a complicated linear circuit is hidden inside a black box and
+          only terminals A and B are visible. For any load connected to A–B, the external voltage-current
+          behavior can be reproduced by a much simpler circuit: one ideal voltage source
+          <strong>V<sub>TH</sub></strong> in series with one resistance
+          <strong>R<sub>TH</sub></strong>.
+        </p>
+        <p>
+          The internal circuit is not physically replaced inside the real system. The equivalent only
+          says that, as viewed from A–B, the load sees exactly the same terminal relationship. This makes
+          it a powerful analysis tool for bias networks, loading effects, output resistance, and later
+          small-signal circuit calculations.
+        </p>
+
+        <h3>Step 1: Find V<sub>TH</sub></h3>
+        <p>
+          Remove the external load so that A–B is open-circuited. Because no load current flows, the
+          measured terminal voltage is the open-circuit voltage. That voltage is exactly the Thevenin
+          source voltage:
+          <strong>V<sub>TH</sub> = V<sub>OC</sub></strong>.
+        </p>
+
+        <h3>Step 2: Find R<sub>TH</sub></h3>
+        <p>
+          One direct approach is to short A–B, calculate the short-circuit current
+          I<sub>SC</sub>, and use <strong>R<sub>TH</sub> = V<sub>OC</sub>/I<sub>SC</sub></strong>.
+          This follows directly from the Thevenin equivalent itself: when A–B is shorted, V<sub>TH</sub>
+          drives current through R<sub>TH</sub>.
+        </p>
+        <p>
+          Another common approach is the test-source method. First deactivate only the
+          <strong>independent</strong> sources, then apply a test voltage V<sub>X</sub> across A–B and
+          calculate the current I<sub>X</sub> flowing into the network. The resistance seen at the port is
+          <strong>R<sub>TH</sub> = V<sub>X</sub>/I<sub>X</sub></strong>. This method is especially useful
+          when dependent or controlled sources are present.
+        </p>
+
+        <h3>Important source-zeroing rule</h3>
+        <ul class="key-point-list">
+          <li>An independent ideal voltage source set to 0 V becomes a short circuit.</li>
+          <li>An independent ideal current source set to 0 A becomes an open circuit.</li>
+          <li>Dependent / controlled sources remain active because their values are determined by circuit variables.</li>
+        </ul>
+
+        <div class="formula-highlight">
+          <strong>Key relationships</strong>
+          <code>VTH = VOC</code>
+          <code>RTH = VOC / ISC</code>
+          <code>or: deactivate independent sources, apply VX → RTH = VX / IX</code>
+        </div>
+      </div>
+    </section>
+    <section class="note-card" id="norton">
+      <div class="note-card-heading-row">
+        <h2>
+          Norton Equivalent Circuit
+          <span class="method">The current-source counterpart of the Thevenin equivalent</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.19</span>
+      </div>
+
+      <div class="image-frame" id="figure-5">
+        <img
+          class="analysis-image"
+          src="./images/basic_analog_concepts/05-norton-equivalent-circuit.jpg"
+          alt="Figure 5. Handwritten Norton equivalent circuit derivation using short-circuit current and equivalent resistance"
+          width="1448"
+          height="2048"
+          loading="lazy"
+        />
+      </div>
+      <p class="figure-caption"><strong>Figure 5.</strong> The same linear two-terminal network can also be represented by an ideal current source IN in parallel with an equivalent resistance RN.</p>
+
+      <div class="description">
+        <h3>Same terminal behavior, different form</h3>
+        <p>
+          Norton and Thevenin equivalents describe the same linear two-terminal network. Thevenin uses
+          a voltage source in series with a resistance, while Norton uses a current source in parallel
+          with a resistance. Which form is easier depends on how the surrounding circuit is connected.
+        </p>
+        <p>
+          The Norton form is often convenient when several branches share the same node, when current
+          division is important, or when a circuit already looks naturally like a current source driving
+          an output resistance.
+        </p>
+
+        <h3>Step 1: Find I<sub>N</sub></h3>
+        <p>
+          Short terminals A and B and calculate the current that flows through the short. That current is
+          the Norton source current:
+          <strong>I<sub>N</sub> = I<sub>SC</sub></strong>. This works because the parallel Norton
+          resistance has zero voltage across it when the output terminals are shorted, so the source
+          current flows through the external short.
+        </p>
+
+        <h3>Step 2: Find R<sub>N</sub></h3>
+        <p>
+          The Norton resistance is identical to the Thevenin resistance seen from the same terminals:
+          <strong>R<sub>N</sub> = R<sub>TH</sub></strong>. It can therefore be found from
+          V<sub>OC</sub>/I<sub>SC</sub> or with the same test-source method after deactivating only the
+          independent sources.
+        </p>
+
+        <h3>Thevenin ↔ Norton conversion</h3>
+        <p>
+          Because the two equivalents must produce the same open-circuit voltage and short-circuit
+          current, they convert directly through Ohm's law. The resistance does not change; only the
+          source representation changes.
+        </p>
+        <ul class="key-point-list">
+          <li>Same port resistance: <strong>R<sub>N</sub> = R<sub>TH</sub></strong>.</li>
+          <li>Open-circuit voltage: <strong>V<sub>TH</sub> = I<sub>N</sub>R<sub>N</sub></strong>.</li>
+          <li>Short-circuit current: <strong>I<sub>N</sub> = V<sub>TH</sub>/R<sub>TH</sub></strong>.</li>
+        </ul>
+
+        <div class="formula-highlight">
+          <strong>Key relationships</strong>
+          <code>IN = ISC</code>
+          <code>RN = RTH = VOC / ISC</code>
+          <code>VTH = IN · RN</code>
+          <code>IN = VTH / RTH</code>
+        </div>
+      </div>
+    </section>
+    <section class="note-card" id="small-signal-model">
+      <div class="note-card-heading-row">
+        <h2>
+          MOSFET Small-Signal Model Derivation
+          <span class="method">Linearize the large-signal drain-current equation around the operating point</span>
+        </h2>
+        <span class="updated-date">Last updated · 2026.08.19</span>
+      </div>
+
+      <div class="image-frame" id="figure-6">
+        <img
+          class="analysis-image"
+          src="./images/basic_analog_concepts/06-mosfet-small-signal-model.jpg"
+          alt="Figure 6. Handwritten MOSFET small-signal model derivation for gm, gds, and ro"
+          width="1448"
+          height="2048"
+          loading="lazy"
+        />
+      </div>
+      <p class="figure-caption"><strong>Figure 6.</strong> Small-signal analysis linearizes the nonlinear MOSFET around one DC operating point and expresses the local drain-current change through gm and ro.</p>
+
+      <div class="description">
+        <h3>Why a small-signal model is needed</h3>
+        <p>
+          The MOSFET drain-current equation is nonlinear, so solving a complete analog circuit directly
+          from the large-signal square-law equation can quickly become cumbersome. Most analog gain
+          calculations, however, ask a much smaller question: after the DC bias point has already been
+          established, what happens when the input changes only a little?
+        </p>
+        <p>
+          Around one operating point, a smooth nonlinear curve can be approximated by its tangent line.
+          Small-signal analysis uses exactly this idea. The large DC quantities establish the operating
+          point, and the small lowercase quantities describe only the incremental variations around it.
+        </p>
+
+        <h3>Linearizing I<sub>D</sub> around the bias point</h3>
+        <p>
+          If both V<sub>GS</sub> and V<sub>DS</sub> change slightly, the first-order drain-current change
+          can be written as the sum of two partial-derivative terms. The sensitivity to V<sub>GS</sub> is
+          called the transconductance <strong>g<sub>m</sub></strong>, while the sensitivity to
+          V<sub>DS</sub> is the output conductance <strong>g<sub>ds</sub></strong>.
+        </p>
+        <p>
+          Therefore, a small gate-source voltage variation generates a current
+          <strong>g<sub>m</sub>v<sub>gs</sub></strong>, and a small drain-source voltage variation
+          generates an additional current <strong>g<sub>ds</sub>v<sub>ds</sub></strong>. Because
+          g<sub>ds</sub> = 1/r<sub>o</sub>, the second effect can be represented by a resistor
+          r<sub>o</sub> between drain and source.
+        </p>
+
+        <h3>Meaning of g<sub>m</sub></h3>
+        <p>
+          g<sub>m</sub> tells us how effectively a small change in gate-source voltage controls drain
+          current at the chosen bias point. For the long-channel square-law saturation model,
+          <strong>g<sub>m</sub> = μC<sub>ox</sub>(W/L)V<sub>OV</sub></strong>, which can also be written
+          as <strong>2I<sub>D</sub>/V<sub>OV</sub></strong>. A larger g<sub>m</sub> means more incremental
+          drain-current change for the same input voltage change.
+        </p>
+
+        <h3>Meaning of r<sub>o</sub></h3>
+        <p>
+          r<sub>o</sub> comes from channel-length modulation. If λ were zero, the saturation curve would
+          be perfectly horizontal, g<sub>ds</sub> would be zero, and r<sub>o</sub> would be infinite.
+          A real MOSFET has a finite slope, so r<sub>o</sub> is finite and appears in parallel with the
+          controlled current source in the small-signal model.
+        </p>
+
+        <h3>Large signal versus small signal notation</h3>
+        <ul class="key-point-list">
+          <li><strong>V<sub>GS</sub>, V<sub>DS</sub>, I<sub>D</sub>:</strong> DC / large-signal operating-point quantities.</li>
+          <li><strong>v<sub>gs</sub>, v<sub>ds</sub>, i<sub>d</sub>:</strong> small incremental signals around that operating point.</li>
+          <li>The small-signal model is valid only while the perturbation is small enough that the local linear approximation remains reasonable.</li>
+          <li>The MOSFET should remain in the intended operating region while the small signal moves around the bias point.</li>
+        </ul>
+
+        <div class="formula-highlight">
+          <strong>Small-signal relationships</strong>
+          <code>gm = ∂ID/∂VGS ≈ μCox(W/L)VOV = 2ID/VOV</code>
+          <code>gds = ∂ID/∂VDS ≈ λID = 1/ro</code>
+          <code>ΔID ≈ (∂ID/∂VGS)ΔVGS + (∂ID/∂VDS)ΔVDS</code>
+          <code>id = gm·vgs + gds·vds = gm·vgs + vds/ro</code>
+        </div>
+      </div>
+    </section>
+
+    <div class="next-topic">
+      <strong>Next topic:</strong> Once these fundamentals are comfortable, continue to
+      <a href="current-mirrors.html">Current Mirrors →</a>
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <div class="footer-navigation">
+      <a class="back-link" href="index.html">← Back to Home</a>
+
+      <button class="back-link back-to-top-link" id="back-to-top" type="button">
+        ↑ Top
+      </button>
+    </div>
+  </footer>
+
+  <button
+    class="back-to-top-float"
+    id="back-to-top-float"
+    type="button"
+    aria-label="Back to top"
+    title="Back to top"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 4h14"></path>
+      <path d="M12 20V7"></path>
+      <path d="m7.5 11.5 4.5-4.5 4.5 4.5"></path>
+    </svg>
+    <span class="back-to-top-float-label">Top</span>
+  </button>
+
+  <button
+    class="return-to-figure"
+    id="return-to-figure"
+    type="button"
+    aria-label="Return to the latest figure"
+    title="Return to the latest figure"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="5.5" width="17" height="14" rx="2"></rect>
+      <circle cx="8.25" cy="10" r="1.35"></circle>
+      <path d="M5.5 17l4.2-4.1 3.1 3 2.2-2.2 3.5 3.3"></path>
+      <path d="M12 2.75v5"></path>
+      <path d="M9.7 5.05 12 2.75l2.3 2.3"></path>
+    </svg>
+    <span class="return-to-figure-label" id="return-to-figure-label">Figure</span>
+  </button>
+
+  <script>
+    (() => {
+      const navLinks = document.querySelectorAll('.section-nav a[href^="#"]');
+      const figureFrames = Array.from(
+        document.querySelectorAll('.image-frame[id^="figure-"]')
+      );
+      const returnToFigureButton =
+        document.getElementById('return-to-figure');
+      const returnToFigureLabel =
+        document.getElementById('return-to-figure-label');
+      const backToTopFloatButton =
+        document.getElementById('back-to-top-float');
+
+      let activeAnimation = null;
+      let currentFigure = null;
+
+      function easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function scrollToSection(target) {
+        if (activeAnimation) {
+          cancelAnimationFrame(activeAnimation);
+          activeAnimation = null;
+        }
+
+        const scrollingElement =
+          document.scrollingElement || document.documentElement;
+
+        const startY = scrollingElement.scrollTop;
+        const targetRect = target.getBoundingClientRect();
+        const desiredY = Math.max(0, startY + targetRect.top - 20);
+        const distance = desiredY - startY;
+        const duration = Math.min(
+          1400,
+          Math.max(700, 650 + Math.abs(distance) * 0.35)
+        );
+        const startTime = performance.now();
+
+        function animate(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easedProgress = easeInOutCubic(progress);
+
+          scrollingElement.scrollTop = startY + distance * easedProgress;
+
+          if (progress < 1) {
+            activeAnimation = requestAnimationFrame(animate);
+          } else {
+            activeAnimation = null;
+            if (target.id) {
+              history.pushState(null, '', `#${target.id}`);
+            }
+          }
+        }
+
+        activeAnimation = requestAnimationFrame(animate);
+      }
+
+      navLinks.forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const targetId = link.getAttribute('href').slice(1);
+          const target = document.getElementById(targetId);
+
+          if (!target) return;
+
+          event.preventDefault();
+          scrollToSection(target);
+        });
+      });
+
+
+      function updateReturnToFigureButton() {
+        const referenceLine = 90;
+        let latestPassedFigure = null;
+
+        figureFrames.forEach((figure) => {
+          const rect = figure.getBoundingClientRect();
+
+          if (rect.top <= referenceLine) {
+            latestPassedFigure = figure;
+          }
+        });
+
+        currentFigure = latestPassedFigure;
+
+        if (!currentFigure) {
+          returnToFigureButton.classList.remove('is-visible');
+          return;
+        }
+
+        const currentRect = currentFigure.getBoundingClientRect();
+        const imageHasLeftViewport = currentRect.bottom < referenceLine;
+
+        returnToFigureButton.classList.toggle(
+          'is-visible',
+          imageHasLeftViewport
+        );
+
+        const image = currentFigure.querySelector('img');
+        const label = image?.alt || 'latest figure';
+        const figureNameMap = {
+          'figure-1': 'Figure 1',
+          'figure-2': 'Figure 2',
+          'figure-3': 'Figure 3',
+          'figure-4': 'Figure 4',
+          'figure-5': 'Figure 5',
+          'figure-6': 'Figure 6'
+        };
+        const shortLabel =
+          figureNameMap[currentFigure.id] || 'Figure';
+
+        returnToFigureLabel.textContent = shortLabel;
+
+        returnToFigureButton.setAttribute(
+          'aria-label',
+          `Return to ${label}`
+        );
+        returnToFigureButton.setAttribute(
+          'title',
+          `Return to ${label}`
+        );
+      }
+
+      function updateBackToTopButton() {
+        const scrollingElement =
+          document.scrollingElement || document.documentElement;
+        backToTopFloatButton.classList.toggle(
+          'is-visible',
+          scrollingElement.scrollTop > 320
+        );
+      }
+
+      backToTopFloatButton.addEventListener('click', () => {
+        scrollToSection(document.body);
+      });
+
+      returnToFigureButton.addEventListener('click', () => {
+        if (currentFigure) {
+          scrollToSection(currentFigure);
+        }
+      });
+
+      window.addEventListener('scroll', updateReturnToFigureButton, {
+        passive: true
+      });
+      window.addEventListener('scroll', updateBackToTopButton, {
+        passive: true
+      });
+      window.addEventListener('resize', updateReturnToFigureButton);
+      updateReturnToFigureButton();
+      updateBackToTopButton();
+
+      const backToTopButton = document.getElementById('back-to-top');
+
+      backToTopButton?.addEventListener('click', () => {
+        scrollToSection(document.body);
+      });
+    })();
+  </script>
+
+</body>
+</html>
