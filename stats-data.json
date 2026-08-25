@@ -12,18 +12,18 @@
   "current": {
     "month": "2026-08",
     "start_date": "2026-08-01",
-    "end_date": "2026-08-24",
-    "users": 21,
-    "sessions": 42,
-    "views": 103
+    "end_date": "2026-08-25",
+    "users": 23,
+    "sessions": 45,
+    "views": 108
   },
   "comparison": {
     "month": "2026-07",
     "start_date": "2026-07-01",
-    "end_date": "2026-07-24",
+    "end_date": "2026-07-25",
     "users": 0,
     "sessions": 0,
     "views": 0
   },
-  "updated_at": "2026-08-25T02:25:39+08:00"
+  "updated_at": "2026-08-26T02:24:32+08:00"
 }
