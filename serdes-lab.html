@@ -1,0 +1,1617 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SerDes Lab · 3‑Tap / 5‑Tap FFE Equalization｜3/5-Tap FFE 互動練習</title>
+<meta name="description" content="Interactive SerDes 3-tap and 5-tap TX FFE equalization lab with zero-forcing, ISI, cursor response, eye diagram, NRZ pattern runner, slicer thresholds, and bilingual English/Traditional Chinese explanations.">
+<meta name="keywords" content="SerDes FFE, TX FFE, 3-tap FFE, 5-tap FFE, feed-forward equalizer, zero forcing, ISI, eye diagram, channel pulse response, cursor response, precursor, postcursor, NRZ, slicer threshold, SerDes 教學, 前饋等化器, 零強迫等化, 眼圖, 符碼間干擾">
+<meta property="og:title" content="SerDes 3-Tap / 5-Tap FFE Interactive Lab｜互動式 FFE 練習">
+<meta property="og:description" content="Practice TX FFE, zero-forcing, ISI, cursor response, eye diagrams, and slicer decisions in one bilingual interactive lab.">
+<style>
+:root{
+  --bg:#061019;--panel:#0c1822;--panel2:#071019;--line:#1e303d;
+  --text:#e9f3f8;--muted:#91a7b7;--green:#67ff83;--cyan:#5be7ff;
+  --blue:#73a7ff;--amber:#ffc85a;--purple:#c493ff;--red:#ff7580
+}
+*{box-sizing:border-box}
+body{
+  margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(91,231,255,.09),transparent 30rem),
+    radial-gradient(circle at 86% 8%,rgba(103,255,131,.05),transparent 28rem),
+    linear-gradient(180deg,#061019,#08141e 58%,#061019)
+}
+.wrap{max-width:1240px;margin:auto;padding:22px}
+.badge{display:inline-block;padding:5px 9px;border:1px solid #294354;border-radius:999px;color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+h1{margin:0;font-size:clamp(30px,4vw,50px);letter-spacing:-.035em}
+.sub{color:var(--muted);line-height:1.5;margin:8px 0 8px}
+.labGoals{
+  margin:0 0 18px;padding-left:20px;color:#cbd8e0;font-size:13px;line-height:1.55
+}
+.labGoals li{margin:3px 0}
+.labGoals b{color:var(--cyan)}
+
+.utilityNav{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px
+}
+.utilityLink,.pageTopLink{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:38px;padding:8px 12px;border:1px solid #2b4150;border-radius:10px;
+  background:#0e202c;color:#dff6ff;text-decoration:none;font-size:12px;font-weight:800;
+  box-shadow:0 6px 18px rgba(0,0,0,.14);transition:filter .16s ease,transform .16s ease,border-color .16s ease
+}
+.utilityLink:hover,.utilityLink:focus-visible,.pageTopLink:hover,.pageTopLink:focus-visible{
+  filter:brightness(1.12);transform:translateY(-1px);border-color:#416276;outline:none;text-decoration:none
+}
+.utilityIcon,.pageTopIcon{color:var(--cyan);font-size:15px;line-height:1}
+.pageBottomNav{display:flex;justify-content:center;margin:18px 0 4px}
+
+.labNav{
+  display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px
+}
+.labNav a{
+  text-decoration:none;border:1px solid #2b4150;border-radius:999px;
+  padding:7px 12px;color:#dff6ff;background:#0e202c;font-size:12px;font-weight:800
+}
+.labNav a.active{background:#173626;border-color:#3c9c58;color:#c0ffca}
+.labNav a:hover{filter:brightness(1.12)}
+.topbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+button{
+  border:1px solid #2b4150;border-radius:10px;background:#102330;color:#dff6ff;
+  padding:9px 12px;font-weight:760;cursor:pointer
+}
+button.active{background:#173626;border-color:#3c9c58;color:#c0ffca}
+button:hover{filter:brightness(1.12)}
+
+.nudgePair{display:inline-flex;gap:4px;align-items:center;justify-content:center}
+.nudgeBtn{
+  width:29px;height:29px;padding:0;border-radius:8px;font-size:16px;line-height:1;
+  display:inline-grid;place-items:center;background:#0b1d29;color:#dff6ff;border:1px solid #2b4150;
+  font-variant-numeric:tabular-nums
+}
+.nudgeBtn:active{transform:translateY(1px)}
+
+.primary{background:#143b24;border-color:#31884a;color:#baffc4}
+.grid{display:grid;grid-template-columns:1.62fr .63fr;gap:16px}
+.stack{display:grid;gap:16px}
+.card{
+  background:linear-gradient(180deg,rgba(16,29,41,.96),rgba(8,17,26,.96));
+  border:1px solid var(--line);border-radius:18px;padding:16px;
+  box-shadow:0 18px 45px rgba(0,0,0,.22)
+}
+.card h2{font-size:18px;margin:0 0 5px}
+.hint{font-size:13px;color:var(--muted);line-height:1.5}
+canvas{
+  width:100%;height:300px;display:block;margin-top:12px;border-radius:13px;border:1px solid #172631;
+  background:
+    linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px),
+    #050b11;
+  background-size:28px 28px
+}
+.eyes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.eyeBox h3{font-size:13px;margin:0 0 6px;color:#cbd8e0}
+.eyeBox canvas{height:290px;margin:0}
+.controls{display:grid;gap:14px;margin-top:14px}
+.row{display:grid;grid-template-columns:84px minmax(120px,1.35fr) auto 68px;gap:8px;align-items:center}
+.row label{font-size:13px;color:#cedae2}
+input[type=range]{width:100%;accent-color:var(--green)}
+input[type=number]{
+  width:68px;padding:8px;border-radius:9px;background:#071019;color:var(--text);
+  border:1px solid #2a3b48;text-align:right
+}
+.buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.scorebox{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-top:14px;border-top:1px solid #20313e;padding-top:14px}
+.score{font-size:42px;font-weight:850;line-height:1}
+.quality{font-size:13px;font-weight:850}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.metric{background:#071019;border:1px solid #182631;border-radius:11px;padding:10px}
+.metric span{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}
+.metric strong{font-variant-numeric:tabular-nums}
+.formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#071019;border:1px solid #172530;padding:10px;border-radius:10px;color:#bceaff;margin-top:11px;overflow:auto;font-size:13px}
+.channel-edit{display:grid;grid-template-columns:repeat(5,minmax(88px,1fr));gap:10px;margin-top:12px}
+.channel-edit div{text-align:center}.channel-edit small{display:block;color:var(--muted);margin-bottom:4px}
+.channel-edit input{width:100%;text-align:center}
+.options{display:grid;gap:11px;margin-top:13px;padding-top:13px;border-top:1px solid #20313e}
+.optionLine{display:flex;gap:12px;justify-content:space-between;align-items:center}
+.optionLine label{font-size:13px;color:#d2dee5}
+.persist{display:grid;grid-template-columns:minmax(120px,1fr) auto 70px;gap:8px;align-items:center}
+.persist output{font-size:12px;color:var(--cyan);text-align:right;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:12px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}
+
+#contribCanvas{height:190px}
+#pulseCanvas{height:180px}
+#contribSection{display:none}
+
+.runnerHead{
+  display:grid;
+  grid-template-columns:minmax(260px,1fr) auto auto auto;
+  gap:10px;
+  align-items:end;
+  margin-top:12px
+}
+.runnerField{display:grid;gap:5px;min-width:250px}
+.runnerField label{font-size:11px;color:var(--muted)}
+.runnerField label .miniNote{color:var(--cyan);font-weight:700}
+.runnerField input[type=text]{
+  background:#071019;color:var(--text);border:1px solid #2a3b48;border-radius:9px;
+  padding:9px 11px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  letter-spacing:.18em;font-weight:800
+}
+#patternCanvas{height:520px}
+.runnerLegend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:12px}
+.runnerStatus{
+  grid-column:1 / -1;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  min-width:0;margin-left:0;text-align:left;
+  padding:9px 12px;border-radius:10px;border:1px solid #213845;background:#071019;color:#dff6ff
+}
+.runnerStatus .mode{font-size:11px;color:var(--cyan);font-weight:800}
+.runnerStatus .line{font-size:12px;color:#d8edf7;line-height:1.35}
+.runnerCheck{
+  display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;margin:0;
+  padding:8px 10px;border-radius:10px;border:1px solid #223744;background:#071019;
+  color:#cddae2;font-size:12px;line-height:1.45
+}
+.runnerCheck b{color:var(--cyan)}
+
+.thresholdControls{
+  display:grid;grid-template-columns:auto minmax(120px,1fr) auto 76px;gap:6px 8px;align-items:center;min-width:340px;flex:1
+}
+.thresholdControls label{font-weight:800;color:#dff6ff;font-size:12px}
+.thresholdControls input[type=range]{width:100%;accent-color:#5be7ff}
+.thresholdControls input[type=number]{
+  width:76px;background:#071019;color:var(--text);border:1px solid #2a3b48;border-radius:8px;
+  padding:6px 7px;font-variant-numeric:tabular-nums
+}
+.thresholdRule{flex-basis:100%;color:#cddae2}
+
+
+.runnerInfoGrid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 8px;align-items:stretch
+}
+.runnerInfoGrid .runnerCheck,.runnerInfoGrid .runnerSummary{height:100%}
+.runnerSummary{
+  margin:0;padding:8px 12px;border-radius:10px;border:1px solid #223744;background:#071019;
+  color:#cddae2;font-size:12px;line-height:1.45
+}
+.runnerSummary b,.runnerSummary code{color:var(--cyan)}
+@media(max-width:900px){
+  .runnerHead{grid-template-columns:1fr 1fr}
+  .runnerStatus{grid-column:1 / -1}
+}
+@media(max-width:760px){
+  .runnerHead{grid-template-columns:1fr}
+  .runnerInfoGrid{grid-template-columns:1fr}
+}
+
+.lesson{margin-top:16px;padding:14px 16px;border:1px solid #26384a;border-radius:14px;background:rgba(8,18,28,.82);color:#c9d8e2;line-height:1.65;font-size:14px}
+
+.calcToggle{
+  width:100%;margin-top:14px;display:flex;justify-content:space-between;align-items:center;
+  text-align:left;background:#0c1c28;border:1px solid #294252;color:#dff6ff;
+}
+.calcToggle .chev{transition:transform .18s ease;color:var(--cyan)}
+.calcToggle.open .chev{transform:rotate(180deg)}
+.calcDetails{
+  display:none;margin-top:10px;padding:14px;border:1px solid #223744;border-radius:12px;
+  background:#071019;color:#d7e4eb
+}
+.calcDetails.open{display:block}
+.calcDetails h3{font-size:14px;margin:14px 0 7px;color:#f1f8fb}
+.calcDetails h3:first-child{margin-top:0}
+.mathBlock{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  white-space:pre-wrap;overflow:auto;background:#050b11;border:1px solid #182a35;
+  border-radius:10px;padding:11px;margin-top:7px;color:#c8efff;line-height:1.55;font-size:12.5px
+}
+.eqRows{display:grid;gap:7px;margin-top:8px}
+.eqRow{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  background:#09141d;border:1px solid #1b303d;border-radius:9px;padding:9px 10px;
+  color:#dce9ef;font-size:12.5px;overflow:auto
+}
+.eqRow b{color:#9effae}
+.scoreNote{
+  margin:10px 0 12px;padding:10px 12px;border-radius:10px;background:#071019;border:1px solid #203746;
+  color:#cddae2;font-size:12px;line-height:1.45
+}
+.scoreNote b,.scoreNote code{color:var(--cyan)}
+.calcGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.calcMini{
+  background:#09141d;border:1px solid #1b303d;border-radius:9px;padding:9px 10px;
+  font-size:12px;color:#cbd9e1
+}
+.calcMini span{display:block;color:var(--muted);font-size:10.5px;margin-bottom:4px}
+@media(max-width:620px){.calcGrid{grid-template-columns:1fr}}
+
+#celebrate{pointer-events:none;position:fixed;inset:0;display:grid;place-items:center;z-index:20;opacity:0;transition:opacity .15s}
+#celebrate.show{opacity:1}
+#celebrate div{padding:18px 24px;border-radius:16px;border:1px solid #47be69;background:rgba(6,19,12,.94);color:#baffc8;font-size:clamp(22px,4vw,42px);font-weight:900;box-shadow:0 0 60px rgba(105,255,136,.22)}
+
+.tapModeBtn{border-radius:999px}
+.outerTapRow,.outerTapMetric{transition:opacity .15s ease}
+body[data-tap-mode="3tap"] .outerTapRow,body[data-tap-mode="3tap"] .outerTapMetric{display:none}
+body[data-tap-mode="3tap"] #ffeMetrics{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
+.keywordCard{margin-top:16px}
+.keywordList{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.keywordList code{padding:6px 9px;border-radius:999px;background:#071019;border:1px solid #294252;color:#bceaff;font-size:12px}
+.zhInline{color:#a9bac5;font-weight:600}
+
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+@media(max-width:620px){
+  .wrap{padding:12px}.card{padding:12px}.eyes{grid-template-columns:1fr}.eyeBox canvas{height:260px}
+  .row{grid-template-columns:78px minmax(100px,1fr) auto 64px}.metrics{grid-template-columns:1fr}
+  .channel-edit{grid-template-columns:repeat(5,minmax(88px,1fr));overflow:auto}
+}
+</style>
+</head>
+<body id="top">
+<div id="celebrate"><div>ZERO FORCING ACHIEVED ✓｜符合零強迫目標</div></div>
+
+<div class="wrap">
+  <nav class="utilityNav" aria-label="Lab navigation｜實驗室導覽">
+    <a class="utilityLink" href="index.html" aria-label="Home｜回首頁">
+      <span class="utilityIcon" aria-hidden="true">⌂</span>
+      <span>Home｜回首頁</span>
+    </a>
+  </nav>
+
+  <div class="badge">Analog Playground · SerDes Lab｜SerDes 互動實驗室</div>
+  <h1>SerDes Lab · 3‑Tap / 5‑Tap FFE Equalization｜3/5-Tap FFE 等化練習</h1>
+  <p class="sub">
+    Switch between 3‑tap and 5‑tap TX FFE in the same lab while keeping the same channel, bit pattern, slicer thresholds, and eye settings.｜
+    可在同一頁切換 3‑tap 與 5‑tap TX FFE，並保留相同的通道、位元序列、判決臨界值與眼圖設定，方便直接比較。
+  </p>
+  <ul class="labGoals">
+    <li><b>1. See what the channel does｜觀察通道影響：</b> start from ideal NRZ bits and observe how the channel creates ISI, waveform distortion, and eye closure.｜從理想 NRZ 位元開始，觀察通道造成的 ISI、波形失真與眼圖閉合。</li>
+    <li><b>2. Compare 3‑tap and 5‑tap FFE｜比較 3/5‑tap FFE：</b> use the same channel to see how extra precursor / postcursor taps extend ISI cancellation range.｜固定同一組通道，比較增加前游標 / 後游標 tap 後可補償的 ISI 範圍。</li>
+    <li><b>3. Check receiver decisions｜檢查接收端判決：</b> inspect sampling points, adjust Vth_H / Vth_L, compare slicer decisions, and search for the worst‑case bit pattern.｜查看取樣點、調整 Vth_H / Vth_L、比較 slicer 判決結果，並搜尋 worst-case 位元序列。</li>
+  </ul>
+
+  <div class="labNav" aria-label="3-tap / 5-tap FFE mode switch｜FFE 模式切換">
+    <button id="mode3Btn" class="tapModeBtn active" data-tap-mode="3tap">3‑Tap FFE</button>
+    <button id="mode5Btn" class="tapModeBtn" data-tap-mode="5tap">5‑Tap FFE</button>
+  </div>
+
+  <div class="topbar">
+    <button class="level active" data-level="easy">Level 1 · Easy｜基礎</button>
+    <button class="level" data-level="notebook">Level 2 · Practice｜練習</button>
+    <button class="level" data-level="hard">Level 3 · Hard｜進階</button>
+    <button id="randomBtn">Random Channel｜隨機通道</button>
+  </div>
+
+  <div class="grid">
+    <div class="stack">
+      <section class="card">
+        <h2>Pulse Response + Cursor Values｜脈衝響應與游標取樣值</h2>
+        <div class="hint">Blue = sampled channel response. Green = combined FFE + channel response. Channel sample values are written on the plot.｜藍色為通道脈衝響應取樣值；綠色為 FFE 與通道卷積後的等化脈衝響應；各取樣值標示於圖中。</div>
+        <canvas id="pulseCanvas"></canvas>
+        <div class="legend">
+          <span><i class="dot" style="background:#73a7ff"></i>Channel｜通道</span>
+          <span><i class="dot" style="background:#67ff83"></i>Equalized｜等化後</span>
+          <span><i class="dot" style="background:#ffc85a"></i>ZF target｜零強迫目標</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Channel Cursor Model｜通道游標模型</h2>
+        <div class="hint">x[0] is the main cursor. Edit any cursor and the challenge updates immediately.｜x[0] 為主游標；修改任一游標取樣值後，結果會立即更新。</div>
+        <div class="channel-edit">
+          <div><small>x[−1]</small><input data-ch="0" type="number" step="0.01"></div>
+          <div><small>x[0]</small><input data-ch="1" type="number" step="0.01"></div>
+          <div><small>x[+1]</small><input data-ch="2" type="number" step="0.01"></div>
+          <div><small>x[+2]</small><input data-ch="3" type="number" step="0.01"></div>
+          <div><small>x[+3]</small><input data-ch="4" type="number" step="0.01"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Before / After Eye Diagram｜FFE 前後眼圖</h2>
+        <div class="hint">Both plots use the Canvas waveform engine. The center dashed line is the selected sampling phase; trajectory and mask can be toggled independently.｜兩張眼圖使用相同波形模型；中央虛線表示目前取樣相位，ideal eye trajectory 與 eye mask 可個別顯示或隱藏。</div>
+        <div class="eyes">
+          <div class="eyeBox"><h3 id="beforeEyeTitle">Before FFE · bypass [0, 1, 0]｜FFE 前</h3><canvas id="eyeBefore"></canvas></div>
+          <div class="eyeBox"><h3>After FFE · your taps｜FFE 後 · 目前 tap 係數</h3><canvas id="eyeAfter"></canvas></div>
+        </div>
+        <div class="options">
+          <div class="optionLine">
+            <label><input id="trajectoryToggle" type="checkbox" checked> Show ideal eye trajectory｜顯示理想眼圖軌跡</label>
+            <label><input id="eyeMaskToggle" type="checkbox" checked> Show eye mask｜顯示 eye mask</label>
+          </div>
+          <div class="optionLine">
+            <label><input id="pauseToggle" type="checkbox"> Pause animation｜暫停動畫</label>
+            <button id="autoCenterBtn" class="primary">Auto Center Eye｜自動置中眼圖</button>
+          </div>
+
+          <div>
+            <div class="optionLine" style="margin-bottom:6px">
+              <label>Eye phase / sampling phase｜Eye phase / 取樣相位</label>
+              <output id="eyePhaseOut" style="font-size:12px;color:var(--cyan);font-variant-numeric:tabular-nums">0.00 UI</output>
+            </div>
+            <div class="persist">
+              <input id="eyePhaseRange" type="range" min="0" max="0.999" step="0.01" value="0">
+              <output style="color:var(--muted)">0 → 1 UI</output>
+            </div>
+          </div>
+
+          <div>
+            <div class="optionLine" style="margin-bottom:6px">
+              <label>Waveform persistence｜波形餘暉</label>
+              <output id="persistOut" style="font-size:12px;color:var(--cyan);font-variant-numeric:tabular-nums">1.5 s</output>
+            </div>
+            <div class="persist">
+              <input id="persistRange" type="range" min="0.10" max="5.00" step="0.1" value="1.5">
+              <output style="color:var(--muted)">0.1 → 5 s</output>
+            </div>
+          </div>
+
+          <div class="hint">
+            Eye phase shifts the folding trigger within one UI. <b>Auto Center Eye</b> searches for the phase with the largest average sampled amplitude, then places that optimum sampling instant on the center dashed line.｜
+            Eye phase 會在 1 UI 內改變 folding phase；<b>Auto Center Eye</b> 會搜尋平均取樣振幅最大的相位，再將最佳取樣時刻對齊中央虛線。
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Bit Pattern Runner</h2>
+        <div id="runnerHint" class="hint">
+          Choose a data pattern, tune the 3‑tap FFE, and watch the signal propagate from NRZ input → TX pre‑emphasis → channel → far‑end sampling → slicer decision.｜選擇位元序列、調整 3‑tap FFE，觀察訊號依序經過 NRZ 輸入 → TX 預加重 → 通道 → 接收端取樣 → slicer 判決。
+        </div>
+
+        <div class="runnerHead">
+          <div class="runnerField">
+            <label>Bit pattern｜位元序列 <span class="miniNote">(max 16 bits｜最多 16 位元)</span></label>
+            <input id="bitPatternInput" type="text" inputmode="numeric" value="10110100" maxlength="16">
+          </div>
+          <button id="runPatternBtn" class="primary">Replay｜重播</button>
+          <button id="findWorstBtn">Find Worst Case (8-bit)｜搜尋 worst-case 序列</button>
+          <button id="patternPauseBtn">Pause｜暫停</button>
+          <div id="runnerStatus" class="runnerStatus">
+            <div id="runnerMode" class="mode">Pattern source: User input｜序列來源：自訂輸入</div>
+            <div id="runnerStatusLine" class="line">Bit 1 of 8 · Input 1 · Slicer decision 1 · Current bit OK · Errors 0/8｜第 1/8 位元 · 輸入 1 · 判決 1 · 正確 · 錯誤 0/8</div>
+          </div>
+        </div>
+
+        <div class="runnerInfoGrid">
+          <div id="runnerCheck" class="runnerCheck">
+            <span><b>Decision thresholds｜判決臨界值</b></span>
+            <div class="thresholdControls">
+              <label for="vthHRange">Vth_H</label>
+              <input id="vthHRange" type="range" min="-1.50" max="1.50" step="0.01" value="0.70">
+              <input id="vthHNum" type="number" min="-1.50" max="1.50" step="0.01" value="0.70">
+
+              <label for="vthLRange">Vth_L</label>
+              <input id="vthLRange" type="range" min="-1.50" max="1.50" step="0.01" value="0.30">
+              <input id="vthLNum" type="number" min="-1.50" max="1.50" step="0.01" value="0.30">
+            </div>
+            <span id="thresholdRuleText" class="thresholdRule">
+              Rule: sample ≥ Vth_H → 1, sample ≤ Vth_L → 0, otherwise hold previous decision｜規則：取樣值 ≥ Vth_H 判 1；≤ Vth_L 判 0；介於兩者之間時維持前一次判決
+            </span>
+          </div>
+          <div id="runnerSummary" class="runnerSummary">
+            <b>Worst-case search｜worst-case 搜尋</b>: uses the current input length (up to 16 bits), brute-forces all <code>2^N</code> patterns, and automatically loads the pattern with the worst decoding margin into the runner.｜依目前輸入長度（最多 16 位元）窮舉全部 <code>2^N</code> 組位元序列，並自動載入判決裕量最小的序列。
+          </div>
+        </div>
+
+        <canvas id="patternCanvas"></canvas>
+        <div class="runnerLegend">
+          <span><i class="dot" style="background:#73a7ff"></i>Input NRZ｜NRZ 輸入</span>
+          <span><i class="dot" style="background:#c493ff"></i>TX FFE pre‑emphasis｜TX FFE 預加重</span>
+          <span><i class="dot" style="background:#67ff83"></i>Far‑end after channel｜通道後接收端波形</span>
+          <span><i class="dot" style="background:#6fe5ff"></i>Slicer / decision output｜Slicer / 判決輸出</span>
+          <span><i class="dot" style="background:#ff7580"></i>Error bit｜錯誤位元</span>
+          <span><i class="dot" style="background:#ffc85a"></i>Running time cursor｜目前時間位置</span>
+        </div>
+      </section>
+
+      <section id="contribSection" class="card">
+        <h2 id="contribTitle">How the 3 Taps Contribute｜3 個 tap 的加權響應</h2>
+        <div id="contribHint" class="hint">Only the active weighted, shifted channel responses are shown. The final summed response is displayed in the Pulse Response plot above.｜僅顯示有效 tap 經加權與位移後的通道響應；所有 tap 的加總結果顯示於上方 Pulse Response。</div>
+        <canvas id="contribCanvas"></canvas>
+        <div class="optionLine" style="margin-top:10px">
+          <label><input id="animateContrib" type="checkbox" checked> Animate highlighted tap｜逐一標示 tap</label>
+          <span id="contribName" class="hint">α−1 · x[k+1]</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="stack">
+      <section class="card">
+        <h2>FFE Controls｜FFE tap 係數</h2>
+        <div id="ffeHint" class="hint">Tune three coefficients until y[−1] ≈ 0, y[0] ≈ 1, y[+1] ≈ 0. Open Calculation Details to see the 3×3 zero‑forcing derivation.｜調整三個 tap 係數，使 y[−1]、y[+1] 接近 0 且 y[0] 接近 1；展開 Calculation Details 可查看 3×3 零強迫解法。</div>
+        <div class="controls">
+          <div class="row outerTapRow">
+            <label>Pre2 α<sub>−2</sub></label>
+            <input id="pre2Range" type="range" min="-1.2" max="1.2" step="0.001" value="0">
+            <input id="pre2Num" type="number" min="-2" max="2" step="0.001" value="0">
+          </div>
+          <div class="row">
+            <label>Pre1 α<sub>−1</sub></label>
+            <input id="pre1Range" type="range" min="-1.2" max="1.2" step="0.001" value="0">
+            <input id="pre1Num" type="number" min="-2" max="2" step="0.001" value="0">
+          </div>
+          <div class="row">
+            <label>Main α<sub>0</sub></label>
+            <input id="mainRange" type="range" min="0" max="2.5" step="0.001" value="1">
+            <input id="mainNum" type="number" min="-2" max="3" step="0.001" value="1">
+          </div>
+          <div class="row">
+            <label>Post1 α<sub>1</sub></label>
+            <input id="post1Range" type="range" min="-1.2" max="1.2" step="0.001" value="0">
+            <input id="post1Num" type="number" min="-2" max="2" step="0.001" value="0">
+          </div>
+          <div class="row outerTapRow">
+            <label>Post2 α<sub>2</sub></label>
+            <input id="post2Range" type="range" min="-1.2" max="1.2" step="0.001" value="0">
+            <input id="post2Num" type="number" min="-2" max="2" step="0.001" value="0">
+          </div>
+        </div>
+        <div class="buttons">
+          <button id="resetBtn">Reset / Bypass｜重設 / 旁路</button>
+          <button id="solveBtn" class="primary">Show ZF Solution｜顯示零強迫解</button>
+        </div>
+        <div class="scorebox">
+          <div><div class="hint">Zero‑forcing score｜零強迫分數</div><div id="score" class="score">0</div></div>
+          <div id="quality" class="quality">TRY IT｜開始調整</div>
+        </div>
+        <div class="scoreNote">
+          A low ZF score does <b>not</b> always mean bit errors. The score checks whether the sampled pulse response is close to <code id="scoreTarget">[0, 1, 0]</code>. The runner tests a finite bit pattern without noise, so residual ISI may still decode correctly.｜ZF 分數低不代表一定會發生位元錯誤；此分數用來衡量取樣後的脈衝響應與目標向量的距離。Bit Pattern Runner 僅測試有限長度且未加入雜訊，因此即使仍有殘餘 ISI，也可能正確判決。
+        </div>
+        <div id="ffeMetrics" class="metrics" style="grid-template-columns:repeat(5,minmax(0,1fr));gap:8px">
+          <div class="metric outerTapMetric"><span>y[−2]</span><strong id="ym2">—</strong></div>
+          <div class="metric"><span>y[−1]</span><strong id="ym1">—</strong></div>
+          <div class="metric"><span>y[0]</span><strong id="y0">—</strong></div>
+          <div class="metric"><span>y[+1]</span><strong id="yp1">—</strong></div>
+          <div class="metric outerTapMetric"><span>y[+2]</span><strong id="yp2">—</strong></div>
+        </div>
+        
+        <div id="formula" class="formula"></div>
+
+        <button id="calcToggle" class="calcToggle">
+          <span>Calculation Details｜計算細節</span>
+          <span class="chev">▼</span>
+        </button>
+
+        <div id="calcDetails" class="calcDetails">
+          <h3>1. Zero‑Forcing Target｜零強迫目標</h3>
+          <div id="calcTarget" class="mathBlock"></div>
+
+          <h3 id="calcEqTitle">2. Three Sample Equations｜三個取樣方程式</h3>
+          <div id="calcEquations" class="eqRows"></div>
+
+          <h3 id="calcMatrixTitle">3. 3×3 Matrix Form｜3×3 矩陣表示</h3>
+          <div id="calcMatrix" class="mathBlock"></div>
+
+          <h3>4. Zero‑Forcing Solution｜零強迫解</h3>
+          <div id="calcSolution" class="mathBlock"></div>
+
+          <h3 id="calcVerifyTitle">5. Verify y[−1], y[0], y[+1]｜驗證取樣值</h3>
+          <div id="calcVerify" class="eqRows"></div>
+
+          <div class="calcGrid">
+            <div class="calcMini"><span>Target vector｜目標向量</span><b id="targetVector">[0, 1, 0]ᵀ</b></div>
+            <div class="calcMini"><span>Interpretation｜物理意義</span><b id="targetInterpretation">Cancel adjacent ISI cursors｜消除相鄰游標的 ISI</b></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="lessonText" class="lesson">
+    <b>Signal chain｜訊號鏈：</b> NRZ bits (try 10110100) → TX 3‑tap FFE → sampled channel pulse response → far‑end waveform → eye diagram.｜NRZ 位元（可試 10110100）→ TX 3‑tap FFE → 通道脈衝響應取樣值 → 接收端波形 → 眼圖。
+    The lab is intentionally lightweight for learning, but the FFE / channel relationship follows the same convolution idea used in SerDes equalization.｜本頁以教學與直覺建立為主，但 FFE 與通道之間仍採用 SerDes 等化中相同的卷積關係。
+  </div>
+
+  <section class="card keywordCard">
+    <h2>Google Search Keywords｜Google 搜尋關鍵字</h2>
+    <div class="hint">Use these English terms to find textbooks, papers, application notes, and interview material.｜建議優先使用下列英文關鍵字搜尋教材、論文、application notes 與面試資料。</div>
+    <div class="keywordList">
+      <code>SerDes FFE</code><code>TX FFE equalization</code><code>3-tap FFE</code><code>5-tap FFE</code>
+      <code>feed-forward equalizer</code><code>FFE zero forcing</code><code>precursor postcursor ISI</code>
+      <code>channel pulse response cursor</code><code>SerDes eye diagram</code><code>NRZ equalization</code>
+      <code>slicer threshold SerDes</code><code>FFE tap coefficient</code><code>residual ISI</code>
+    </div>
+  </section>
+
+  <nav class="pageBottomNav" aria-label="Page shortcuts｜頁面快捷鍵">
+    <a class="pageTopLink" href="#top" aria-label="Top｜回到頂端">
+      <span class="pageTopIcon" aria-hidden="true">↑</span>
+      <span>Top｜回到頂端</span>
+    </a>
+  </nav>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const presets = {
+    easy:[0.08,0.95,-0.12,0.03,0.00],
+    notebook:[0.14,0.90,-0.18,0.07,-0.03],
+    hard:[0.26,0.74,-0.30,0.16,-0.07]
+  };
+  let ch=[...presets.easy];
+  let lastScore=0,paused=false,phase=0,lastAnim=0,contribPhase=0;
+  let tapMode='3tap';
+  let tapMemory={tap3:[0,1,0],tap5:[0,0,1,0,0]};
+
+  const pre2R=$('pre2Range'),pre1R=$('pre1Range'),mainR=$('mainRange'),post1R=$('post1Range'),post2R=$('post2Range');
+  const pre2N=$('pre2Num'),pre1N=$('pre1Num'),mainN=$('mainNum'),post1N=$('post1Num'),post2N=$('post2Num');
+  const TAP_SHIFTS=[-2,-1,0,1,2];
+  const pc=$('pulseCanvas'),pctx=pc.getContext('2d');
+  const cc=$('contribCanvas'),cctx=cc ? cc.getContext('2d') : null;
+  const eb=$('eyeBefore'),eba=eb.getContext('2d');
+  const ea=$('eyeAfter'),eaa=ea.getContext('2d');
+  const patternCanvas=$('patternCanvas'),patternCtx=patternCanvas.getContext('2d');
+  const vthHR=$('vthHRange'),vthHN=$('vthHNum'),vthLR=$('vthLRange'),vthLN=$('vthLNum');
+  let runnerStart=performance.now(),runnerPaused=false,runnerPauseAt=0,runnerFinished=false;
+  let runnerMode='User pattern';
+  let lastWorstCaseInfo=null;
+  let VTH_H=0.70, VTH_L=0.30;
+
+
+
+  function setThresholds(h,l,source=''){
+    h=Math.max(-1.5,Math.min(1.5,+h));
+    l=Math.max(-1.5,Math.min(1.5,+l));
+
+    // Keep a small dead-zone so the two thresholds cannot cross.
+    const minGap=0.05;
+    if(h < l + minGap){
+      if(source==='H') h=l+minGap;
+      else if(source==='L') l=h-minGap;
+      else {
+        const mid=(h+l)/2;
+        h=mid+minGap/2;
+        l=mid-minGap/2;
+      }
+    }
+
+    h=Math.min(1.5,h);
+    l=Math.max(-1.5,l);
+    VTH_H=h;
+    VTH_L=l;
+
+    vthHR.value=h.toFixed(2);
+    vthHN.value=h.toFixed(2);
+    vthLR.value=l.toFixed(2);
+    vthLN.value=l.toFixed(2);
+
+    if(lastWorstCaseInfo){
+      // Threshold changes invalidate the previous worst-case result.
+      lastWorstCaseInfo=null;
+      runnerMode='User pattern';
+      updateWorstSummary(null);
+    }
+  }
+
+  vthHR.oninput=()=>{setThresholds(vthHR.value,VTH_L,'H');};
+  vthHN.oninput=()=>{setThresholds(vthHN.value,VTH_L,'H');};
+  vthLR.oninput=()=>{setThresholds(VTH_H,vthLR.value,'L');};
+  vthLN.oninput=()=>{setThresholds(VTH_H,vthLN.value,'L');};
+
+
+  function stepDecimals(stepText){
+    const s=String(stepText||'1').toLowerCase();
+    if(s.includes('e-')) return +(s.split('e-')[1]||0);
+    const p=s.indexOf('.');
+    return p<0?0:s.length-p-1;
+  }
+
+  function installRangeNudges(){
+    document.querySelectorAll('input[type=range]').forEach(r=>{
+      if(r.dataset.nudged==='1') return;
+      r.dataset.nudged='1';
+      const pair=document.createElement('span');
+      pair.className='nudgePair';
+      const dec=document.createElement('button');
+      const inc=document.createElement('button');
+      dec.type=inc.type='button';
+      dec.className=inc.className='nudgeBtn';
+      dec.textContent='−'; inc.textContent='+';
+      dec.title='Decrease by one displayed step｜減少一個步進值';
+      inc.title='Increase by one displayed step｜增加一個步進值';
+      const nudge=dir=>{
+        const step=parseFloat(r.step)||1;
+        const places=stepDecimals(r.step);
+        const lo=r.min===''?-Infinity:+r.min;
+        const hi=r.max===''? Infinity:+r.max;
+        let v=(parseFloat(r.value)||0)+dir*step;
+        v=Math.min(hi,Math.max(lo,v));
+        r.value=v.toFixed(places);
+        r.dispatchEvent(new Event('input',{bubbles:true}));
+      };
+      dec.addEventListener('click',()=>nudge(-1));
+      inc.addEventListener('click',()=>nudge(+1));
+      pair.append(dec,inc);
+      r.insertAdjacentElement('afterend',pair);
+    });
+  }
+
+  function fit(c){
+    const d=window.devicePixelRatio||1,r=c.getBoundingClientRect(),w=r.width,h=r.height;
+    const W=Math.max(10,Math.round(w*d)),H=Math.max(10,Math.round(h*d));
+    if(c.width!==W||c.height!==H){c.width=W;c.height=H}
+    const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);
+    return {w,h}
+  }
+
+  function taps(){
+    const a=[+pre2R.value,+pre1R.value,+mainR.value,+post1R.value,+post2R.value];
+    if(tapMode==='3tap'){a[0]=0;a[4]=0;}
+    return a
+  }
+  function activeTapShifts(){return tapMode==='3tap'?[-1,0,1]:[-2,-1,0,1,2]}
+  function activeTargetKs(){return tapMode==='3tap'?[-1,0,1]:[-2,-1,0,1,2]}
+  function activeTapLabels(){return tapMode==='3tap'?['α−1','α0','α1']:['α−2','α−1','α0','α1','α2']}
+  function activeCoefficients(a=taps()){return tapMode==='3tap'?[a[1],a[2],a[3]]:a}
+  function bypassTaps(){return tapMode==='3tap'?[0,1,0]:[0,0,1,0,0]}
+  function xAt(k){const i=k+1;return i>=0&&i<ch.length?ch[i]:0}
+  function yAt(k,a=taps()){
+    return a.reduce((sum,coef,i)=>sum + coef*xAt(k-TAP_SHIFTS[i]),0)
+  }
+
+  function solveN(A,b){
+    const n=A.length;
+    const M=A.map((r,i)=>[...r,b[i]]);
+    for(let c=0;c<n;c++){
+      let piv=c;
+      for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[piv][c])) piv=r;
+      [M[c],M[piv]]=[M[piv],M[c]];
+      if(Math.abs(M[c][c])<1e-10) return null;
+      const d=M[c][c];
+      for(let j=c;j<=n;j++) M[c][j]/=d;
+      for(let r=0;r<n;r++){
+        if(r===c) continue;
+        const f=M[r][c];
+        for(let j=c;j<=n;j++) M[r][j]-=f*M[c][j];
+      }
+    }
+    return M.map(r=>r[n])
+  }
+
+  function zf(){
+    const shifts=activeTapShifts(), targetKs=activeTargetKs();
+    const A=targetKs.map(k=>shifts.map(shift=>xAt(k-shift)));
+    const target=targetKs.map(k=>k===0?1:0);
+    const sol=solveN(A,target);
+    if(!sol)return null;
+    return tapMode==='3tap'?[0,sol[0],sol[1],sol[2],0]:sol
+  }
+
+  function bind(r,n){
+    r.oninput=()=>{n.value=(+r.value).toFixed(3);update()};
+    n.oninput=()=>{r.value=n.value;update()}
+    n.onchange=()=>{n.value=(+n.value).toFixed(3);r.value=n.value;update()}
+  }
+  bind(pre2R,pre2N);bind(pre1R,pre1N);bind(mainR,mainN);bind(post1R,post1N);bind(post2R,post2N);
+  function setT(a){
+    const v=a.length===3?[0,a[0],a[1],a[2],0]:a;
+    [pre2R.value,pre1R.value,mainR.value,post1R.value,post2R.value]=v;
+    [pre2N.value,pre1N.value,mainN.value,post1N.value,post2N.value]=v.map(x=>(+x).toFixed(3))
+  }
+  function rememberCurrentTaps(){
+    const a=taps();
+    if(tapMode==='3tap')tapMemory.tap3=[a[1],a[2],a[3]];
+    else tapMemory.tap5=[...a];
+  }
+  function applyModeCopy(){
+    const is3=tapMode==='3tap';
+    document.body.dataset.tapMode=tapMode;
+    $('mode3Btn').classList.toggle('active',is3);
+    $('mode5Btn').classList.toggle('active',!is3);
+    $('beforeEyeTitle').textContent=is3?'Before FFE · bypass [0, 1, 0]｜FFE 前 · Bypass':'Before FFE · bypass [0, 0, 1, 0, 0]｜FFE 前 · Bypass';
+    $('runnerHint').textContent=is3
+      ?'Choose a data pattern, tune the 3‑tap FFE, and watch NRZ input → TX pre‑emphasis → channel → far‑end sampling → slicer decision.｜選擇位元序列、調整 3‑tap FFE，觀察 NRZ 輸入 → TX 預加重 → 通道 → 接收端取樣 → slicer 判決。'
+      :'Choose a data pattern, tune the 5‑tap FFE, and compare the extra Pre2 / Post2 control over longer-range ISI.｜選擇位元序列、調整 5‑tap FFE，比較增加 Pre2 / Post2 後對較遠游標 ISI 的補償能力。';
+    $('ffeHint').textContent=is3
+      ?'Tune three coefficients until y[−1] ≈ 0, y[0] ≈ 1, y[+1] ≈ 0. Open Calculation Details to see the 3×3 zero‑forcing derivation.｜調整三個 tap 係數，使 y[−1]、y[+1] 接近 0 且 y[0] 接近 1；展開 Calculation Details 可查看 3×3 零強迫解法。'
+      :'Tune five coefficients so y[−2], y[−1], y[+1], y[+2] approach 0 while y[0] approaches 1. Open Calculation Details to see the 5×5 zero‑forcing derivation.｜調整五個 tap 係數，使 y[−2]、y[−1]、y[+1]、y[+2] 接近 0 且 y[0] 接近 1；展開 Calculation Details 可查看 5×5 零強迫解法。';
+    $('scoreTarget').textContent=is3?'[0, 1, 0]':'[0, 0, 1, 0, 0]';
+    $('contribTitle').textContent=is3?'How the 3 Taps Contribute｜3 個 tap 的加權響應':'How the 5 Taps Contribute｜5 個 tap 的加權響應';
+    $('lessonText').innerHTML=is3
+      ?'<b>Signal chain｜訊號鏈：</b> NRZ bits (try 10110100) → TX 3‑tap FFE → sampled channel pulse response → far‑end waveform → eye diagram.｜NRZ 位元（可試 10110100）→ TX 3‑tap FFE → 通道脈衝響應取樣值 → 接收端波形 → 眼圖。 The lab is intentionally lightweight for learning, but the FFE / channel relationship follows the same convolution idea used in SerDes equalization.｜本頁以教學與直覺建立為主，但 FFE 與通道之間仍採用 SerDes 等化中相同的卷積關係。'
+      :'<b>Signal chain｜訊號鏈：</b> NRZ bits (try 10110100) → TX 5‑tap FFE → sampled channel pulse response → far‑end waveform → eye diagram.｜NRZ 位元（可試 10110100）→ TX 5‑tap FFE → 通道脈衝響應取樣值 → 接收端波形 → 眼圖。 Extra Pre2 / Post2 taps extend the equalizer reach beyond the adjacent cursors.｜額外的 Pre2 / Post2 可將等化範圍延伸至更遠的游標。';
+  }
+  function setTapMode(mode,refresh=true){
+    if(mode!==tapMode)rememberCurrentTaps();
+    tapMode=mode;
+    setT(tapMode==='3tap'?tapMemory.tap3:tapMemory.tap5);
+    applyModeCopy();
+    lastScore=0;
+    if(refresh){update();clearEyes();autoCenterEye();restartRunner();}
+  }
+
+  function axes(ctx,w,h,ymin=-.55,ymax=1.25,opts={}){
+    ctx.clearRect(0,0,w,h);
+    const L=opts.L ?? 34, R=opts.R ?? 12, T=opts.T ?? 18, B=opts.B ?? 26;
+    const xMin=opts.xMin ?? -2.2, xMax=opts.xMax ?? 4.2;
+    const X=k=>L+(k-xMin)/(xMax-xMin)*(w-L-R);
+    const Y=v=>T+(ymax-v)/(ymax-ymin)*(h-T-B);
+    ctx.strokeStyle='rgba(255,255,255,.075)';ctx.lineWidth=1;
+    for(let k=-2;k<=4;k++){ctx.beginPath();ctx.moveTo(X(k),T);ctx.lineTo(X(k),h-B);ctx.stroke()}
+    for(let v=-.4;v<=1.2;v+=.2){ctx.beginPath();ctx.moveTo(L,Y(v));ctx.lineTo(w-R,Y(v));ctx.stroke()}
+    ctx.strokeStyle='rgba(255,255,255,.28)';ctx.beginPath();ctx.moveTo(L,Y(0));ctx.lineTo(w-R,Y(0));ctx.stroke();
+    ctx.fillStyle='#8fa5b5';ctx.font=(opts.tickFont || '15px system-ui');
+    for(let k=-2;k<=4;k++)ctx.fillText(k,X(k)-5,h-8);
+    return {X,Y}
+  }
+
+  function drawPulse(){
+    const {w,h}=fit(pc),{X,Y}=axes(pctx,w,h,-.85,1.45,{L:38,R:14,T:16,B:28,xMin:-4.35,xMax:6.35,tickFont:'15px system-ui'}),ks=[-4,-3,-2,-1,0,1,2,3,4,5,6];
+    const xs=ks.map(xAt),ys=ks.map(k=>yAt(k));
+    function line(vals,color){
+      pctx.strokeStyle=color;pctx.fillStyle=color;pctx.lineWidth=2.25;pctx.beginPath();
+      vals.forEach((v,i)=>i?pctx.lineTo(X(ks[i]),Y(v)):pctx.moveTo(X(ks[i]),Y(v)));pctx.stroke();
+      vals.forEach((v,i)=>{pctx.beginPath();pctx.arc(X(ks[i]),Y(v),4,0,Math.PI*2);pctx.fill()})
+    }
+    line(xs,'#73a7ff');line(ys,'#67ff83');
+
+    pctx.font='17px ui-monospace,SFMono-Regular,Menlo,monospace';
+    xs.forEach((v,i)=>{
+      if(Math.abs(v)<1e-9)return;
+      const label=(v>=0?'+':'')+v.toFixed(2),xx=X(ks[i]),yy=Y(v)+(v>=0?-14:24);
+      pctx.fillStyle='#9ec1ff';pctx.fillText(label,xx-pctx.measureText(label).width/2,yy)
+    });
+
+    pctx.fillStyle='#ffc85a';
+    activeTargetKs().map(k=>[k,k===0?1:0]).forEach(([k,v])=>{pctx.beginPath();pctx.arc(X(k),Y(v),6,0,Math.PI*2);pctx.fill()})
+  }
+
+  function drawContrib(ts){
+    if(!cc || !cctx) return;
+    const ks=[-4,-3,-2,-1,0,1,2,3,4,5,6],a=taps();
+    const {w,h}=fit(cc),{X,Y}=axes(cctx,w,h,-.85,1.45,{L:34,R:12,T:16,B:24,xMin:-4.35,xMax:6.35,tickFont:'14px system-ui'});
+    const indices=tapMode==='3tap'?[1,2,3]:[0,1,2,3,4];
+    if($('animateContrib').checked)contribPhase=Math.floor(ts/1100)%indices.length;
+    const colors=['#5be7ff','#e6a15c','#c493ff','#67ff83','#ffc85a'];
+    const names=['α−2 · x[k+2]','α−1 · x[k+1]','α0 · x[k]','α1 · x[k−1]','α2 · x[k−2]'];
+    const curves=indices.map(i=>({i,vals:ks.map(k=>a[i]*xAt(k-TAP_SHIFTS[i]))}));
+    $('contribName').textContent=names[indices[contribPhase]];
+    curves.forEach((curve,j)=>{
+      cctx.globalAlpha=j===contribPhase?1:.22;cctx.strokeStyle=colors[curve.i];cctx.lineWidth=j===contribPhase?3:1.5;cctx.beginPath();
+      curve.vals.forEach((v,i)=>i?cctx.lineTo(X(ks[i]),Y(v)):cctx.moveTo(X(ks[i]),Y(v)));cctx.stroke()
+    });
+    cctx.globalAlpha=1;
+  }
+
+
+  function fmt(v,d=3){
+    const n=Math.abs(v)<0.5*Math.pow(10,-d)?0:v;
+    return (n>=0?'+':'')+n.toFixed(d)
+  }
+
+  function plain(v,d=3){
+    const n=Math.abs(v)<0.5*Math.pow(10,-d)?0:v;
+    return n.toFixed(d)
+  }
+
+  function updateCalculationDetails(){
+    const a=taps(), sol=zf();
+    const targetKs=activeTargetKs(), shifts=activeTapShifts(), tapLabels=activeTapLabels();
+    const coeffs=activeCoefficients(a);
+    const rows=targetKs.map(k=>shifts.map(shift=>xAt(k-shift)));
+    const ys=targetKs.map(k=>yAt(k));
+    const target=targetKs.map(k=>k===0?1:0);
+    const is3=tapMode==='3tap';
+
+    $('calcTarget').textContent=targetKs.map((k,i)=>`y[${k>0?'+'+k:String(k).replace('-', '−')}] = ${target[i]}`).join('\n');
+    $('calcEqTitle').textContent=is3?'2. Three Sample Equations｜三個取樣方程式':'2. Five Sample Equations｜五個取樣方程式';
+    $('calcMatrixTitle').textContent=is3?'3. 3×3 Matrix Form｜3×3 矩陣表示':'3. 5×5 Matrix Form｜5×5 矩陣表示';
+    $('calcVerifyTitle').textContent=is3?'5. Verify y[−1], y[0], y[+1]｜驗證取樣值':'5. Verify y[−2] … y[+2]｜驗證取樣值';
+    $('targetVector').textContent=is3?'[0, 1, 0]ᵀ':'[0, 0, 1, 0, 0]ᵀ';
+    $('targetInterpretation').textContent=is3?'Cancel adjacent ISI cursors｜消除相鄰游標的 ISI':'Cancel two ISI cursors on each side｜消除前後各兩個游標的 ISI';
+
+    $('calcEquations').innerHTML = targetKs.map((k,ri)=>{
+      const terms=rows[ri].map((coef,ci)=>`(${plain(coef)})${tapLabels[ci]}`).join(' + ');
+      const kk=k>0?`+${k}`:String(k).replace('-', '−');
+      return `<div class="eqRow">y[${kk}] = ${terms} = <b>${plain(ys[ri])}</b></div>`;
+    }).join('');
+
+    const rowText=r=>`[ ${r.map(v=>plain(v)).join('   ')} ]`;
+    $('calcMatrix').textContent =
+`A =
+${rows.map(rowText).join('\n')}
+
+α = [ ${tapLabels.join(', ')} ]ᵀ
+b = [ ${target.join(', ')} ]ᵀ
+
+A · α = b`;
+
+    if(sol){
+      const solActive=activeCoefficients(sol);
+      $('calcSolution').textContent=`A · α = b\n\nα = A⁻¹b\n\n${tapLabels.map((lab,i)=>`${lab} = ${plain(solActive[i],6)}`).join('\n')}\n\n≈ [ ${solActive.map(v=>plain(v,3)).join(', ')} ]ᵀ`;
+    }else{
+      $('calcSolution').textContent=`Matrix is singular for the current channel, so a unique ${is3?'3‑tap':'5‑tap'} zero‑forcing solution does not exist.｜目前通道矩陣為奇異矩陣，沒有唯一的 ${is3?'3‑tap':'5‑tap'} 零強迫解。`;
+    }
+
+    $('calcVerify').innerHTML = targetKs.map((k,ri)=>{
+      const terms=shifts.map((shift,ci)=>`(${plain(coeffs[ci])})(${plain(xAt(k-shift))})`).join(' + ');
+      const kk=k>0?`+${k}`:String(k).replace('-', '−');
+      return `<div class="eqRow">y[${kk}] = ${terms} = <b>${plain(ys[ri])}</b></div>`;
+    }).join('');
+  }
+
+  function stats(){
+    const ks=activeTargetKs();
+    const v=ks.map(k=>yAt(k)),a=taps();
+    const zeroIndex=ks.indexOf(0);
+    const err=v.reduce((sum,val,i)=>sum + (val-(i===zeroIndex?1:0))**2,0);
+    const score=Math.max(0,Math.round(100*Math.exp(-(tapMode==='3tap'?4:3)*err)));
+    $('score').textContent=score;
+    $('ym2').textContent=yAt(-2).toFixed(3);
+    $('ym1').textContent=yAt(-1).toFixed(3);
+    $('y0').textContent=yAt(0).toFixed(3);
+    $('yp1').textContent=yAt(1).toFixed(3);
+    $('yp2').textContent=yAt(2).toFixed(3);
+
+    const q=$('quality');
+    if(score>=99){q.textContent='ZERO FORCING ✓｜符合零強迫目標';q.style.color='#67ff83'}
+    else if(score>=90){q.textContent='VERY GOOD｜接近目標';q.style.color='#a7ffb4'}
+    else if(score>=70){q.textContent='GETTING CLOSE｜逐漸接近';q.style.color='#ffc85a'}
+    else{q.textContent='KEEP TUNING｜尚未達標';q.style.color='#ff8b94'}
+
+    $('formula').textContent = tapMode==='3tap'
+      ? `y[k] = ${a[1].toFixed(2)}·x[k+1] + ${a[2].toFixed(2)}·x[k] + ${a[3].toFixed(2)}·x[k−1]`
+      : `y[k] = ${a[0].toFixed(2)}·x[k+2] + ${a[1].toFixed(2)}·x[k+1] + ${a[2].toFixed(2)}·x[k] + ${a[3].toFixed(2)}·x[k−1] + ${a[4].toFixed(2)}·x[k−2]`;
+
+    if(score>=99&&lastScore<99){$('celebrate').classList.add('show');setTimeout(()=>$('celebrate').classList.remove('show'),900)}
+    lastScore=score
+  }
+  function update(){stats();drawPulse();updateCalculationDetails()}
+
+  document.querySelectorAll('[data-ch]').forEach(inp=>inp.oninput=()=>{ch[+inp.dataset.ch]=parseFloat(inp.value)||0;update();autoCenterEye()});
+  function syncCh(){document.querySelectorAll('[data-ch]').forEach(inp=>inp.value=ch[+inp.dataset.ch].toFixed(2))}
+  document.querySelectorAll('.level').forEach(btn=>btn.onclick=()=>{
+    document.querySelectorAll('.level').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+    ch=[...presets[btn.dataset.level]];syncCh();setT(bypassTaps());lastScore=0;update();autoCenterEye()
+  });
+  $('randomBtn').onclick=()=>{
+    document.querySelectorAll('.level').forEach(x=>x.classList.remove('active'));
+    ch=[+(Math.random()*.50-.18).toFixed(2),+(.70+Math.random()*.25).toFixed(2),+(Math.random()*.58-.32).toFixed(2),+(Math.random()*.26-.08).toFixed(2),+(Math.random()*.16-.06).toFixed(2)];
+    syncCh();setT(bypassTaps());lastScore=0;update();autoCenterEye()
+  };
+  $('resetBtn').onclick=()=>{setT(bypassTaps());lastScore=0;update();autoCenterEye()};
+  $('solveBtn').onclick=()=>{const sol=zf();if(!sol)return alert(`Singular ${tapMode==='3tap'?'3×3':'5×5'} channel matrix. Try another channel.｜通道矩陣為奇異矩陣，請更換通道參數。`);setT(sol);update();autoCenterEye()};
+
+  document.querySelectorAll('[data-tap-mode]').forEach(btn=>btn.onclick=()=>setTapMode(btn.dataset.tapMode));
+
+  $('calcToggle').onclick=()=>{
+    const open=$('calcDetails').classList.toggle('open');
+    $('calcToggle').classList.toggle('open',open);
+  };
+
+  $('persistRange').oninput=e=>$('persistOut').textContent=(+e.target.value).toFixed(1)+' s';
+  $('pauseToggle').onchange=e=>paused=e.target.checked;
+  $('eyePhaseRange').oninput=e=>{
+    $('eyePhaseOut').textContent=(+e.target.value).toFixed(2)+' UI';
+    clearEyes();
+  };
+  $('autoCenterBtn').onclick=()=>autoCenterEye();
+  $('trajectoryToggle').onchange=()=>clearEyes();
+  $('eyeMaskToggle').onchange=()=>clearEyes();
+
+
+  // ---- Deterministic bit-pattern runner ----
+  const RUN_SPS=40;
+
+  function sanitizePattern(raw){
+    let s=(raw||'').replace(/[^01]/g,'').slice(0,16);
+    if(!s)s='10110100';
+    return s
+  }
+
+  function patternBits(){
+    const s=sanitizePattern($('bitPatternInput').value);
+    if($('bitPatternInput').value!==s)$('bitPatternInput').value=s;
+    return [...s].map(c=>+c)
+  }
+
+  function bitsToSymbols(b){
+    return b.map(v=>v?1:-1)
+  }
+
+  function ffeSymbols(sym,a=taps()){
+    return sym.map((v,k)=>
+      TAP_SHIFTS.reduce((sum,s,i)=>{
+        const src=k-s;
+        const bit=(src>=0&&src<sym.length)?sym[src]:0;
+        return sum+a[i]*bit;
+      },0)
+    )
+  }
+
+  function channelSymbols(u){
+    // ch[] stores h[-1], h[0], h[+1], h[+2], h[+3].
+    const out=new Array(u.length+4).fill(0);
+    for(let k=0;k<out.length;k++){
+      let s=0;
+      for(let ci=0;ci<ch.length;ci++){
+        const m=ci-1;
+        const src=k-m;
+        if(src>=0&&src<u.length)s+=ch[ci]*u[src];
+      }
+      out[k]=s
+    }
+    return out
+  }
+
+  function holdSamples(vals,sps=RUN_SPS){
+    const out=[];
+    vals.forEach(v=>{for(let i=0;i<sps;i++)out.push(v)});
+    return out
+  }
+
+  function smoothSamples(raw){
+    const out=new Array(raw.length);
+    let state=raw[0]||0;
+    const beta=.16;
+    for(let i=0;i<raw.length;i++){
+      state += beta*(raw[i]-state);
+      out[i]=state
+    }
+    return out
+  }
+
+  function runnerData(){
+    const bits = patternBits();
+    const symbols = bitsToSymbols(bits);
+    const ffeSymbolsRate = ffeSymbols(symbols);
+    const farSymbolsRate = channelSymbols(ffeSymbolsRate);
+
+    return {
+      bits,
+      symbols,
+      inputSamples: holdSamples(symbols),
+      ffeSymbolsRate,
+      ffeSamples: holdSamples(ffeSymbolsRate),
+      farSymbolsRate,
+      farSamples: smoothSamples(holdSamples(farSymbolsRate))
+    }
+  }
+
+    function updateRunnerUiLabels(){
+    const s=sanitizePattern($('bitPatternInput').value);
+    if($('bitPatternInput').value!==s)$('bitPatternInput').value=s;
+    const n=s.length;
+    $('findWorstBtn').textContent=`Find Worst Case (${n}-bit)｜搜尋 worst-case 序列`;
+    $('runPatternBtn').textContent='Replay｜重播';
+  }
+
+  function analyzePatternBits(bitsArr){
+    const symbols = bitsToSymbols(bitsArr);
+    const ffeSymbolsRate = ffeSymbols(symbols);
+    const farSamples = smoothSamples(holdSamples(channelSymbols(ffeSymbolsRate)));
+
+    let prevDecision = bitsArr[0] ?? 0;
+    let errors = 0;
+    let minMargin = Number.POSITIVE_INFINITY;
+    let criticalBit = 0;
+    let criticalSample = 0;
+    let criticalDecision = 0;
+    let uncertainCount = 0;
+
+    for(let k=0;k<bitsArr.length;k++){
+      const idx=Math.round((k+0.5)*RUN_SPS);
+      const sample=farSamples[Math.min(idx,farSamples.length-1)] ?? 0;
+
+      const margin = bitsArr[k] ? (sample - VTH_H) : (VTH_L - sample);
+      if(margin < minMargin){
+        minMargin = margin;
+        criticalBit = k;
+        criticalSample = sample;
+      }
+
+      let decision, uncertain=false;
+      if(sample >= VTH_H){
+        decision = 1;
+      }else if(sample <= VTH_L){
+        decision = 0;
+      }else{
+        decision = prevDecision;
+        uncertain = true;
+        uncertainCount++;
+      }
+      prevDecision = decision;
+
+      if(decision !== bitsArr[k]) errors++;
+      if(k === criticalBit) criticalDecision = decision;
+    }
+
+    return {
+      pattern: bitsArr.join(''),
+      length: bitsArr.length,
+      errors,
+      minMargin,
+      criticalBit,
+      criticalSample,
+      criticalDecision,
+      uncertainCount
+    };
+  }
+
+  function findWorstCasePatternOfLength(n){
+    const total = 1 << n;
+    let best = null;
+
+    for(let mask=0; mask<total; mask++){
+      const bitsArr = Array.from({length:n}, (_,i)=> (mask >> (n-1-i)) & 1);
+      const info = analyzePatternBits(bitsArr);
+
+      const better =
+        !best ||
+        info.errors > best.errors ||
+        (info.errors === best.errors && info.minMargin < best.minMargin) ||
+        (info.errors === best.errors && Math.abs(info.minMargin - best.minMargin) < 1e-12 && info.pattern < best.pattern);
+
+      if(better) best = info;
+    }
+    return best;
+  }
+
+  function updateWorstSummary(info){
+    if(info){
+      const total = 1 << info.length;
+      $('runnerSummary').innerHTML =
+        `<b>Worst-case result｜worst-case 結果</b>: searched <code>${total.toLocaleString()}</code> patterns at <code>${info.length}</code> bits.｜已窮舉 ${total.toLocaleString()} 組 ${info.length} 位元序列。 ` +
+        `Loaded <code>${info.pattern}</code>. Critical bit <code>${info.criticalBit+1}</code>, minimum margin <code>${info.minMargin.toFixed(3)} V</code>, sample <code>${info.criticalSample.toFixed(3)} V</code>, ` +
+        `errors <code>${info.errors}</code>, uncertain decisions <code>${info.uncertainCount}</code>.｜臨界位元：${info.criticalBit+1}；最小判決裕量：${info.minMargin.toFixed(3)} V；錯誤：${info.errors}；落入未判定區：${info.uncertainCount}。`;
+    }else{
+      $('runnerSummary').innerHTML =
+        `<b>Worst-case search｜worst-case 搜尋</b>: brute-forces all <code>2^N</code> patterns for the current input length (up to 16 bits), then loads the most difficult pattern into the runner.｜依目前輸入長度窮舉全部 <code>2^N</code> 組位元序列，再載入判決裕量最小的序列。`;
+    }
+  }
+
+  function drawPatternRunner(ts){
+    const {w,h}=fit(patternCanvas),ctx=patternCtx,data=runnerData();
+    ctx.clearRect(0,0,w,h);
+
+    const {bits, ffeSymbolsRate, ffeSamples, farSamples} = data;
+
+    // Runner display uses a reserved right-side tail for annotations.
+    const titleX=10, levelLabelX=112;
+    const L=190,R=18,T=30,B=32;
+    const usableH=h-T-B;
+
+    // Make TX FFE and Far-end lanes 50% taller than Input / Slicer.
+    const laneRatios=[1,1.5,1.5,1];
+    const ratioSum=laneRatios.reduce((a,b)=>a+b,0);
+    const laneHeights=laneRatios.map(r=>usableH*(r/ratioSum));
+    const laneTop=[];
+    let acc=T;
+    for(const hh of laneHeights){laneTop.push(acc); acc+=hh;}
+
+    const bitN=bits.length;
+    const totalUI=bitN+3.0;
+    const Xui=u=>L+(u/totalUI)*(w-L-R);
+
+        $('runnerMode').textContent = runnerMode.startsWith('Worst-case') ? 'Pattern source: Worst-case search｜序列來源：worst-case 搜尋' : 'Pattern source: User input｜序列來源：自訂輸入';
+
+    // Build display-domain sample arrays.
+    const inputDisplaySamples = holdSamples(bits.map(v=>v?1:0)); // show 1/0 levels, not +/-1 symbols
+
+    function arrMin(arr){ let m=Infinity; for(const v of arr){ if(v<m) m=v; } return m; }
+    function arrMax(arr){ let m=-Infinity; for(const v of arr){ if(v>m) m=v; } return m; }
+
+    function makeVoltageMap(top,height,minV,maxV){
+      const padTop=height*0.14, padBot=height*0.14;
+      const rangeMin=Math.min(minV, 0, VTH_L);
+      const rangeMax=Math.max(maxV, 1, VTH_H);
+      const usable=Math.max(20, height-padTop-padBot);
+      const gain=usable/Math.max(1e-6, rangeMax-rangeMin);
+      const yOf=v => top + padTop + (rangeMax - v)*gain;
+      return {
+        top,height,padTop,padBot,rangeMin,rangeMax,gain,yOf,
+        yHigh:yOf(1), yLow:yOf(0)
+      };
+    }
+
+    const mapInput  = makeVoltageMap(laneTop[0], laneHeights[0], 0, 1);
+    const mapTx     = makeVoltageMap(laneTop[1], laneHeights[1], arrMin(ffeSamples), arrMax(ffeSamples));
+    const mapFar    = makeVoltageMap(laneTop[2], laneHeights[2], arrMin(farSamples), arrMax(farSamples));
+    const mapSlicer = makeVoltageMap(laneTop[3], laneHeights[3], 0, 1);
+
+    const maps=[mapInput,mapTx,mapFar,mapSlicer];
+    const laneNames=[
+      ['Input NRZ｜NRZ 輸入'],
+      ['TX FFE','pre-emphasis｜預加重'],
+      ['Far-end｜接收端','after-channel｜通道後'],
+      ['Slicer output｜Slicer','decision｜判決輸出']
+    ];
+
+    // Vertical bit grid + bit labels
+    ctx.font='15px system-ui';
+    for(let k=0;k<=bitN;k++){
+      const x=Xui(k);
+      ctx.strokeStyle='rgba(255,255,255,.065)';
+      ctx.beginPath();ctx.moveTo(x,T-6);ctx.lineTo(x,h-B+6);ctx.stroke();
+      if(k<bitN){
+        ctx.fillStyle='#c9d8e2';
+        ctx.textAlign='center';
+        ctx.fillText(String(bits[k]),Xui(k+.5),18);
+      }
+    }
+
+    // Lane names
+    ctx.fillStyle='#9eb0bd';
+    ctx.font='11px system-ui';
+    ctx.textAlign='left';
+    for(let i=0;i<laneNames.length;i++){
+      const lines=laneNames[i];
+      ctx.fillText(lines[0], titleX, laneTop[i]+14);
+      if(lines[1]) ctx.fillText(lines[1], titleX, laneTop[i]+28);
+    }
+
+    // H/L guide lines and labels; all lines use the same voltage map as the waveform.
+    ctx.font='12px ui-monospace,SFMono-Regular,Menlo,monospace';
+    maps.forEach(mp=>{
+      ctx.strokeStyle='rgba(220,245,255,.16)';
+      ctx.setLineDash([4,5]);
+      ctx.beginPath();ctx.moveTo(L,mp.yHigh);ctx.lineTo(w-R,mp.yHigh);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(L,mp.yLow);ctx.lineTo(w-R,mp.yLow);ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle='rgba(220,245,255,.92)';
+      ctx.textAlign='left';
+      ctx.fillText('H 1V', levelLabelX, mp.yHigh+4);
+      ctx.fillText('L 0V', levelLabelX, mp.yLow+4);
+    });
+
+    // Threshold lines on Far-end lane: same map as the green waveform.
+    const yVthH=mapFar.yOf(VTH_H);
+    const yVthL=mapFar.yOf(VTH_L);
+    ctx.strokeStyle='rgba(255,200,90,.42)';
+    ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(L,yVthH);ctx.lineTo(w-R,yVthH);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(L,yVthL);ctx.lineTo(w-R,yVthL);ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle='rgba(255,200,90,.92)';
+    ctx.font='11px ui-monospace,SFMono-Regular,Menlo,monospace';
+    ctx.textAlign='left';
+    ctx.fillText(`Vth_H ${VTH_H>=0?'+':''}${VTH_H.toFixed(2)}`, titleX, yVthH+4);
+    ctx.fillText(`Vth_L ${VTH_L>=0?'+':''}${VTH_L.toFixed(2)}`, titleX, yVthL+4);
+
+    // Playback progress
+    const speedUI=1.8;
+    let elapsed=(runnerPaused ? (runnerPauseAt-runnerStart) : (ts-runnerStart))/1000;
+    let cursorUI=Math.min(elapsed*speedUI,totalUI);
+    if(cursorUI>=totalUI){
+      cursorUI=totalUI;
+      if(!runnerFinished){
+        runnerFinished=true;
+        runnerPaused=true;
+        runnerPauseAt=ts;
+        $('patternPauseBtn').textContent='Resume｜繼續';
+      }
+    }
+    const revealX=Xui(cursorUI);
+
+    function drawArray(arr,map,color){
+      const maxX=Math.min(w-R,revealX);
+      ctx.save();
+      ctx.beginPath();ctx.rect(L,T-8,w-L-R,h-T-B+16);ctx.clip();
+      ctx.strokeStyle=color;ctx.lineWidth=2.15;ctx.shadowColor=color;ctx.shadowBlur=2;
+      ctx.beginPath();
+      let started=false;
+      for(let i=0;i<arr.length;i++){
+        const ui=i/RUN_SPS;
+        const x=Xui(ui);
+        if(x>maxX) break;
+        const y=map.yOf(arr[i]);
+        if(!started){ctx.moveTo(x,y);started=true;} else ctx.lineTo(x,y);
+      }
+      if(started) ctx.stroke();
+      ctx.restore();
+    }
+
+    drawArray(inputDisplaySamples, mapInput, '#73a7ff');
+    drawArray(ffeSamples,         mapTx,    '#c493ff');
+    drawArray(farSamples,         mapFar,   '#67ff83');
+
+    // TX FFE symbol annotations
+    ctx.font='11px ui-monospace,SFMono-Regular,Menlo,monospace';
+    ctx.textAlign='center';
+    ffeSymbolsRate.forEach((v,k)=>{
+      const x=Xui(k+.5);
+      if(x>revealX) return;
+      const y=mapTx.yOf(v);
+
+      ctx.beginPath();
+      ctx.fillStyle='rgba(228,203,255,.98)';
+      ctx.arc(x,y,3.5,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle='rgba(228,203,255,.94)';
+      ctx.fillText(`${v>=0?'+':''}${v.toFixed(2)}`, x, y+(v>=0?-11:16));
+    });
+
+    // Far-end sampling + slicing
+    const farDecisionSamples=[];
+    const decisionSamples=[]; // for display, 1 or 0
+    let prevDecision=bits[0]??0;
+
+    for(let k=0;k<bitN;k++){
+      const sampleUI=k+.5;
+      const idx=Math.round(sampleUI*RUN_SPS);
+      const x=Xui(sampleUI);
+      const sample=farSamples[Math.min(idx,farSamples.length-1)]??0;
+      const y=mapFar.yOf(sample);
+
+      let decision, uncertain=false;
+      if(sample>=VTH_H){
+        decision=1;
+      }else if(sample<=VTH_L){
+        decision=0;
+      }else{
+        decision=prevDecision;
+        uncertain=true;
+      }
+      prevDecision=decision;
+
+      const error=decision!==bits[k];
+      const margin = bits[k] ? (sample - VTH_H) : (VTH_L - sample);
+      farDecisionSamples.push({k,x,y,v:sample,decision,error,uncertain,margin});
+      decisionSamples.push(decision);
+    }
+
+    // Far-end dots + sample values
+    farDecisionSamples.forEach(p=>{
+      if(p.x>revealX) return;
+      ctx.beginPath();
+      ctx.fillStyle=p.error?'rgba(255,117,128,.98)':'rgba(175,255,195,.95)';
+      ctx.arc(p.x,p.y,3.8,0,Math.PI*2);
+      ctx.fill();
+
+      let txt=`${p.v>=0?'+':''}${p.v.toFixed(2)}`;
+      if(p.uncertain) txt+='*';
+      ctx.fillStyle=p.error?'rgba(255,117,128,.92)':'rgba(175,255,195,.86)';
+      ctx.fillText(txt,p.x,p.y-10);
+    });
+
+    // Slicer output
+    const slicerSamples=[];
+    decisionSamples.forEach(v=>{for(let i=0;i<RUN_SPS;i++) slicerSamples.push(v)});
+    drawArray(slicerSamples, mapSlicer, '#5be7ff');
+
+    // Decision dots + annotations
+    farDecisionSamples.forEach(p=>{
+      if(p.x>revealX) return;
+      const yS=mapSlicer.yOf(p.decision);
+
+      ctx.beginPath();
+      ctx.fillStyle=p.error?'rgba(255,117,128,.98)':'rgba(111,229,255,.98)';
+      ctx.arc(p.x,yS,3.6,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle=p.error?'rgba(255,117,128,.98)':'rgba(111,229,255,.92)';
+      const dTxt=String(p.decision)+(p.uncertain?'*':'');
+      ctx.fillText(dTxt,p.x,yS-10);
+    });
+
+    // Current sample highlight
+    const currentBit=Math.min(bitN-1,Math.max(0,Math.floor(Math.min(cursorUI,bitN-.001))));
+    const currentSample=farDecisionSamples[currentBit];
+
+    if(currentSample){
+      ctx.strokeStyle='#ffc85a';
+      ctx.fillStyle='rgba(255,200,90,.14)';
+      ctx.lineWidth=1.7;
+
+      ctx.beginPath();
+      ctx.arc(currentSample.x,currentSample.y,8,0,Math.PI*2);
+      ctx.fill();ctx.stroke();
+
+      const currentSlicerY=mapSlicer.yOf(currentSample.decision);
+      ctx.beginPath();
+      ctx.arc(currentSample.x,currentSlicerY,8,0,Math.PI*2);
+      ctx.fill();ctx.stroke();
+
+      // Waveform info callout boxes removed to keep the waveform area clean.
+    }
+
+    // Running-time cursor finishes at far-right edge of the reserved tail.
+    ctx.strokeStyle='#ffc85a';
+    ctx.lineWidth=1.7;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(revealX,T-7);ctx.lineTo(revealX,h-B+7);ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Right-top status
+    const errors=farDecisionSamples.filter(p=>p.error).length;
+    const cur=currentSample;
+    $('runnerStatusLine').textContent =
+      `Bit ${currentBit+1} of ${bitN} · Input ${bits[currentBit]} · Slicer decision ${cur.decision} · Current bit ${cur.error?'ERROR':'OK'} · Errors ${errors}/${bitN}｜第 ${currentBit+1}/${bitN} 位元 · 輸入 ${bits[currentBit]} · 判決 ${cur.decision} · ${cur.error?'錯誤':'正確'} · 錯誤 ${errors}/${bitN}`;
+
+    $('runPatternBtn').textContent='Replay｜重播';
+  }
+
+  function restartRunner(){
+    const p=sanitizePattern($('bitPatternInput').value);
+    $('bitPatternInput').value=p;
+    $('runPatternBtn').textContent='Replay '+p+'｜重播';
+    runnerStart=performance.now();
+    runnerPaused=false;
+    runnerFinished=false;
+    $('patternPauseBtn').textContent='Pause｜暫停';
+    drawPatternRunner(runnerStart);
+  }
+
+  $('bitPatternInput').oninput=()=>{
+    const clean=sanitizePattern($('bitPatternInput').value);
+    $('bitPatternInput').value=clean;
+    $('runPatternBtn').textContent='Replay '+clean+'｜重播';
+  };
+  updateRunnerUiLabels();
+  updateWorstSummary(null);
+
+  $('bitPatternInput').addEventListener('input', ()=>{
+    runnerMode='User pattern';
+    lastWorstCaseInfo=null;
+    updateRunnerUiLabels();
+    updateWorstSummary(null);
+  });
+
+  $('runPatternBtn').onclick=()=>{
+    runnerMode='User pattern';
+    lastWorstCaseInfo=null;
+    updateWorstSummary(null);
+    restartRunner();
+  };
+
+  $('findWorstBtn').onclick=()=>{
+    updateRunnerUiLabels();
+    const n = patternBits().length;
+    runnerMode = `Searching worst case (${n}-bit)`;
+    $('runnerMode').textContent = runnerMode.startsWith('Worst-case') ? 'Pattern source: Worst-case search｜序列來源：worst-case 搜尋' : 'Pattern source: User input｜序列來源：自訂輸入';
+    $('runnerStatusLine').textContent = `Searching ${ (1<<n).toLocaleString() } candidate patterns for the lowest decoding margin...｜正在搜尋 ${(1<<n).toLocaleString()} 組候選位元序列，以找出最小判決裕量…`;
+    $('runnerSummary').innerHTML =
+      `<b>Worst-case search｜worst-case 搜尋</b>: brute-forcing <code>${(1<<n).toLocaleString()}</code> patterns of length <code>${n}</code>...｜正在窮舉所有 ${n} 位元序列…`;
+
+    setTimeout(()=>{
+      const info = findWorstCasePatternOfLength(n);
+      lastWorstCaseInfo = info;
+      $('bitPatternInput').value = info.pattern;
+      updateRunnerUiLabels();
+      updateWorstSummary(info);
+      runnerMode = `Worst-case result (${n}-bit brute force)`;
+      restartRunner();
+    }, 0);
+  };
+
+  $('patternPauseBtn').onclick=()=>{
+    if(runnerFinished){
+      return;
+    }
+    if(!runnerPaused){
+      runnerPaused=true;
+      runnerPauseAt=performance.now();
+      $('patternPauseBtn').textContent='Resume｜繼續';
+    }else{
+      const now=performance.now();
+      runnerStart += now-runnerPauseAt;
+      runnerPaused=false;
+      $('patternPauseBtn').textContent='Pause｜暫停';
+    }
+  };
+
+
+  const COMPARE_STATE_KEY='serdes_ffe_compare_state_v3_combined';
+  const LEGACY_STATE_KEY='serdes_ffe_compare_state_v2';
+
+  function readCompareState(){
+    try{
+      const current=JSON.parse(localStorage.getItem(COMPARE_STATE_KEY)||'{}');
+      if(Object.keys(current).length)return current;
+      return JSON.parse(localStorage.getItem(LEGACY_STATE_KEY)||'{}')
+    }catch(e){return {}}
+  }
+
+  function markMatchingLevel(){
+    document.querySelectorAll('.level').forEach(b=>b.classList.remove('active'));
+    for(const [name,p] of Object.entries(presets)){
+      if(p.length===ch.length && p.every((v,i)=>Math.abs(v-ch[i])<1e-9)){
+        const b=document.querySelector(`.level[data-level="${name}"]`);
+        if(b)b.classList.add('active');
+        break;
+      }
+    }
+  }
+
+  function saveCompareState(){
+    rememberCurrentTaps();
+    const s={
+      shared:{
+        ch:[...ch],
+        pattern:sanitizePattern($('bitPatternInput').value),
+        vthH:VTH_H,
+        vthL:VTH_L,
+        eyePhase:+$('eyePhaseRange').value,
+        persistence:+$('persistRange').value
+      },
+      activeMode:tapMode,
+      tap3:{taps:[...tapMemory.tap3]},
+      tap5:{taps:[...tapMemory.tap5]}
+    };
+    try{localStorage.setItem(COMPARE_STATE_KEY,JSON.stringify(s))}catch(e){}
+  }
+
+  function restoreCompareState(){
+    const s=readCompareState();
+    if(s.shared){
+      const shared=s.shared;
+      if(Array.isArray(shared.ch)&&shared.ch.length===5&&shared.ch.every(Number.isFinite)) ch=[...shared.ch];
+      syncCh(); markMatchingLevel();
+      if(typeof shared.pattern==='string') $('bitPatternInput').value=sanitizePattern(shared.pattern);
+      setThresholds(Number.isFinite(shared.vthH)?shared.vthH:0.70, Number.isFinite(shared.vthL)?shared.vthL:0.30);
+      if(Number.isFinite(shared.eyePhase)){
+        $('eyePhaseRange').value=Math.max(0,Math.min(.999,shared.eyePhase)).toFixed(2);
+        $('eyePhaseOut').textContent=(+$('eyePhaseRange').value).toFixed(2)+' UI';
+      }
+      if(Number.isFinite(shared.persistence)){
+        $('persistRange').value=Math.max(.1,Math.min(5,shared.persistence)).toFixed(1);
+        $('persistOut').textContent=(+$('persistRange').value).toFixed(1)+' s';
+      }
+    }else{
+      syncCh();setThresholds(0.70,0.30);
+    }
+    if(s.tap3&&Array.isArray(s.tap3.taps)&&s.tap3.taps.length===3&&s.tap3.taps.every(Number.isFinite))tapMemory.tap3=[...s.tap3.taps];
+    if(s.tap5&&Array.isArray(s.tap5.taps)&&s.tap5.taps.length===5&&s.tap5.taps.every(Number.isFinite))tapMemory.tap5=[...s.tap5.taps];
+    tapMode=(s.activeMode==='5tap')?'5tap':'3tap';
+    setT(tapMode==='3tap'?tapMemory.tap3:tapMemory.tap5);
+    applyModeCopy();
+    return !!s.shared
+  }
+
+  window.addEventListener('beforeunload',saveCompareState);
+
+
+  // ---- Original V1 Canvas eye engine, generalized to Before/After ----
+  const SPS=24;
+  let bits=Array.from({length:90},()=>Math.random()>.5?1:-1);
+
+  function conv(a,b){
+    const z=new Array(a.length+b.length-1).fill(0);
+    for(let i=0;i<a.length;i++)for(let j=0;j<b.length;j++)z[i+j]+=a[i]*b[j];
+    return z
+  }
+  function gauss(){
+    let a=[],s=0;
+    for(let i=0;i<17;i++){const q=i-8,v=Math.exp(-q*q/18);a.push(v);s+=v}
+    return a.map(v=>v/s)
+  }
+  const smooth=gauss();
+
+  function wave(a){
+    const u=bits.map((v,k)=>
+      TAP_SHIFTS.reduce((sum,s,i)=>{
+        const src=k-s;
+        const bit=(src>=0&&src<bits.length)?bits[src]:v;
+        return sum+a[i]*bit;
+      },0)
+    );
+    const n=[];u.forEach(v=>{for(let i=0;i<SPS;i++)n.push(v)});
+    const h=new Array(5*SPS+1).fill(0);ch.forEach((v,i)=>h[i*SPS]=v);
+    const z=conv(n,conv(h,smooth));
+    return z.map((v,i)=>v+.006*Math.sin(i*.37+phase)+.004*Math.sin(i*.91))
+  }
+
+  function idealEye(ctx,w,h){
+    const L=18,R=w-18,M=h/2,hi=M-h*.24,lo=M+h*.24;
+    const x1=L+(R-L)*.24,xc=(L+R)/2,x2=L+(R-L)*.76;
+
+    ctx.save();
+
+    // Ideal NRZ trajectory / boundary
+    if($('trajectoryToggle').checked){
+      ctx.strokeStyle='rgba(255,209,102,.72)';
+      ctx.lineWidth=1.6;
+      ctx.setLineDash([7,6]);
+      ctx.beginPath();
+      ctx.moveTo(L,hi);ctx.lineTo(x1,hi);ctx.lineTo(xc,M);ctx.lineTo(x2,hi);ctx.lineTo(R,hi);
+      ctx.moveTo(L,lo);ctx.lineTo(x1,lo);ctx.lineTo(xc,M);ctx.lineTo(x2,lo);ctx.lineTo(R,lo);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Receiver eye mask
+    if($('eyeMaskToggle').checked){
+      ctx.strokeStyle='rgba(255,209,102,.50)';
+      ctx.fillStyle='rgba(255,209,102,.06)';
+      ctx.lineWidth=1.4;
+      ctx.beginPath();
+      ctx.moveTo(x1,M);ctx.lineTo(xc,hi);ctx.lineTo(x2,M);ctx.lineTo(xc,lo);ctx.closePath();
+      ctx.fill();ctx.stroke();
+    }
+
+    ctx.restore()
+  }
+
+  function drawEye(canvas,ctx,z,dt){
+    const {w,h}=fit(canvas);
+    // Persistence control: this is the V1 fade mechanism with adjustable alpha.
+    const tau=+$('persistRange').value;
+    const fade=Math.max(.018,Math.min(.50,1-Math.exp(-dt/Math.max(.08,tau))));
+    ctx.fillStyle=`rgba(5,11,17,${fade})`;ctx.fillRect(0,0,w,h);
+
+    const L=18,R=18,T=18,B=18,M=h/2,S=(h-T-B)*.34,N=2*SPS,U=z.length-N-1;
+    ctx.save();ctx.shadowColor='rgba(255,154,98,.35)';ctx.shadowBlur=2;
+    for(let n=0;n<28;n++){
+      const phaseSamples=Math.round(+$('eyePhaseRange').value*SPS);
+      const st=((n*3+Math.floor(phase))%Math.max(1,Math.floor(U/SPS)-4))*SPS + phaseSamples;
+      ctx.strokeStyle='rgba(103,255,131,.22)';ctx.lineWidth=1.15;ctx.beginPath();
+      for(let i=0;i<=N;i++){
+        const xx=L+i/N*(w-L-R),yy=M-z[st+i]*S;
+        i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)
+      }
+      ctx.stroke()
+    }
+    ctx.restore();
+    ctx.strokeStyle='rgba(255,255,255,.10)';ctx.beginPath();ctx.moveTo(L,M);ctx.lineTo(w-R,M);ctx.stroke();
+    ctx.strokeStyle='rgba(91,231,255,.24)';ctx.setLineDash([5,6]);ctx.beginPath();ctx.moveTo(w/2,T);ctx.lineTo(w/2,h-B);ctx.stroke();ctx.setLineDash([]);
+    idealEye(ctx,w,h)
+  }
+
+
+  function phaseMetric(z,offset){
+    // Good sampling phases have samples clustered near the high/low rails,
+    // i.e. a large average absolute amplitude and fewer near-zero samples.
+    let sumAbs=0,sumSq=0,count=0,nearZero=0;
+    const guard=6*SPS;
+    for(let i=guard+offset;i<z.length-guard;i+=SPS){
+      const v=z[i];
+      const a=Math.abs(v);
+      sumAbs+=a;
+      sumSq+=v*v;
+      if(a<0.25) nearZero++;
+      count++;
+    }
+    if(!count) return -1e9;
+    const meanAbs=sumAbs/count;
+    const rms=Math.sqrt(sumSq/count);
+    const zeroPenalty=nearZero/count;
+    return meanAbs + 0.20*rms - 0.55*zeroPenalty;
+  }
+
+  function autoCenterEye(){
+    // Use the equalized far-end waveform to find the receiver's best sampling phase.
+    const z=wave(taps());
+    let best=0,bestMetric=-1e99;
+    for(let q=0;q<SPS;q++){
+      const m=phaseMetric(z,q);
+      if(m>bestMetric){bestMetric=m;best=q}
+    }
+    const ui=best/SPS;
+    $('eyePhaseRange').value=ui.toFixed(3);
+    $('eyePhaseOut').textContent=ui.toFixed(2)+' UI';
+    clearEyes();
+    return ui;
+  }
+
+  function clearEyes(){
+    [[eb,eba],[ea,eaa]].forEach(([c,ctx])=>{const {w,h}=fit(c);ctx.fillStyle='#050b11';ctx.fillRect(0,0,w,h)})
+  }
+
+  function animate(ts){
+    drawContrib(ts);
+    drawPatternRunner(ts);
+    if(!paused && ts-lastAnim>=33){ // ~30 fps: keeps iPad load reasonable while preserving V1 behavior
+      const dt=Math.min(.10,(ts-lastAnim)/1000||.033);lastAnim=ts;
+      drawEye(eb,eba,wave([0,0,1,0,0]),dt);
+      drawEye(ea,eaa,wave(taps()),dt);
+      phase+=.22;
+      if(Math.floor(phase)%8===0){bits.shift();bits.push(Math.random()>.5?1:-1)}
+    }
+    requestAnimationFrame(animate)
+  }
+
+  window.addEventListener('resize',()=>{drawPulse();clearEyes();drawPatternRunner(performance.now())});
+  installRangeNudges();
+  restoreCompareState();
+  update();clearEyes();autoCenterEye();restartRunner();
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>

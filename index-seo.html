@@ -1,66 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8VZV3YWSBB"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-8VZV3YWSBB');
-  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- SEO:START (managed by update-seo.py) -->
-  <title>JC Cheng Analog | Analog IC Design Notes &amp; Interactive Tools</title>
-  <meta name="description" content="Practical analog IC design notes and interactive tools covering power management, small-signal analysis, high-speed analog, SerDes, FFE equalization, eye diagrams, ISI, and circuit debugging." />
+  <title>JC Cheng Analog | Analog IC Design Notes</title>
+  <meta
+    name="description"
+    content="Practical analog IC design notes covering power management, small-signal analysis, high-speed analog, SerDes, FFE equalization, eye diagrams, ISI, bandgap references, and circuit debugging."
+  />
   <meta name="keywords" content="analog IC design, high-speed analog, SerDes, FFE, feed-forward equalizer, eye diagram, ISI, zero forcing, power management, small-signal analysis" />
-  <meta name="author" content="JC Cheng" />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://jc-cheng-analog.github.io/" />
-
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="JC Cheng Analog" />
-  <meta property="og:title" content="JC Cheng Analog | Analog IC Design Notes &amp; Interactive Tools" />
-  <meta property="og:description" content="Practical analog IC design notes and interactive tools covering power management, small-signal analysis, high-speed analog, SerDes, FFE equalization, eye diagrams, ISI, and circuit debugging." />
-  <meta property="og:url" content="https://jc-cheng-analog.github.io/" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="https://jc-cheng-analog.github.io/logo.png" />
-  <meta property="og:image:alt" content="JC Cheng Analog | Analog IC Design Notes &amp; Interactive Tools" />
-
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="JC Cheng Analog | Analog IC Design Notes &amp; Interactive Tools" />
-  <meta name="twitter:description" content="Practical analog IC design notes and interactive tools covering power management, small-signal analysis, high-speed analog, SerDes, FFE equalization, eye diagrams, ISI, and circuit debugging." />
-  <meta name="twitter:image" content="https://jc-cheng-analog.github.io/logo.png" />
-
-  <script id="seo-structured-data" type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": "https://jc-cheng-analog.github.io/#website",
-      "url": "https://jc-cheng-analog.github.io/",
-      "name": "JC Cheng Analog",
-      "description": "Practical analog IC design notes and interactive tools covering power management, small-signal analysis, high-speed analog, SerDes, FFE equalization, eye diagrams, ISI, and circuit debugging.",
-      "inLanguage": "en",
-      "alternateName": [
-        "JC Cheng Analog IC Notes",
-        "jc-cheng-analog.github.io"
-      ]
-    },
-    {
-      "@type": "Person",
-      "@id": "https://jc-cheng-analog.github.io/#jccheng",
-      "name": "JC Cheng",
-      "url": "https://jc-cheng-analog.github.io/"
-    }
-  ]
-}
-  </script>
-  <!-- SEO:END (managed by update-seo.py) -->
-<style>
+  <style>
     html {
       scroll-behavior: auto;
     }
@@ -272,52 +222,14 @@
       outline: none;
     }
 
-    .study-map-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      padding: 10px 24px;
-      border-bottom: 1px solid #e2e5e8;
-      background: #f7f8fa;
-    }
-
     .study-map-legend {
       display: flex;
-      flex-wrap: wrap;
       gap: 18px;
+      padding: 12px 24px;
+      border-bottom: 1px solid #e2e5e8;
+      background: #f7f8fa;
       color: #667085;
       font-size: 12px;
-    }
-
-    .study-map-toggle {
-      flex: 0 0 auto;
-      min-height: 34px;
-      padding: 7px 12px;
-      border: 1px solid #cfd5dc;
-      border-radius: 8px;
-      background: #ffffff;
-      color: #34485e;
-      font: inherit;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(11, 46, 89, 0.06);
-      transition:
-        color 0.18s ease,
-        border-color 0.18s ease,
-        background-color 0.18s ease,
-        transform 0.18s ease;
-    }
-
-    .study-map-toggle:hover,
-    .study-map-toggle:focus-visible {
-      border-color: rgba(176, 141, 87, 0.62);
-      background: #fffdf7;
-      color: #0b2e59;
-      transform: translateY(-1px);
-      outline: none;
     }
 
     .study-map-content {
@@ -382,12 +294,6 @@
     }
 
     .study-map-tree details > ul {
-      margin-left: 17px;
-      padding-left: 17px;
-      border-left: 1px solid #d8dde3;
-    }
-
-    .study-map-tree .study-map-subtree {
       margin-left: 17px;
       padding-left: 17px;
       border-left: 1px solid #d8dde3;
@@ -548,15 +454,15 @@
 
     .note-search-status {
       position: absolute;
-      top: calc(100% + 5px);
-      left: 4px;
+      top: 50%;
+      right: 92px;
       color: #e0a0b1;
       font-size: 12px;
-      line-height: 1.2;
+      line-height: 1;
       white-space: nowrap;
       pointer-events: none;
       opacity: 0;
-      transform: none;
+      transform: translateY(-50%);
       transition: opacity 0.42s ease;
     }
 
@@ -705,154 +611,6 @@
       border-radius: 4px;
     }
 
-
-    .information-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 16px;
-    }
-
-    .information-card {
-      overflow: hidden;
-      background: #ffffff;
-      border: 1px solid #dce1e6;
-      border-radius: 12px;
-      padding: 0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .information-card h3 {
-      margin: 0;
-      padding: 13px 18px;
-      background: #6c85aa;
-      color: #eee0c6;
-      font-size: 20.9px;
-      line-height: 1.25;
-      font-weight: 700;
-    }
-
-    .information-card-body {
-      padding: 18px 20px 20px;
-      background: #ffffff;
-    }
-
-    .contact-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .contact-link,
-    .stats-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #34485e;
-      text-decoration: none;
-      transition:
-        color 0.18s ease,
-        transform 0.18s ease;
-    }
-
-    .contact-link:hover,
-    .contact-link:focus-visible,
-    .stats-link:hover,
-    .stats-link:focus-visible {
-      color: #0b2e59;
-      text-decoration: none;
-      transform: translateX(2px);
-      outline: none;
-    }
-
-    .contact-link svg,
-    .stats-link svg {
-      width: 20px;
-      height: 20px;
-      flex: 0 0 auto;
-      color: #b08d57;
-    }
-
-    .email-copy {
-      width: 100%;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      font: inherit;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .email-copy .copy-icon {
-      width: 18.7px;
-      height: 18.7px;
-      margin-left: 2px;
-      color: #8b96a3;
-    }
-
-    .email-copy .copy-status {
-      margin-left: 2px;
-      color: #b08d57;
-      font-size: 12px;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.18s ease;
-    }
-
-    .email-copy .copy-status.is-visible {
-      opacity: 1;
-    }
-
-    .stats-card-link {
-      display: block;
-      color: inherit;
-      text-decoration: none;
-      background: #ffffff;
-    }
-
-    .stats-card-link:hover,
-    .stats-card-link:focus-visible {
-      text-decoration: none;
-      outline: none;
-    }
-
-    .stats-visual {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      min-height: 72px;
-      padding: 4px 0;
-    }
-
-    .stats-visual-icon {
-      width: 42px;
-      height: 42px;
-      flex: 0 0 auto;
-      color: #b08d57;
-    }
-
-    .stats-title {
-      color: #0b2e59;
-      font-weight: 400;
-      margin-bottom: 2px;
-    }
-
-    .stats-subtitle {
-      color: #6b7280;
-      font-size: 14px;
-    }
-
-    .stats-arrow {
-      margin-left: auto;
-      color: #b08d57;
-      font-size: 20px;
-      transition: transform 0.18s ease;
-    }
-
-    .stats-card-link:hover .stats-arrow,
-    .stats-card-link:focus-visible .stats-arrow {
-      transform: translateX(3px);
-    }
-
     .page-bottom-nav {
       display: flex;
       justify-content: center;
@@ -943,9 +701,7 @@
       }
 
       .note-search-status {
-        top: calc(100% + 5px);
-        left: 4px;
-        right: auto;
+        right: 92px;
       }
 
       .technical-notes-header + .note-card {
@@ -962,27 +718,12 @@
         width: min(100%, 280px);
       }
 
-      .information-grid {
-        grid-template-columns: 1fr;
-      }
-
       .study-map-header {
         padding: 18px 18px 15px;
       }
 
-      .study-map-toolbar {
-        align-items: flex-start;
-        padding: 10px 18px;
-      }
-
       .study-map-legend {
-        gap: 10px 16px;
-      }
-
-      .study-map-toggle {
-        min-height: 32px;
-        padding: 7px 10px;
-        font-size: 12px;
+        padding: 11px 18px;
       }
 
       .study-map-content {
@@ -1021,12 +762,12 @@
           </svg>
           <span>About</span>
         </a>
-        <a class="site-nav-link" href="#information">
+        <a class="site-nav-link" href="#contact">
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
             <path d="M5 7l7 5.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>
-          <span>Information</span>
+          <span>Contact</span>
         </a>
 
         <div class="note-search" id="note-search">
@@ -1119,18 +860,6 @@
     </p>
   </button>
 
-  <button
-    class="card note-card category-card"
-    type="button"
-    data-study-map-section="Simple Analysis Tool"
-    aria-label="Open Simple Analysis Tool in Study Map"
-  >
-    <h3>Simple Analysis Tool</h3>
-    <p>
-      Interactive RC, current-mirror, and MOSFET small-signal explorers for fast visual circuit learning.
-    </p>
-  </button>
-
   <a class="card note-card category-card" href="debug-cases.html" aria-label="Open Debug Cases">
     <h3>Debug Cases</h3>
     <p>
@@ -1138,80 +867,11 @@
     </p>
   </a>
 
-  <h2 id="information">Information</h2>
-
-  <div class="information-grid">
-    <section class="information-card" aria-labelledby="contact-title">
-      <h3 id="contact-title">Contact</h3>
-
-      <div class="information-card-body">
-        <div class="contact-list">
-          <a
-            class="contact-link"
-            href="https://github.com/JC-Cheng-Analog"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 2.8a9.4 9.4 0 0 0-3 18.3c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.7-1.4-2.3-.3-4.7-1.1-4.7-5a3.9 3.9 0 0 1 1-2.7 3.6 3.6 0 0 1 .1-2.7s.8-.3 2.8 1a9.7 9.7 0 0 1 5 0c2-1.3 2.8-1 2.8-1a3.6 3.6 0 0 1 .1 2.7 3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.7 5 .4.3.7 1 .7 2v3c0 .3.2.6.7.5A9.4 9.4 0 0 0 12 2.8Z"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-            </svg>
-            <span>GitHub: JC-Cheng-Analog</span>
-          </a>
-
-          <button
-            class="contact-link email-copy"
-            id="email-copy"
-            type="button"
-            data-email="jcchenganalog@gmail.com"
-            aria-label="Copy email address"
-            title="Copy email"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
-              <path d="M5 7l7 5.2L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-            <span>jcchenganalog@gmail.com</span>
-            <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="8" y="8" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"></rect>
-              <path d="M6 15H5.5A1.5 1.5 0 0 1 4 13.5v-8A1.5 1.5 0 0 1 5.5 4h8A1.5 1.5 0 0 1 15 5.5V6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
-            </svg>
-            <span class="copy-status" id="copy-status" aria-live="polite"></span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section class="information-card" aria-labelledby="statistics-title">
-      <a class="stats-card-link" href="stats.html">
-        <h3 id="statistics-title">Site Statistics</h3>
-
-        <div class="information-card-body">
-          <div class="stats-visual">
-          <svg class="stats-visual-icon" viewBox="0 0 48 48" aria-hidden="true">
-            <rect x="7" y="24" width="7" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"></rect>
-            <rect x="20.5" y="14" width="7" height="25" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"></rect>
-            <rect x="34" y="8" width="7" height="31" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"></rect>
-            <path d="M5 40.5h38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          </svg>
-
-          <div>
-            <div class="stats-title">Website Statistics</div>
-            <div class="stats-subtitle">Traffic &amp; growth record</div>
-          </div>
-
-          <span class="stats-arrow" aria-hidden="true">→</span>
-          </div>
-        </div>
-      </a>
-    </section>
-  </div>
+  <h2 id="contact">Contact</h2>
+  <p>
+    GitHub:
+    <a href="https://github.com/JC-Cheng-Analog">JC-Cheng-Analog</a>
+  </p>
 
   <div class="page-bottom-nav">
     <a class="back-to-top" href="#top" aria-label="Back to top">
@@ -1230,25 +890,13 @@
         <button class="study-map-close" id="study-map-close" type="button" aria-label="Close Study Map">×</button>
       </div>
 
-      <div class="study-map-toolbar">
-        <div class="study-map-legend" aria-label="Content status">
-          <span><span class="map-status available" aria-hidden="true"></span> Available</span>
-          <span><span class="map-status planned" aria-hidden="true"></span> Planned</span>
-        </div>
-
-        <button
-          class="study-map-toggle"
-          id="study-map-toggle"
-          type="button"
-          aria-controls="study-map-tree"
-          aria-expanded="false"
-        >
-          Expand All
-        </button>
+      <div class="study-map-legend" aria-label="Content status">
+        <span><span class="map-status available" aria-hidden="true"></span> Available</span>
+        <span><span class="map-status planned" aria-hidden="true"></span> Planned</span>
       </div>
 
       <div class="study-map-content">
-        <ul class="study-map-tree" id="study-map-tree">
+        <ul class="study-map-tree">
           <li>
             <details open>
               <summary>Power Management</summary>
@@ -1326,11 +974,7 @@
             <details>
               <summary>Analog Building Blocks</summary>
               <ul>
-                <li>
-                  <a class="study-map-item" href="current-mirrors.html">
-                    <span class="map-status available"></span>Current Mirrors
-                  </a>
-                </li>
+                <li><span class="study-map-item"><span class="map-status planned"></span>Current Mirrors</span></li>
                 <li><span class="study-map-item"><span class="map-status planned"></span>Differential Pairs</span></li>
                 <li><span class="study-map-item"><span class="map-status planned"></span>5-Transistor OTA</span></li>
                 <li>
@@ -1395,35 +1039,6 @@
                       <li><span class="study-map-item"><span class="map-status planned"></span>Gaussian Distribution</span></li>
                       <li><span class="study-map-item"><span class="map-status planned"></span>Process Variation</span></li>
                       <li><span class="study-map-item"><span class="map-status planned"></span>Monte Carlo Analysis</span></li>
-                    </ul>
-                  </details>
-                </li>
-                <li>
-                  <details>
-                    <summary>Simple Analysis Tool</summary>
-                    <ul>
-                      <li>
-                        <a class="study-map-item" href="https://jc-cheng-analog.github.io/rc-explorer.html">
-                          <span class="map-status available"></span>RC Charge / Discharge Explorer
-                        </a>
-                      </li>
-                      <li>
-                        <a class="study-map-item" href="https://jc-cheng-analog.github.io/current-mirror-explorer.html">
-                          <span class="map-status available"></span>Complete Current Mirror Explorer
-                        </a>
-                      </li>
-                      <li>
-                        <a class="study-map-item" href="mosfet-vgs-id-small-signal-explorer.html">
-                          <span class="map-status available"></span>MOSFET VGS → ID Small-Signal Explorer
-                        </a>
-                        <ul class="study-map-subtree">
-                          <li>
-                            <a class="study-map-item" href="mosfet-small-signal-challenge.html">
-                              <span class="map-status available"></span>MOSFET Small-Signal Challenge
-                            </a>
-                          </li>
-                        </ul>
-                      </li>
                     </ul>
                   </details>
                 </li>
@@ -1625,74 +1240,9 @@
 
       searchInput.addEventListener("input", clearSearchFeedback);
 
-      const emailCopy = document.getElementById("email-copy");
-      const copyStatus = document.getElementById("copy-status");
-      let copyStatusTimer;
-
-      const copyEmailAddress = async () => {
-        const email = emailCopy.dataset.email;
-
-        try {
-          await navigator.clipboard.writeText(email);
-        } catch (error) {
-          const textArea = document.createElement("textarea");
-          textArea.value = email;
-          textArea.setAttribute("readonly", "");
-          textArea.style.position = "fixed";
-          textArea.style.opacity = "0";
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand("copy");
-          textArea.remove();
-        }
-
-        window.clearTimeout(copyStatusTimer);
-        copyStatus.textContent = "Copied!";
-        copyStatus.classList.add("is-visible");
-
-        copyStatusTimer = window.setTimeout(() => {
-          copyStatus.classList.remove("is-visible");
-          window.setTimeout(() => {
-            copyStatus.textContent = "";
-          }, 180);
-        }, 1500);
-      };
-
-      emailCopy.addEventListener("click", copyEmailAddress);
-
       const studyMapTrigger = document.getElementById("study-map-trigger");
       const studyMapDialog = document.getElementById("study-map-dialog");
       const studyMapClose = document.getElementById("study-map-close");
-      const studyMapToggle = document.getElementById("study-map-toggle");
-      const studyMapTree = document.getElementById("study-map-tree");
-      const studyMapDetails = Array.from(
-        studyMapTree.querySelectorAll("details")
-      );
-      const topLevelDetails = Array.from(studyMapTree.children)
-        .map((item) => item.querySelector(":scope > details"))
-        .filter(Boolean);
-
-      const setStudyMapToggleState = (isExpanded) => {
-        studyMapToggle.textContent = isExpanded ? "Collapse All" : "Expand All";
-        studyMapToggle.setAttribute("aria-expanded", String(isExpanded));
-      };
-
-      const expandStudyMap = () => {
-        studyMapDetails.forEach((details) => {
-          details.open = true;
-        });
-        setStudyMapToggleState(true);
-      };
-
-      const collapseStudyMapToSecondLevel = () => {
-        studyMapDetails.forEach((details) => {
-          details.open = false;
-        });
-        topLevelDetails.forEach((details) => {
-          details.open = true;
-        });
-        setStudyMapToggleState(false);
-      };
 
       const openStudyMap = () => {
         studyMapDialog.showModal();
@@ -1730,21 +1280,8 @@
         });
       });
 
-      studyMapToggle.addEventListener("click", () => {
-        const isExpanded = studyMapToggle.getAttribute("aria-expanded") === "true";
-
-        if (isExpanded) {
-          collapseStudyMapToSecondLevel();
-        } else {
-          expandStudyMap();
-        }
-      });
-
       studyMapTrigger.addEventListener("click", openStudyMap);
       studyMapClose.addEventListener("click", closeStudyMap);
-
-      // Default view: show only the first and second levels.
-      collapseStudyMapToSecondLevel();
 
       studyMapDialog.addEventListener("click", (event) => {
         if (event.target === studyMapDialog) {
