@@ -15,23 +15,31 @@
       "users": 24,
       "sessions": 49,
       "views": 116
+    },
+    {
+      "month": "2026-09",
+      "start_date": "2026-09-01",
+      "end_date": "2026-09-30",
+      "users": 5,
+      "sessions": 8,
+      "views": 12
     }
   ],
   "current": {
-    "month": "2026-09",
-    "start_date": "2026-09-01",
-    "end_date": "2026-09-29",
-    "users": 4,
-    "sessions": 7,
-    "views": 11
+    "month": "2026-10",
+    "start_date": null,
+    "end_date": null,
+    "users": 0,
+    "sessions": 0,
+    "views": 0
   },
   "comparison": {
-    "month": "2026-08",
-    "start_date": "2026-08-01",
-    "end_date": "2026-08-29",
-    "users": 24,
-    "sessions": 47,
-    "views": 112
+    "month": "2026-09",
+    "start_date": null,
+    "end_date": null,
+    "users": 0,
+    "sessions": 0,
+    "views": 0
   },
-  "updated_at": "2026-09-30T05:39:37+08:00"
+  "updated_at": "2026-10-01T05:40:13+08:00"
 }
