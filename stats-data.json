@@ -28,18 +28,18 @@
   "current": {
     "month": "2026-10",
     "start_date": "2026-10-01",
-    "end_date": "2026-10-25",
+    "end_date": "2026-10-26",
     "users": 8,
-    "sessions": 17,
-    "views": 16
+    "sessions": 19,
+    "views": 18
   },
   "comparison": {
     "month": "2026-09",
     "start_date": "2026-09-01",
-    "end_date": "2026-09-25",
+    "end_date": "2026-09-26",
     "users": 3,
     "sessions": 6,
     "views": 10
   },
-  "updated_at": "2026-10-26T04:09:22+08:00"
+  "updated_at": "2026-10-27T06:06:25+08:00"
 }
