@@ -23,23 +23,31 @@
       "users": 5,
       "sessions": 8,
       "views": 12
+    },
+    {
+      "month": "2026-10",
+      "start_date": "2026-10-01",
+      "end_date": "2026-10-31",
+      "users": 10,
+      "sessions": 28,
+      "views": 50
     }
   ],
   "current": {
-    "month": "2026-10",
-    "start_date": "2026-10-01",
-    "end_date": "2026-10-30",
-    "users": 9,
-    "sessions": 25,
-    "views": 46
+    "month": "2026-11",
+    "start_date": null,
+    "end_date": null,
+    "users": 0,
+    "sessions": 0,
+    "views": 0
   },
   "comparison": {
-    "month": "2026-09",
-    "start_date": "2026-09-01",
-    "end_date": "2026-09-30",
-    "users": 5,
-    "sessions": 8,
-    "views": 12
+    "month": "2026-10",
+    "start_date": null,
+    "end_date": null,
+    "users": 0,
+    "sessions": 0,
+    "views": 0
   },
-  "updated_at": "2026-10-31T05:47:50+08:00"
+  "updated_at": "2026-11-01T04:47:37+08:00"
 }
