@@ -35,19 +35,19 @@
   ],
   "current": {
     "month": "2026-11",
-    "start_date": null,
-    "end_date": null,
+    "start_date": "2026-11-01",
+    "end_date": "2026-11-01",
     "users": 0,
-    "sessions": 0,
-    "views": 0
+    "sessions": 1,
+    "views": 1
   },
   "comparison": {
     "month": "2026-10",
-    "start_date": null,
-    "end_date": null,
+    "start_date": "2026-10-01",
+    "end_date": "2026-10-01",
     "users": 0,
     "sessions": 0,
     "views": 0
   },
-  "updated_at": "2026-11-01T04:47:37+08:00"
+  "updated_at": "2026-11-02T05:29:48+08:00"
 }
